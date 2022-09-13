@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='576.00pt' height='576.00pt' viewBox='0 0 576.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='576.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng=='>
+    <rect x='59.04' y='59.04' width='486.72' height='443.52' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
+</g>
+<g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
+<line x1='111.08' y1='502.56' x2='492.85' y2='502.56' style='stroke-width: 0.75;' />
+<line x1='111.08' y1='502.56' x2='111.08' y2='509.76' style='stroke-width: 0.75;' />
+<line x1='206.53' y1='502.56' x2='206.53' y2='509.76' style='stroke-width: 0.75;' />
+<line x1='301.97' y1='502.56' x2='301.97' y2='509.76' style='stroke-width: 0.75;' />
+<line x1='397.41' y1='502.56' x2='397.41' y2='509.76' style='stroke-width: 0.75;' />
+<line x1='492.85' y1='502.56' x2='492.85' y2='509.76' style='stroke-width: 0.75;' />
+<text x='111.08' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>-4</text>
+<text x='206.53' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>-2</text>
+<text x='301.97' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>0</text>
+<text x='397.41' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>2</text>
+<text x='492.85' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>4</text>
+<line x1='59.04' y1='490.76' x2='59.04' y2='109.00' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='490.76' x2='51.84' y2='490.76' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='395.32' x2='51.84' y2='395.32' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='299.88' x2='51.84' y2='299.88' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='204.44' x2='51.84' y2='204.44' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='109.00' x2='51.84' y2='109.00' style='stroke-width: 0.75;' />
+<text transform='translate(41.76,490.76) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>-4</text>
+<text transform='translate(41.76,395.32) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>-2</text>
+<text transform='translate(41.76,299.88) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>0</text>
+<text transform='translate(41.76,204.44) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>2</text>
+<text transform='translate(41.76,109.00) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>4</text>
+<polygon points='59.04,502.56 545.76,502.56 545.76,59.04 59.04,59.04 ' style='stroke-width: 0.75;' />
+<text x='302.40' y='557.28' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>CAP1 (7% explained)</text>
+<text transform='translate(12.96,280.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>CAP2 (1% explained)</text>
+</g>
+<g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
+<line x1='59.04' y1='299.88' x2='545.76' y2='299.88' style='stroke-width: 0.75; stroke-dasharray: 1.00,3.00;' />
+<line x1='301.97' y1='502.56' x2='301.97' y2='59.04' style='stroke-width: 0.75; stroke-dasharray: 1.00,3.00;' />
+</g>
+<g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
+<text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>OTC warming: I. ten at SC site, 2021 day/night</text>
+</g>
+<g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
+<rect x='59.04' y='59.04' width='134.09' height='57.60' style='stroke-width: 0.75;' />
+<rect x='110.72' y='84.24' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
+<rect x='110.72' y='98.64' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #61D04F;' />
+<text x='126.08' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OTC warming P = 0.388</text>
+<text x='130.16' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>in</text>
+<text x='130.16' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>out</text>
+<rect x='458.65' y='59.04' width='87.11' height='57.60' style='stroke-width: 0.75;' />
+<circle cx='486.50' cy='87.84' r='2.70' style='stroke-width: 0.75;' />
+<circle cx='486.50' cy='102.24' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
+<text x='502.21' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time P = 0.001</text>
+<text x='497.30' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>day</text>
+<text x='497.30' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>night</text>
+<circle cx='294.71' cy='162.23' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='256.89' cy='355.21' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='336.89' cy='287.33' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='336.74' cy='218.53' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='381.44' cy='261.49' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='387.74' cy='360.42' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='387.74' cy='360.42' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='387.74' cy='360.42' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='290.04' cy='381.94' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='309.71' cy='354.37' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='364.98' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='260.43' cy='369.19' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='343.78' cy='438.39' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='373.82' cy='246.72' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='359.87' cy='248.95' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='363.71' cy='115.20' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='363.46' cy='80.25' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='374.47' cy='227.82' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='366.09' cy='85.89' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='384.96' cy='360.94' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='362.00' cy='284.45' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='289.00' cy='103.71' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='335.02' cy='267.54' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='262.19' cy='373.48' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='310.70' cy='366.91' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='370.25' cy='215.53' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='359.47' cy='390.89' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='359.94' cy='405.11' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='359.06' cy='349.76' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='286.13' cy='385.21' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='333.72' cy='436.45' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='236.49' cy='245.31' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='367.89' cy='268.71' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='367.06' cy='296.49' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='289.89' cy='423.91' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='297.28' cy='369.82' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='351.79' cy='402.76' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='356.11' cy='428.26' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='345.06' cy='259.43' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='339.61' cy='278.73' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='325.28' cy='264.70' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='305.86' cy='282.76' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='266.98' cy='179.71' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='375.94' cy='354.54' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='382.94' cy='426.30' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='374.00' cy='327.48' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='361.80' cy='419.21' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='286.85' cy='186.70' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='262.09' cy='251.93' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='278.00' cy='323.82' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='288.14' cy='229.12' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='289.13' cy='312.39' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='271.52' cy='320.92' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='229.66' cy='458.80' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='297.40' cy='75.47' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='235.55' cy='359.71' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='251.34' cy='384.97' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='261.07' cy='256.91' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='267.79' cy='443.59' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='228.72' cy='442.67' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='272.84' cy='349.22' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='282.97' cy='313.16' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='242.07' cy='313.84' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='288.81' cy='290.79' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='305.78' cy='337.37' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='252.01' cy='370.90' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='283.03' cy='208.46' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='238.99' cy='342.37' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='263.87' cy='336.67' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='291.72' cy='178.54' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='288.05' cy='479.94' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='270.22' cy='410.40' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='249.78' cy='335.44' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='226.99' cy='383.98' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='231.12' cy='451.60' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='223.09' cy='452.40' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='235.42' cy='441.99' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='280.65' cy='292.81' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='244.55' cy='383.74' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='261.79' cy='429.71' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='267.50' cy='325.52' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='269.00' cy='333.19' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='248.75' cy='231.86' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='258.53' cy='207.15' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='226.10' cy='423.02' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='241.48' cy='423.34' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='261.46' cy='208.99' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='270.17' cy='249.53' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='273.36' cy='159.08' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='255.82' cy='324.77' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='246.45' cy='234.75' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='252.50' cy='207.66' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='267.87' cy='141.62' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='263.96' cy='311.65' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='269.70' cy='186.51' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='249.06' cy='194.15' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='239.63' cy='322.89' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='259.93' cy='304.93' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='258.73' cy='206.32' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='272.87' cy='172.90' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='237.82' cy='160.06' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='279.70' cy='140.22' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='247.15' cy='143.25' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='258.97' cy='151.17' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='232.85' cy='364.25' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='232.85' cy='364.25' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='303.24' cy='169.57' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='303.24' cy='169.57' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='267.88' cy='243.49' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='237.42' cy='372.90' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='367.23' cy='334.02' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='350.95' cy='171.38' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='312.21' cy='315.97' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='344.74' cy='375.19' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='268.14' cy='368.92' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='276.13' cy='203.95' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='359.54' cy='230.37' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='383.78' cy='322.17' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='363.75' cy='273.12' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='338.69' cy='111.51' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='348.66' cy='325.46' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='378.43' cy='167.27' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='283.08' cy='281.66' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='322.08' cy='207.99' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='322.08' cy='207.99' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='344.30' cy='185.99' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='380.74' cy='382.38' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='380.74' cy='382.38' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='342.66' cy='294.71' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='290.56' cy='334.14' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='353.79' cy='181.36' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='321.91' cy='433.80' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
+<circle cx='291.59' cy='395.21' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='295.86' cy='412.29' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='280.48' cy='237.06' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='381.53' cy='326.65' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='325.53' cy='465.67' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
+<circle cx='289.88' cy='240.99' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<circle cx='291.76' cy='339.89' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
+<circle cx='352.83' cy='305.53' r='2.70' style='stroke-width: 0.75; stroke: #61D04F; fill: #61D04F;' />
+<text x='271.07' y='307.25' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>DNday</text>
+<text x='334.68' y='298.89' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>DNnight</text>
+<text x='305.26' y='331.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OIin</text>
+<text x='297.45' y='266.94' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OIout</text>
+<text transform='translate(357.98,294.19) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>a-farnesene</text>
+<text transform='translate(324.52,300.28) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-myrcene</text>
+<text transform='translate(382.45,289.50) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>b-ocimene</text>
+<text transform='translate(306.40,301.77) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>.gamma.-Terpinene</text>
+<text transform='translate(336.01,296.47) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>a-pinene</text>
+<text transform='translate(305.42,300.97) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>bergamotene</text>
+<text transform='translate(301.87,299.61) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(E)-4-oxohex-2-enal  </text>
+<text transform='translate(307.27,300.86) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(E)-4,8-Dimethylnona-1,3,7-triene</text>
+<text transform='translate(298.99,300.55) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1-Decanol, 2-hexyl-</text>
+<text transform='translate(306.30,301.04) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2,4-diethylheptan-1-ol</text>
+<text transform='translate(303.19,298.16) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1-Hexadecanol, 2-methyl-</text>
+<text transform='translate(301.91,300.53) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1-Hexanol, 3-methyl-</text>
+<text transform='translate(302.24,302.79) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>pentan-1-ol  </text>
+<text transform='translate(306.03,302.04) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1-Pentanol, 4-methyl-</text>
+<text transform='translate(306.54,300.63) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>p-mentha-1,3,8-triene</text>
+<text transform='translate(306.60,300.72) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1,4-Cyclohexadiene, 3-ethenyl-1,2-dimethyl-</text>
+<text transform='translate(304.07,301.44) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</text>
+<text transform='translate(299.41,300.24) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>1H-Pyrrole-2,5-dione</text>
+<text transform='translate(304.90,303.04) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2-Cyclopenten-1-one</text>
+<text transform='translate(300.79,303.39) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2-Decenal, (E)-</text>
+<text transform='translate(300.73,296.84) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2-ethylhexan-1-ol  </text>
+<text transform='translate(302.66,299.92) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(E)-hex-2-enal  </text>
+<text transform='translate(303.19,301.63) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2-Pentenal, (E)-</text>
+<text transform='translate(304.01,301.87) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2-Undecene, 3-methyl-, (Z)-</text>
+<text transform='translate(309.71,299.68) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(4E,6Z)-alloocimene</text>
+<text transform='translate(303.32,299.22) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol  </text>
+<text transform='translate(301.26,303.93) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
+<text transform='translate(296.32,298.83) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>[(E)-hex-3-enyl] acetate</text>
+<text transform='translate(290.84,303.10) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>pseudoionone</text>
+<text transform='translate(303.82,302.55) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>4-Cyanocyclohexene</text>
+<text transform='translate(299.08,294.76) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(Z)-hex-4-en-1-ol</text>
+<text transform='translate(303.26,302.65) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>5-Methyl-4,5-dihydroisoxazole-5-carboxylic acid, methyl ester</text>
+<text transform='translate(305.48,302.59) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Benzenecarbothioic acid</text>
+<text transform='translate(312.75,295.10) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>methyl benzoate</text>
+<text transform='translate(309.23,303.94) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-pinene</text>
+<text transform='translate(303.06,300.18) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>4-caranol</text>
+<text transform='translate(306.91,303.07) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Bicyclo[7.2.0]undec-4-ene, 4,11,11-trimethyl-8-methylene-</text>
+<text transform='translate(306.40,300.50) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Butanamide, 3-methyl-</text>
+<text transform='translate(301.72,300.61) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>[(Z)-hex-3-enyl] butanoate</text>
+<text transform='translate(305.88,299.36) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Butanoic acid, methyl ester</text>
+<text transform='translate(296.23,300.89) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Carbonic acid, hexadecyl prop-1-en-2-yl ester</text>
+<text transform='translate(300.75,301.68) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Carbonic acid, nonyl prop-1-en-2-yl ester</text>
+<text transform='translate(309.17,303.46) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>carveol</text>
+<text transform='translate(308.40,296.87) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-caryophyllene</text>
+<text transform='translate(302.97,302.55) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>cis-a-bergamotene</text>
+<text transform='translate(301.81,300.00) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>[(Z)-hex-3-enyl] 2-methylpropanoate  </text>
+<text transform='translate(302.65,300.25) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>[(Z)-hex-3-enyl] 2-methylbutanoate</text>
+<text transform='translate(302.28,299.40) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>a-copaene</text>
+<text transform='translate(302.49,301.62) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Cyclopropane, nonyl-</text>
+<text transform='translate(304.91,293.76) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>D-limonene</text>
+<text transform='translate(303.66,301.57) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Decane, 2,8,8-trimethyl-</text>
+<text transform='translate(295.01,289.98) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>Decanoic acid, silver(1+) salt</text>
+<text transform='translate(304.32,301.72) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Disulfide, di-tert-dodecyl</text>
+<text transform='translate(305.95,300.85) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Eicosyl octyl ether</text>
+<text transform='translate(303.22,300.89) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Ethanone, 1-(1,2,2,3-tetramethylcyclopentyl)-, (1R-cis)-</text>
+<text transform='translate(304.44,300.76) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Formic acid, octyl ester</text>
+<text transform='translate(301.02,302.63) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Hexyl chloroformate</text>
+<text transform='translate(303.36,301.64) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Hexyl octyl ether</text>
+<text transform='translate(304.10,300.83) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>a-terpineol</text>
+<text transform='translate(303.29,301.11) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>linalool</text>
+<text transform='translate(303.48,301.93) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Methyl tiglate</text>
+<text transform='translate(304.54,300.87) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>o-Xylene</text>
+<text transform='translate(302.51,300.46) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>2,4,6-trimethyloctane  </text>
+<text transform='translate(303.88,302.08) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Oxalic acid, 2-ethylhexyl hexyl ester</text>
+<text transform='translate(303.33,299.62) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Pentafluoropropionic acid, dodecyl ester</text>
+<text transform='translate(302.62,287.65) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>petasitene</text>
+<text transform='translate(304.07,302.25) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Tetradecane, 5-methyl-</text>
+<text transform='translate(307.17,292.46) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>trans-a-bergamotene</text>
+<text transform='translate(321.61,299.61) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-ocimene.1</text>
+<text transform='translate(304.06,303.19) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Tridecane, 4-methyl-</text>
+<text transform='translate(303.39,300.89) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Undecanal</text>
+<text transform='translate(303.56,300.61) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Undecane, 4,4-dimethyl-</text>
+<text transform='translate(303.79,299.94) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>a-copaene.1</text>
+<text transform='translate(302.53,299.91) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>(1R,5R)-1-Isopropyl-8-methyl-4-methylenespiro[4.5]dec-7-ene</text>
+<text transform='translate(298.75,301.57) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>Benzyl nitrile</text>
+<text transform='translate(301.28,303.90) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>3-methylbutanal oxime</text>
+<text transform='translate(304.28,301.18) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>3-Hexen-1-ol, (Z)-</text>
+</g>
+</svg>

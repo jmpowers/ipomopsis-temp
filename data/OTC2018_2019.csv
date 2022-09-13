@@ -1,0 +1,201 @@
+"n"	"Year"	"Date"	"DN"	"Site"	"PlantType"	"Tissue"	"OI"	"Sample"	"Sample2"	"nomatch"	"Bag"	"Pump"	"End"	"NumFlrs"	"NumBuds"	"NumLeaf"	"PumpID"	"SoilVWC"	"SoilDepth"	"Comments"	"Collector"	"LeafDryWtGrams"
+174	2018	2018-07-25	"day"	"GNA"	"agg"	"air"	"air"	"AIR-E"	"Air2redo"		10:37	11:07	11:22				"DRC4"				"Jocelyn"	
+178	2018	2018-07-25	"day"	"GNA"	"agg"	"air"	"air"	"AIR-N"	"AirN"	""	13:44	14:14	14:29				"DRC4"				"Jocelyn"	
+196	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-370"	"370"	""	09:50	10:20	10:35	1	2		"DRC8"	3.8	1.173		"Amanda"	
+194	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-394"	"394"	""	08:47	09:17	09:32	1	0		"DRC8"	4.9	1.194		"Amanda"	
+180	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-A1"	"A1"	""	08:42	09:12	09:27	1	0		"DRC6"	3.9	1.177		"Rachel"	
+163	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-A2"	"A2"	""	09:20	09:50	10:05	1	0		"DRC2"	3.3	1.163		"Alex"	
+181	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-C1"	"C1"	""	09:19	09:51	10:04	1	0		"DRC6"	1.9	1.136		"Rachel"	
+182	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-C2"	"C2"	""	09:47	10:20	10:35	1	0		"DRC6"	3.7	1.171		"Rachel"	
+187	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-C3"	"C3"	""	12:52	13:23	13:38	1	0		"DRC4"	2.3	1.145		"Rachel"	
+165	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-D1"	"D1"	""	10:15	10:45	11:00	1	0		"DRC2"				"Alex"	
+166	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-D2"	"D2"	""	10:20	10:50	11:05	1	0		"DRC3"				"Alex"	
+169	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-D3"	"D3"	""	11:20	11:50	12:05	1	0		"DRC2"			"flr fell off when pump started, also needed to retie bag"	"Alex"	
+197	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-E1"	"E1"	""	10:10	10:40	10:55	1	1		"DRC1"	3.9	1.174		"Amanda"	
+199	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-E2"	"E2"	""	11:05	13:35	11:50	1	1		"DRC1"	3.5	1.168		"Amanda"	
+200	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-E3"	"E3"	""	11:09	11:39	11:55	1	1		"DRC8"	4.4	1.184		"Amanda"	
+183	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-A1"	"KM10A1"	""	09:41	10:12	10:27	1	0		"DRC5"	4.2	1.182		"Rachel"	
+184	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-B1"	"KM10B1"	0	10:13	10:43	10:58	1	0		"DRC5"	3.7	1.171		"Rachel"	
+185	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-B2"	"KM10B2"	""	10:26	10:56	11:09	1	0		"DRC6"	2.6	1.149		"Rachel"	
+188	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-C1"	"KM10C1"	""	12:58	13:28	13:43	1	0		"DRC5"	4.5	1.186		"Rachel"	
+186	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-C2"	"KM10C2"	""	10:55	11:22	11:37	1	0		"DRC5"	5.4	1.204		"Rachel"	
+177	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM10-D1"	"KM10D1"	""	13:32	14:02	14:17	1	0		"DRC4"	2.7	1.153		"Jocelyn"	
+189	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM14-A1"	"KM14A1"	""	13:18	13:49	14:04	1	0		"DRC4"	1.3	1.125		"Rachel"	
+191	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"KM14-C1"	"KM14C1"	""	13:58	14:28	14:44	1	0		"DRC4"	2.1	1.139		"Rachel"	
+192	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-X02"	"X02"	""	14:04	14:34	14:49	1	0		"DRC4"	3.1	1.159		"Rachel"	
+161	2018	2018-07-25	"day"	"GNA"	"agg"	"air"	"air"	"AIR1"	"Air1"	""	08:45	09:15	09:30				"DRC2"			"outside A"	"Alex"	
+164	2018	2018-07-25	"day"	"GNA"	"agg"	"air"	"air"	"AIR2"	"Air2"	""	09:40	10:10	10:25				"DRC3"			"outside A"	"Alex"	
+168	2018	2018-07-25	"day"	"GNA"	"agg"	"air"	"air"	"AIR3"	"Air3"	""	11:13	11:43	11:58				"DRC3"			"outside D & E"	"Alex"	
+175	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-112"	"112"	""	10:57	11:27	11:42	1	0		"DRC4"	4.6	1.188	"near KM10"	"Jocelyn"	
+176	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-114"	"114"	""	13:02	13:32	13:47	1	0		"DRC4"	4.8	1.191	"near KM10"	"Jocelyn"	
+160	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-116"	"116"	""	08:40	09:10	09:25	1	0		"DRC3"	3.7	1.171	"outside A"	"Alex"	
+170	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-120"	"120"	""	09:09	09:39	09:54	1	0		"DRC5"	2.4	1.147	"outside C"	"Jocelyn"	
+171	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-136"	"136"	""	09:29	09:59	10:14	1	0		"DRC4"	4.7	1.189	"outside C"	"Jocelyn"	
+167	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-20"	"20"	""	10:40	11:10	11:25	1	0		"DRC2"	2.7	1.152	"outside D & E"	"Alex"	
+198	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-219"	"219"	""	10:20	10:50	11:05	1	1		"DRC8"	4.1	1.179	"outside E"	"Amanda"	
+162	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-320"	"320"	""	09:08	09:38	09:53	1	0		"DRC3"	4.2	1.181	"outside A"	"Alex"	
+172	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"CW-69"	"69"	""	09:55	10:25	10:40	1	0		"DRC4"	5.6	1.206	"near KM10"	"Jocelyn"	
+193	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-B1"	"B1"	""	08:43	09:13	09:28	1	0		"DRC4"	1.9	1.137	"outside B"	"Amanda"	
+195	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"in"	"CW-B2"	"B2"	""	09:47	10:17	10:32	1	0		"DRC1"	4.3	1.182	"outside B"	"Amanda"	
+190	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"KM-1401"	"KM1401"	""	13:24	13:54	14:09	1	0		"DRC5"	1.9	1.137	"near KM14"	"Rachel"	
+179	2018	2018-07-25	"day"	"GNA"	"agg"	"flower"	"out"	"KM-1402"	"KM1402"		13:49	14:19	14:34	1	0		"DRC4"	4	1.178	"near KM14"	"Jocelyn"	
+173	2018	2018-07-25	"day"	"GNA"	"agg"	"leaf"	"out"	"CW-69leaf"	69	""	10:17	10:47	11:02				"DRC4"			"near KM10"	"Jocelyn"	
+159	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"CW-D3"	"D3"	""	13:17	13:47	14:02	1	0		"DRC5"	3.4	1.165	"bud opened since yesterday"	"Amanda & Carrie"	
+149	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM11-B1"	"KM11B1"	"NR"	11:02	11:33	11:48	1	0		"DRC8"	3.3	1.163	"BROKE TUBE"	"Amanda & Carrie"	
+150	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM11-C1"	"KM11C1"	""	11:25	11:59	13:14	1	1		"DRC4"	4.1	1.189		"Amanda & Carrie"	
+154	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM11-C2"	"KM11C2"		12:16	12:46	13:01	1	0		"."	3.8	1.174		"Amanda & Carrie"	
+155	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM13-A1"	"KM13A1"	""	12:23	12:55	13:10	1	0		"."	3.4	1.166	"flr fell off when started pump"	"Amanda & Carrie"	
+156	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM13-B1"	"KM13B1"	""	12:46	13:07	13:22	1	0		"DRC5"	4.1	1.179		"Amanda & Carrie"	
+157	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM13-C1"	"KM13C1"	""	12:48	13:10	13:25	1	0		"DRC4"	4.1	1.17	"flr fell off when started pump; bag open on bottom"	"Amanda & Carrie"	
+151	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM4-A1"	"KM4A1"	""	11:44	12:14	12:29	1	0		"DRC4"	3.4	1.165		"Amanda & Carrie"	
+152	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"in"	"KM4-B1"	"KM4B1"	""	11:48	12:20	12:38	1	1		"DRC5"	3.6	1.169		"Amanda & Carrie"	
+148	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"out"	"KM-1101"	"KM1101"	""	10:58	11:28	11:43	1	0		"DRC5"	5.1	1.198	"near KM11"	"Amanda & Carrie"	
+158	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"out"	"KM-1301"	"KM1301"		13:14	13:45	14:00	1	0		"DRC4"	3.7	1.172	"near KM13"	"Amanda & Carrie"	
+153	2018	2018-07-26	"day"	"GNA"	"agg"	"flower"	"out"	"KM4-0401"	"KM40401"	""	12:00	12:33	12:48	1	0		"DRC4"	5.4	1.202	"near KM4"	"Amanda & Carrie"	
+147	2018	2018-07-26	"day"	"GNA"		"air"	"air"	"AIR"	"Air"	""	10:08	10:38	10:53				"DRC8"				"Amanda & Carrie"	
+124	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-F1"	"F1"	""	08:55	09:25	09:40	1	0		"DRC5"	3.3	" 1.163 "		"Carrie"	
+126	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-F2"	"F2"	""	09:53	10:24	10:39	1	0		"DRC5"	3.1	" 1.159 "		"Carrie"	
+129	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-F3"	"F3"	""	14:06	14:36	14:51	1	0		"DRC3"	2.3	" 1.145 "		"Carrie"	
+120	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-G1"	"G1"	""	10:14	10:44	10:59	1	0		"DRC1"	1.0	" 1.118 "	"inside middle "	"Rachel"	
+122	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-G2"	"G2"	""	10:51	11:21	11:36	1	0		"DRC1"			"inside up"	"Rachel"	
+123	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-G3"	"G3"	""	11:09	11:40	11:55	1	0		"DRC6"	3.3	" 1.164 "	"inside down"	"Rachel"	
+117	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-H1"	"H1"	""	09:39	10:09	10:24	1	0		"DRC6"	1.4	" 1.125 "		"Rachel"	
+142	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-I1"	"I1"	""	09:15	09:45	10:00	1	0		"DRC4"	1.4	" 1.126 "		"Amanda"	
+143	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-I2"	"I2"	""	09:43	10:13	10:28	1	0		"DRC8"	1.3	" 1.122 "		"Amanda"	
+130	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-I3"	"I3"	""	14:25	14:55	15:10	1	0		"DRC5"	2.6	" 1.151 "	"windy"	"Carrie"	
+131	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-J1"	"J1"	""	08:52	09:22	09:37	1	0		"DRC2"	1.3	" 1.123 "		"Alex"	
+133	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-J2"	"J2"	""	09:15	09:45	10:00	1	0		"DRC2"	1.5	" 1.128 "		"Alex"	
+135	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"in"	"CW-J3"	"J3"	""	09:40	10:10	10:25	1	0		"DRC2"	0.3	" 1.102 "		"Alex"	
+119	2018	2018-07-27	"day"	"bb"	"agg"	"leaf"	"in"	"H1-leaf"	"H1"	""	09:55	10:25	10:40	1	0		"DRC6"	1.4	" 1.125 "		"Rachel"	
+141	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb10"	"10"	""	08:50	09:23	09:48	1	0		"DRC4"	1.1	" 1.119 "	"outside I"	"Amanda"	
+121	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb123"	"123"	""	10:30	11:01	11:16	1	0		"DRC6"	2.9	" 1.155 "	"outside G"	"Rachel"	
+136	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb13"	"13"	""	09:42	10:12	10:27	1	0		"DRC3"	1.4	" 1.120 "	"outside J"	"Alex"	
+132	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb14"	"14"	""	08:59	09:29	09:44	1	0		"DRC3"	1.4	" 1.126 "	"outside J"	"Alex"	
+134	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb15"	"15"	""	09:20	09:50	10:05	1	0		"DRC3"	5.1	" 1.198 "	"outside J"	"Alex"	
+139	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb2"	"2"	""	10:52	11:22	11:37	1	0		"DRC2"	4.3	" 1.182 "	"outside G"	"Alex"	
+140	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb3"	"3"	""	11:00	11:30	11:44	1	1		"DRC3"	2.1	" 1.140 "	"outside G"	"Alex"	
+125	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb348"	"348"	""	09:17	09:47	10:02	1	0		"DRC5"	4.3	" 1.183 "	"outide F"	"Carrie"	
+127	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb353"	"353"	""	10:11	10:42	10:57	1	0		"DRC5"	3.2	" 1.158 "	"outside F"	"Carrie"	
+128	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb4"	"4"	""	14:02	14:32	14:47	1	0		"DRC2"	2.5	" 1.148 "	"outside F"	"Carrie"	
+116	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb5"	"5"	""	09:00	09:30	09:45	1	0		"DRC1"	1.8	" 1.135 "	"outside H"	"Rachel"	
+118	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb6"	"6"	""	09:48	10:18	10:33	1	0		"DRC1"	3.0	" 1.158 "	"outside H"	"Rachel"	
+144	2018	2018-07-27	"day"	"bb"	"agg"	"flower"	"out"	"CW-bb9"	"9"	""	09:48	10:18	10:33	1	1		"DRC4"	3.3	" 1.163 "	"outside I"	"Amanda"	
+145	2018	2018-07-27	"day"	"bb"		"air"	"air"	"AIR3"	"Air3"	""	10:42	11:12	11:27				"DRC8"				"Amanda"	
+146	2018	2018-07-27	"day"	"bb"		"air"	"air"	"AIR4"	"Air4"	""	10:44	11:14	11:29				"DRC4"				"Amanda"	
+137	2018	2018-07-27	"day"	"bb"		"air"	"air"	"AIR1"	"Air1"	""	10:00	10:30	10:45				"DRC2"			"outside J"	"Alex"	
+138	2018	2018-07-27	"day"	"bb"		"air"	"air"	"AIR2"	"Air2"	""	10:29	10:59	11:14				"DRC3"			"outside J"	"Alex"	
+36	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-V1"	"V1"	"NR"	11:51	12:23	12:38	"1"	"0"	"0"	"-"			"fell off during pumping."	"Carrie"	
+41	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-V1 REDO"	"V1 REDO"	"NR"	12:47						"-"			"abandoned due to thunderstorm"	"Carrie"	
+39	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-V2"	"V2"	"NR"	12:28	12:58					"-"			"abandoned due to thunderstorm"	"Carrie"	
+37	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-W1"	"W1"	0	11:53	12:26	12:41	"1"	"0"	"0"	"CW2"	8.6	1.258		"Carrie"	
+40	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-W2"	"W2"	"NR"	12:42						"-"			"abandoned due to thunderstorm"	"Carrie"	
+32	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-X1"	"X1"	""	11:05	11:40	11:55	"1"	"0"	"0"	"DRC7"	5.8	1.212		"Carrie"	
+33	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-X2"	"X2"	""	11:26	11:57	12:12	"1"	"0"	"0"	"DRC7"				"Carrie"	
+25	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-Y1"	"Y1"	""	09:58	10:29	10:44	"1"	"0"	"0"	"DRC7"	7.6	1.242		"Carrie"	
+28	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-Y2"	"Y2"	""	10:22	10:54	11:09	"1"	"0"	"0"	"DRC7"				"Carrie"	
+24	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-Z1"	"Z1"	""	09:47	10:18	10:33	"1"	"0"	"0"	"DRC8"	9.7	1.276		"Carrie"	
+27	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-Z2"	"Z2"	""	10:15	10:46	11:01	"1"	"0"	"0"	"DRC8"				"Carrie"	
+30	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-Z3"	"Z3"	""	10:50	11:20	11:35	"1"	"0"	"0"	"DRC8"			"big hole cut in bag"	"Carrie"	
+23	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA1"	"1"	""	09:40	10:10	10:25	"1"	"0"	"0"	"DRC4"	10.9	1.295	"near OTC-Z"	"Carrie"	
+26	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA2"	"2"	""	10:06	10:36	10:51	"1"	"0"	"0"	"CW2"	8.1	1.251	"near OTC-Y"	"Carrie"	
+29	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA3"	"3"	""	10:40	11:12	11:27	"1"	"0"	"0"	"DRC4"	11.8	1.311		"Carrie"	
+31	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA4"	"4"	""	11:01	11:31	11:46	"1"	"0"	"0"	"DRC4"			"near OTC-X"	"Carrie"	
+34	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA5"	"5"	""	11:33	12:03	12:18	"1"	"0"	"0"	"DRC4"	10.4	1.287		"Carrie"	
+35	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA6"	"6"	""	11:44	12:14	12:29	"1"	"0"	"0"	"DRC8"	6.8	1.229		"Carrie"	
+38	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA7"	"7"	""	12:11	12:41	12:56	"1"	"0"	"0"	"DRC4"	6.6	1.224		"Carrie"	
+42	2019	2019-07-31	"day"	"GNA"	"agg"	"flower"	"out"	"GNA8"	"8"	"NR"	12:45						"-"			"abandoned due to thunderstorm"	"Carrie"	
+22	2019	2019-07-31	"day"	"GNA"		"air"	"air"	"Air1"	"Air1"	""	09:36	10:06	10:21				"CW2"			"near OTC-Z"	"Carrie"	
+79	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-A1"	"A1"	""	12:08	12:38	12:53	"1"	"0"	"0"	"CW1"	5.7	1.209		"Carrie"	
+57	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-A2"	"A2"	""	12:30	13:24	13:39	"1"	"0"	"0"	"DRC4"	4.2	1.182		"John"	
+47	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-B1"	"B1"	""	10:39	11:10	11:25	"1"	"0"	"0"	"DRC5"	0.3	1.102		"John"	
+78	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-B2"	"B2"	""	11:56	12:26	12:41	"1"	"0"	"0"	"DRC7"				"Carrie"	
+50	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-C1"	"C1"	""	11:02	11:34	11:49	"1"	"0"	"0"	"DRC4"	1.7	1.132		"John"	
+55	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-C2"	"C2"	""	12:07	12:45	13:00	"1"	"0"	"0"	"."	3.3	1.164		"John"	
+53	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-C3"	"C3"	""	11:45	12:15	12:31	"1"	"0"	"0"	"DRC5"	2.9	1.158		"John"	
+52	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-D1"	"D1"	""	11:24	11:57	12:12	"1"	"0"	"0"	"DRC4"	2.7	1.153		"John"	
+69	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-E1"	"E1"	""	10:22	10:54	11:09	"1"	"0"	"0"	"DRC7"				"Carrie"	
+72	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-E2"	"E2"	""	10:58	11:25	11:39	"1"	"0"	"0"	"."				"Carrie"	
+71	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"in"	"OTC-E3"	"E3"	""	10:39	11:09	11:24	"1"	"0"	"0"	"."				"Carrie"	
+82	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-A1-leaf"	"A1"	""	12:46	13:16	13:31			"1"	"CW1"			"leaf looks really sad"	"Carrie"	0.00452
+83	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-A2-leaf"	"A2"	0	12:50	13:20	13:35			"1"	"."				"Carrie"	0.01030
+46	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-B1-leaf"	"B1"	""	10:19	10:49	11:04			"1"	"DRC5"	0.3	1.102	"wood smoke 9-10am"	"John"	0.00793
+80	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-B2-leaf"	"B2"	""	12:31	13:01	13:16			"1"	"DRC7"	5.6	1.209		"Carrie"	0.00822
+44	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-C1-leaf"	"C1"	""	09:44	10:10	10:25			"1"	"DRC4"	1.7	1.132	"wood smoke 9-10am"	"John"	0.01032
+59	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-C2-leaf"	"C2"	""	12:58	13:33	13:48			"1"	"DRC5"	3.3	1.164		"John"	0.01134
+84	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-C3-leaf"	"C3"	0	13:08	13:41	13:56			"1"	"CW2"				"Carrie"	0.00829
+62	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-D1-leaf"	"D1"	""	13:22	13:58	14:13			"1"	"DRC4"	2.7	1.153		"John"	0.01042
+65	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-E1-leaf"	"E1"	0	09:42	10:12	10:27			"1"	"CW2"	6.1	1.191		"Carrie"	0.00849
+67	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-E2-leaf"	"E2"	""	10:08	10:38	10:53			"1"	"CW2"				"Carrie"	0.00951
+76	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"in"	"OTC-E3-leaf"	"E3"	""	11:32	12:02	12:17			"1"	"CW1"				"Carrie"	0.00670
+49	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC1"	"1"	""	11:01	11:32	11:48	"1"	"0"	"0"	"DRC5"	9.7	1.277		"John"	
+58	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC10"	"10"	""	12:31	13:09	13:24	"1"	"0"	"0"	"DRC5"	6.4	1.222		"John"	
+48	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC2"	"2"	""	10:41	11:13	11:28	"1"	"0"	"0"	"DRC4"	7.7	1.224		"John"	
+51	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC3"	"3"	""	11:21	11:54	12:09	"1"	"0"	"0"	"DRC5"	8.1	1.251		"John"	
+54	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC4"	"4"	""	11:47	12:18	12:33	"1"	"0"	"0"	"DRC4"	5.6	1.207		"John"	
+56	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC5"	"5"	""	12:09	12:40	12:55	"1"	"0"	"0"	"."	7	1.233		"John"	
+70	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC6"	"6"	""	10:29	11:01	11:16	"1"	"0"	"0"	"CW2"				"Carrie"	
+68	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC7"	"7"	""	10:16	10:48	11:03	"1"	"0"	"0"	"CW1"	6.9	1.235		"Carrie"	
+73	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC8"	"8"	""	11:12	11:42	11:57	"1"	"0"	"0"	"CW1"				"Carrie"	
+75	2019	2019-08-02	"day"	"SC"	"ten"	"flower"	"out"	"SC9"	"9"	""	11:27	11:57	12:12	"1"	"0"	"0"	"CW2"	8.6	1.26		"Carrie"	
+43	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC1-leaf"	"1"	""	09:40	10:14	10:29			"1"	"DRC5"	9.7	1.227	"wood smoke 9-10am"	"John"	0.01562
+45	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC2-leaf"	"2"	""	10:17	10:47	11:02			"1"	"DRC4"	7.7	1.244	"wood smoke 9-10am"	"John"	0.01112
+85	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC3-leaf"	"3"	""	13:13	13:43	13:58			"1"	"CW1"				"Carrie"	0.00793
+60	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC4-leaf"	"4"	""	12:59	13:36	13:54			"1"	"DRC7"	5.6	1.207		"John"	0.00869
+61	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC5-leaf"	"5"	""	13:20	13:56	14:11			"1"	"DRC7"	7	1.233		"John"	0.01438
+64	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC6-leaf"	"6"	""	09:38	10:10	10:25			"2"	"CW1"	8.2	1.252		"Carrie"	0.01129
+66	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC7-leaf"	"7"	""	10:03	10:33	10:48			"1"	"DRC7"	7.1	1.235		"Carrie"	0.00747
+74	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC8-leaf"	"8"	""	11:15	11:45	12:00			"1"	"DRC7"	6.5	1.224		"Carrie"	0.01079
+77	2019	2019-08-02	"day"	"SC"	"ten"	"leaf"	"out"	"SC9-leaf"	"9"	""	11:52	12:22	12:37			"1"	"CW2"				"Carrie"	0.02116
+63	2019	2019-08-02	"day"	"SC"		"air"	"air"	"Air-SC1"	"AirSC1"	""	09:35	10:05	10:20				"DRC7"				"Carrie"	
+81	2019	2019-08-02	"day"	"SC"		"air"	"air"	"Air-SC2"	"AirSC2"	""	12:34	13:04	13:19				"CW2"				"Carrie"	
+10	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-A2"	"A2"	""	19:37	20:07	20:22	"1"	"0"	"0"	"DRC7"			"sad flower"	"Carrie"	
+13	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-B1"	"B1"	""	19:56	20:26	20:41	"1"	"0"	"0"	"DRC5"				"Carrie"	
+12	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-B2"	"B2"	""	19:47	20:17	20:32	"1"	"0"	"0"	"DRC9"				"Carrie"	
+14	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-C1"	"C1"	""	20:05	20:35	20:50	"1"	"0"	"0"	"DRC4"				"Carrie"	
+15	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-C2"	"C2"	""	20:18	20:48	21:03	"1"	"0"	"0"	"DRC5"				"Carrie"	
+18	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-C3"	"C3"	""	20:53	21:23	21:38	"1"	"0"	"0"	"DRC5"				"Carrie"	
+20	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-E1"	"E1"	""	21:10	21:40	21:55	"1"	"0"	"0"	"DRC9"				"Carrie"	
+19	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-E2"	"E2"	""	20:59	21:29	21:44	"1"	"0"	"0"	"DRC4"				"Carrie"	
+21	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"in"	"OTC-E3"	"E3"	""	21:20	21:50	22:05	"1"	"0"	"0"	"DRC4"				"Carrie"	
+16	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC1"	"1"	""	20:28	20:58	21:13	"1"	"1"	"0"	"DRC7"				"Carrie"	
+11	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC10"	"10"	""	19:44	20:14	20:29	"1"	"0"	"0"	"DRC4"				"Carrie"	
+6	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC3"	"3"	""	20:42	21:13	21:29	"1"	"0"	"0"	"DRC8"				"Diane"	
+7	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC4"	"4"	""	20:58	21:28	21:43	"1"	"0"	"0"	"DRC10"			"put in air control too for 1 min"	"Diane"	
+17	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC5"	"5"	""	20:38	21:08	21:23	"1"	"0"	"0"	"DRC9"				"Carrie"	
+2	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC6"	"6"	""	19:45	20:14	20:29	"1"	"0"	"0"	"CW2"				"Diane"	
+4	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC7"	"7"	""	20:03	20:33	20:48	"1"	"0"	"0"	"DRC10"				"Diane"	
+3	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC8"	"8"	""	19:48	20:18	20:33	"1"	"0"	"0"	"DRC8"				"Diane"	
+5	2019	2019-08-02	"night"	"SC"	"ten"	"flower"	"out"	"SC9"	"9"	0	20:21	20:51	21:06	"1"	"0"	"0"	"CW2"				"Diane"	
+1	2019	2019-08-02	"night"	"SC"		"air"	"air"	"Air1"	"Air1"	""	19:14	19:43	19:58				"DRC8"				"Diane"	
+8	2019	2019-08-02	"night"	"SC"		"air"	"air"	"Air3"	"Air3"	""	21:18	21:48	22:03				"DRC10"				"Diane"	
+9	2019	2019-08-02	"night"	"SC"		"air"	"air"	"Air2"	"Air2"	""	19:23	19:53	20:08				"DRC8"				"Carrie"	
+97	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-V1"	"V1"	""	10:32	11:02	11:17	"1"	"0"	"0"	"DRC4"				"Carrie"	
+92	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-V2"	"V2"	""	10:02	10:32	10:47	"1"	"0"	"0"	"DRC10"				"Carrie"	
+96	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-W1"	"W1"	""	10:27	10:57	11:12	"1"	"0"	"0"	"CW1"			"trap slipped out in middle of pumping"	"Carrie"	
+95	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"in"	"OTC-W2"	"W2"	""	10:23	10:53	11:08	"1"	"0"	"0"	"DRC7"				"Carrie"	
+90	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-V1-leaf"	"V1"	""	09:42	10:14	10:29			"1"	"DRC5"				"Carrie"	0.00498
+100	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-V2-leaf"	"V2"	""	10:49	11:19	11:34			"1"	"."				"Carrie"	0.00940
+89	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-W1-leaf"	"W1redo"	""	09:36	10:08	10:23			"1"	"DRC7"	7.9	1.248		"Carrie"	0.00804
+99	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-W2-leaf"	"W2"	""	10:46	11:16	11:31			"1"	"CW1"				"Carrie"	0.00826
+103	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-X1-leaf"	"X1"	""	11:27	11:57	12:12			"1"	"DRC4"				"Carrie"	0.00941
+105	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-X2-leaf"	"X2"	""	11:43	12:13	12:28			"1"	"CW1"				"Carrie"	0.00439
+107	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-Y1-leaf"	"Y1"	""	11:53	12:23	12:38			"1"	"DRC4"				"Carrie"	0.00775
+109	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-Y2-leaf"	"Y2"	""	12:04	12:35	12:50			"1"	"DRC5"				"Carrie"	0.00629
+112	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-Z1-leaf"	"Z1"	""	12:26	12:56	13:11			"1"	"DRC4"				"Carrie"	0.00818
+113	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-Z2-leaf"	"Z2"	""	12:38	13:08	13:23			"1"	"."				"Carrie"	0.00585
+114	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"in"	"OTC-Z3-leaf"	"Z3redo"		12:47	13:17	13:32			"1"	"DRC7"			"somewhat large cut in bag for trap"	"Carrie"	0.00505
+94	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"out"	"GNA10"	"10"	""	10:20	10:50	11:05	"1"	"0"	"0"	"DRC5"	9.3	1.270		"Carrie"	
+91	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"out"	"GNA8"	"8"	""	09:57	10:27	10:42	"1"	"0"	"0"	"CW1"				"Carrie"	
+93	2019	2019-08-05	"day"	"GNA"	"agg"	"flower"	"out"	"GNA9"	"9"	""	10:07	10:37	10:52	"1"	"0"	"0"	"DRC4"				"Carrie"	
+111	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA1-leaf"	"1"	"NR"	12:22	12:52	13:07			"1"	"DRC10"			"bag blew off"	"Carrie"	
+115	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA1-leaf"	"1redo"	""	12:52	13:22	13:37			"1"	"DRC10"			"rebag of GNA1 since bag fell off before pumping earlier today"	"Carrie"	0.01530
+98	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA10-leaf"	"10"	"NR"	10:36	11:06	11:21			"1"	"DRC5"			"bag blew off"	"Carrie"	0.00746
+108	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA2-leaf"	"2"	""	12:00	12:30	12:45			"1"	"CW1"				"Carrie"	0.01950
+110	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA3-leaf"	"3"	""	12:09	12:40	12:55			"1"	"CW1"			"small leaf"	"Carrie"	0.00417
+102	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA4-leaf"	"4"	""	11:25	11:55	12:10			"1"	"DRC5"				"Carrie"	0.00642
+106	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA5-leaf"	"5"	""	11:49	12:19	12:34			"1"	"DRC10"				"Carrie"	0.01285
+104	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA6-leaf"	"6"	""	11:40	12:10	12:25			"1"	"DRC7"				"Carrie"	0.00561
+87	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA8-leaf"	"8"	0	09:25	09:55	10:10			"1"	"CW1"	8.0	1.249		"Carrie"	0.01181
+88	2019	2019-08-05	"day"	"GNA"	"agg"	"leaf"	"out"	"GNA9-leaf"	"9"	""	09:30	10:00	10:15			"1"	"DRC4"	5.5	1.206		"Carrie"	0.01272
+86	2019	2019-08-05	"day"	"GNA"		"air"	"air"	"Air1"	"Air1"	""	09:21	09:51	10:08				"DRC10"				"Carrie"	
+101	2019	2019-08-05	"day"	"GNA"		"air"	"air"	"Air2"	"Air2"	""	10:56	11:30	11:45				"DRC7"				"Carrie"	

@@ -1,0 +1,163 @@
+observer	date	time	vial	lost	chamber	location	plant	bag	pump	end	equil	pumping	flowers	buds	pump_id	VWC	notes	location_time
+CW	2021-07-13	day	13		I	inside	227	9:45	10:15	10:30	0:30	0:15	1	0	DRC7	1.3	JP: changed bag from 9:04 to 9:45	inside_day
+CW	2021-07-13	day	19		I		air	9:47	10:47	11:02	1:00	0:15			DRC7			air_day
+CW	2021-07-13	day	14		XI	outside	185	9:50	10:20	10:35	0:30	0:15	1	0	DRC7	4.7	JP: moved 1 flower 0 buds to this line from air line	outside_day
+CW	2021-07-13	day	15		I	inside	196	9:53	10:23	10:56	0:30	0:33	1	0	CW1	1.9	long pump time	inside_day
+CW	2021-07-13	day	17		XI	outside	139	9:56	10:30	10:45	0:34	0:15	1	0	DRC7	3.5		outside_day
+CW	2021-07-13	day	18		I	inside	192	10:11	10:41	10:56	0:30	0:15	1	0	CW2	2.9		inside_day
+CW	2021-07-13	day	20		XB	outside	193	10:33	11:03	11:18	0:30	0:15	1	0	CW1	3.4		outside_day
+CW	2021-07-13	day	21		XB	outside	172	10:50	11:20	11:35	0:30	0:15	1	0	CW2	2.1	trap blew out ~2 min?	outside_day
+CW	2021-07-13	day	22		G	inside	99	11:07	11:37	11:52	0:30	0:15	1	0	CW1	3.5		inside_day
+CW	2021-07-13	day	23		XF	outside	184	11:10	11:40	11:55	0:30	0:15	1	1	DRC7	3		outside_day
+CW	2021-07-13	day	24		G	inside	93	11:24	11:54	12:09	0:30	0:15	1	0	CW2	4.4		inside_day
+CW	2021-07-13	day	35		F	inside	220	11:42	12:12	12:27	0:30	0:15	1	0	DRC7	3.2		inside_day
+CW	2021-07-13	day	26		F	inside	208	11:49	12:20	12:35	0:31	0:15	1	0	CW1	2.5		inside_day
+CW	2021-07-13	day	27		XF	outside	221	11:58	12:28	12:43	0:30	0:15	1	0	CW2	3.6		outside_day
+CW	2021-07-13	day	28		D	inside	12	12:02	12:32	12:47	0:30	0:15	1	0	DRC7	6.3		inside_day
+CW	2021-07-13	day	29		XD	outside	264	12:12	12:42	12:59	0:30	0:17	1	0	CW1	3.7	very pale! trap blew out <1min each of 2x	outside_day
+CW	2021-07-13	day	30		XG	outside	5	12:24	12:54	13:09	0:30	0:15	1	0	DRC7	3.8		outside_day
+CW	2021-07-13	day	36		D	inside	156	12:31	13:01	13:16	0:30	0:15	1	1	CW2	4.6		inside_day
+JP	2021-07-13	day	1		H	inside	557	9:45	10:15	10:30	0:30	0:15	1	1	JMP2	2.8		inside_day
+JP	2021-07-13	day	2		H	inside	743	9:49	10:19	10:35	0:30	0:16	1	0	JMP3	1.4		inside_day
+JP	2021-07-13	day	3		XH	outside	188	9:52	10:22	10:39	0:30	0:17	1	0	DRC1	3.4	JP: changed end from 10:29 to 10:39	outside_day
+JP	2021-07-13	day	4		XH	outside	air	9:55	10:46	11:01	0:51	0:15			JMP3			air_day
+JP	2021-07-13	day	5		XH	outside	105	10:11	10:43	10:58	0:32	0:15	1	0	DRC1	4.2	newly tagged, white flowers	outside_day
+JP	2021-07-13	day	6		H	inside	200	10:29	10:59	11:18	0:30	0:19	1	0	JMP2	2.2		inside_day
+JP	2021-07-13	day	7		B	inside	294	10:34	11:06	11:21	0:32	0:15	1	0		1.9		inside_day
+JP	2021-07-13	day	8		B	inside	238	10:52	11:24	11:39	0:32	0:15	1	0		3.2		inside_day
+JP	2021-07-13	day	9		XA	outside	191	11:11	11:46	12:01	0:35	0:15	1	0	DRC1	3		outside_day
+JP	2021-07-13	day	10		XA	outside	186	11:13	11:49	12:04	0:36	0:15	1	0	JMP3	2.4		outside_day
+JP	2021-07-13	day	11		A	inside	19	11:17	11:52	12:07	0:35	0:15	1	0	JMP2	2.9		inside_day
+JP	2021-07-13	day	12		E	inside	16	11:58	12:28	12:43	0:30	0:15	1	0	JMP3	5.8		inside_day
+JP	2021-07-13	day	31		E	inside	6	11:59	12:30	12:45	0:31	0:15	1	0	DRC1	4.6		inside_day
+JP	2021-07-13	day	32		XE	outside	27	12:00	12:32	12:47	0:32	0:15	1	0	JMP2	5.9		outside_day
+JP	2021-07-13	day	33		XD	outside	71	12:21	12:51	13:06	0:30	0:15	1	0	DRC1	4.1		outside_day
+JP	2021-07-13	day	34		XC	outside	187	12:22	12:53	13:08	0:31	0:15	1	0	JMP2	3.1		outside_day
+JP	2021-07-13	day	35		C	inside	189	12:25	12:55	13:10	0:30	0:15	1	0	JMP3	4.9		inside_day
+DH	2021-07-15	night	74		H	inside	557	19:46	20:16	20:31	0:30	0:15	1	0	DRC7	2		inside_night
+DH	2021-07-15	night	75		XH	outside	188	19:49	20:19	20:34	0:30	0:15	1	0	JMP3	3.3		outside_night
+DH	2021-07-15	night	76		H	inside	743	19:53	20:24	20:39	0:31	0:15	1	0	JMP2	3.5		inside_night
+DH	2021-07-15	night	77		XH	outside	105	20:17	20:47	21:02	0:30	0:15	1	0	DRC7	8.2		outside_night
+DH	2021-07-15	night	78		H	inside	200	20:26	20:56	21:12	0:30	0:16	1	0	JMP3	2.9		inside_night
+DH	2021-07-15	night	83		XC	outside	187	20:52	21:22	21:37	0:30	0:15	1	0	DRC7	6.5		outside_night
+DH	2021-07-15	night	81		C	inside	189	20:55	21:25	21:40	0:30	0:15	1	0	JMP2	4.8		inside_night
+DH	2021-07-15	night	82		D	inside	12	21:11	21:41	21:56	0:30	0:15	1	0	JMP3	6.7		inside_night
+DH	2021-07-15	night	84		F	inside	208	21:30	22:00	22:15	0:30	0:15	1	0	DRC4	3.1		inside_night
+DH	2021-07-15	night	88				air	21:38	22:04	22:14	0:26	0:10					JP: short pumping, check end time	air_night
+CW	2021-07-15	night	56	1	XI	outside	185	19:46	20:16	20:31	0:30	0:15	1	1	DRC4	7.5		outside_night
+CW	2021-07-15	night	59	1	I	inside	196	19:48	20:18	20:33	0:30	0:15	1	0	CW2	5.6	JP: changed pump from 20:28 to 20:18	inside_night
+CW	2021-07-15	night	58	1	I	inside	227	19:50	20:20	20:35	0:30	0:15	1	0	DRC3	5.3		inside_night
+CW	2021-07-15	night	57	1	XI	outside	139	19:55	20:25	20:40	0:30	0:15	1	0	DRC8	9.7		outside_night
+CW	2021-07-15	night	60	1	I	inside	192	20:17	20:47	21:02	0:30	0:15	1	0	CW2	4.9		inside_night
+CW	2021-07-15	night	62	1	XG	outside	5	20:27	20:57	21:12	0:30	0:15	1	0	DRC8	9.8		outside_night
+CW	2021-07-15	night	61	1	G	inside	99	20:29	20:59	21:14	0:30	0:15	1	0	DRC3	4		inside_night
+CW	2021-07-15	night	63	1	I		air	20:36	21:06	21:21	0:30	0:15			CW2			air_night
+CW	2021-07-15	night	64		F	inside	220	20:44	21:14	21:29	0:30	0:15	1	0	DRC4			inside_night
+CW	2021-07-15	night	65		G	inside	93	20:52	21:22	21:37	0:30	0:15	1	0	DRC3	5.5		inside_night
+CW	2021-07-15	night	72		XF	outside	221	21:10	21:40	21:55	0:30	0:15	1	0	DRC8	7.3		outside_night
+CW	2021-07-15	night	79		XF	outside	184	21:26	21:56	22:11	0:30	0:15	1	0	CW2	8.2		outside_night
+JP	2021-07-15	night	50	1	B	inside	294	19:44	20:18	20:33	0:34	0:15	1	0	CW1	4.6		inside_night
+JP	2021-07-15	night	51		B	inside	238	19:46	20:20	20:35	0:34	0:15	1	0	DRC1	7.6		inside_night
+JP	2021-07-15	night	52		XB	outside	193	19:47	20:22	20:37	0:35	0:15	1	0	DRC10	11.2		outside_night
+JP	2021-07-15	night	53		XB	outside	172	19:48	20:23	20:38	0:35	0:15	1	0	DRC9	4.5		outside_night
+JP	2021-07-15	night	66		A	inside	19	20:08	20:43	21:00	0:35	0:17	1	0	DRC10	2.8		inside_night
+JP	2021-07-15	night	67		A	inside	170	20:09	20:45	21:00	0:36	0:15	1	0	DRC1	2.6		inside_night
+JP	2021-07-15	night	68		XA	outside	186	20:11	20:47	21:02	0:36	0:15	1	0	DRC9	6.2		outside_night
+JP	2021-07-15	night	69		XA	outside	191	20:12	20:49	21:04	0:37	0:15	1	0	CW1	4.5		outside_night
+JP	2021-07-15	night	70		E	inside	6	20:55	21:29	21:47	0:34	0:18	1	0		9.4		inside_night
+JP	2021-07-15	night	71		E	inside	16	20:57	21:32	21:47	0:35	0:15	1	0		7.6		inside_night
+JP	2021-07-15	night	72		XE	outside	27	20:59	21:35	21:51	0:36	0:16	1	0		11.2		outside_night
+JP	2021-07-15	night	85		D	inside	156	21:23	21:54	22:09	0:31	0:15	1	0	CW1	4.3		inside_night
+JP	2021-07-15	night	86		XD	outside	71	21:26	21:58	22:15	0:32	0:17	1	0	DRC9	10.9		outside_night
+JP	2021-07-15	night	87		XE	outside	air	21:44	22:13	22:28	0:29	0:15			CW1			air_night
+JP	2021-07-15	night	91		XE	outside	Artemisia	21:45	22:15	22:30	0:30	0:15			DRC9		A few leaves of the locally abundant Artemisia tridentata	
+JP	2021-07-15	night	54		XD	outside	264	22:22	22:56	23:11	0:34	0:15	1	0	CW1	6.9		outside_night
+JP	2021-07-15	night	55		C	inside	207	22:24	22:56	23:11	0:32	0:15	1	0	DRC9	3.3		inside_night
+CW	2021-07-27	day	151		XI	outside	185	10:03	10:33	10:48	0:30	0:15	1	0	CW1	13.7		
+CW	2021-07-27	day	152		XI	outside	air	10:04	10:34	10:49	0:30	0:15			DRC5			
+CW	2021-07-27	day	153		I	inside	227	10:06	10:36	10:51	0:30	0:15	1	0	DRC9	10.5		
+CW	2021-07-27	day	154		I	inside	196	10:08	10:38	10:53	0:30	0:15	1	0	CW2	12.1		
+CW	2021-07-27	day	155		XI	outside	139	10:09	10:39	10:54	0:30	0:15	1	0	DRC7	16.1		
+CW	2021-07-27	day	156		I	inside	192	10:30	11:01	11:16	0:31	0:15	1	0	DRC5	15.9		
+CW	2021-07-27	day	157		XH	outside	188	10:32	11:03	11:18	0:31	0:15	1	0	DRC7	20.1	trap fell out while pumping	
+CW	2021-07-27	day	158		H	inside	557	10:43	11:13	11:28	0:30	0:15	1	0	DRC9	8.9		
+CW	2021-07-27	day	159		H	inside	200	10:44	11:14	11:29	0:30	0:15	1	0	CW1	9.9		
+CW	2021-07-27	day	160		XH	outside	noname	10:46	11:16	11:31	0:30	0:15	1	0	DRC5	14.6		
+CW	2021-07-27	day	164		H	inside	743	10:58	11:28	11:43	0:30	0:15	1	0	CW2	7.9		
+CW	2021-07-27	day	163		H	inside	226	11:01	11:32	11:47	0:31	0:15	1	0	DRC4	9.8		
+CW	2021-07-27	day	162		B	inside	294	11:06	11:36	11:53	0:30	0:17	1	0	CW1	15.1		
+CW	2021-07-27	day	161		XB	outside	172	11:08	11:38	11:51	0:30	0:13	1	0	DRC5	14.7		
+CW	2021-07-28	day	165		XF	outside	184	9:40	10:10	10:25	0:30	0:15	1	0	CW2	12.8		
+CW	2021-07-28	day	166		XF	outside	air	9:41	10:11	10:26	0:30	0:15			DRC3			
+CW	2021-07-28	day	167		G	inside	201	9:43	10:13	10:28	0:30	0:15	1	0	DRC5	15		
+CW	2021-07-28	day	168		G	inside	99	9:46	10:16	10:31	0:30	0:15	1	0	DRC8	10.8		
+CW	2021-07-28	day	169		XG	outside	5	9:48	10:18	10:33	0:30	0:15	1	0	DRC10	15.4		
+CW	2021-07-28	day	170		XF	outside	221	10:19	10:49	11:04	0:30	0:15	1	0	CW2	14.2		
+CW	2021-07-28	day	171		G	inside	93	10:21	10:51	11:06	0:30	0:15	1	0	DRC5	16.9		
+CW	2021-07-28	day	172		F	inside	220	10:23	10:53	11:08	0:30	0:15	1	0	DRC8	9.6		
+CW	2021-07-28	day	173		F	inside	8	10:24	10:54	11:09	0:30	0:15	1	0	DRC10	9.2	Big cut in bag to pump	
+CW	2021-07-28	day	174		E	inside	16	10:28	10:58	11:13	0:30	0:15	1	0	DRC3	17.4		
+CW	2021-07-28	day	190		XB	outside	193	10:45	11:15	11:30	0:30	0:15	1	0	CW2	14.6		
+CW	2021-07-28	day	191		B	inside	238	10:47	11:17	11:32	0:30	0:15	1	0	DRC5	9.5		
+CW	2021-07-28	day	192		B	inside	111	10:59	11:29	11:44	0:30	0:15	1	0	DRC8	7.8		
+DH	2021-07-28	day	175		XC	outside	187	9:40	10:11	10:25	0:31	0:14	1	0	DRC4	8.9		
+DH	2021-07-28	day	177		C	inside	207	9:42	10:12	10:28	0:30	0:16	1	0	DRC9	13.1		
+DH	2021-07-28	day	178		XD	outside	71	9:44	10:14	10:29	0:30	0:15	1	0	DRC1	12.9		
+DH	2021-07-28	day	176		C	inside	189	9:45	10:15	10:30	0:30	0:15	1	0	CW1	14.7		
+DH	2021-07-28	day	179		D	inside	12	9:47	10:17	10:32	0:30	0:15	1	0	DRC7	7.2		
+DH	2021-07-28	day	180		XD	outside	264	9:50	10:20	10:35	0:30	0:15	1	0	JMP2	14.1		
+DH	2021-07-28	day	181		D	inside	156	10:21	10:51	11:06	0:30	0:15	1	0	DRC7	11.3		
+DH	2021-07-28	day	182		E	inside	6	10:23	10:53	11:08	0:30	0:15	1	0	JMP2	15.9		
+DH	2021-07-28	day	183		XE	outside	27	10:25	10:55	11:10	0:30	0:15	1	0	DRC1	27.2		
+DH	2021-07-28	day	184		A	inside	19	10:36	11:08	11:25	0:32	0:17	1	0	DRC9	6.9		
+DH	2021-07-28	day	185		XA	outside	186	10:40	11:10	11:26	0:30	0:16	1	0	DRC4	15	flower pulled off fixing pump	
+DH	2021-07-28	day	186		XA	outside	191	10:54	11:24	11:39	0:30	0:15	1	0	DRC1	15.5		
+DH	2021-07-28	day	187		A	inside	170	11:10	11:40	11:55	0:30	0:15	1	0	DRC9	10.2		
+DH	2021-07-28	day	188		XA	air	air	11:18	11:48	12:03	0:30	0:15	1	0	JMP2			
+DH	2021-07-26	night	106		H	inside	200	19:47	20:21	20:36	0:34	0:15	1	0	DRC10	8.8	flower pulled off fixing pump	
+DH	2021-07-26	night	103		XH	outside	188	19:49	20:19	20:35	0:30	0:16	1	0	DRC1	20.1		
+DH	2021-07-26	night	104		H	inside	743	19:51	20:21	20:36	0:30	0:15	1	0	DRC5	6.8		
+DH	2021-07-26	night	102		H	inside	557	19:52	20:17	20:32	0:25	0:15	1	0	DRC4	12.5	old, dried flower also in bag; pump started tooo early	
+DH	2021-07-26	night	101														dropped scent trap	
+DH	2021-07-26	night	106		XH	outside	noname	20:26	20:56	21:11	0:30	0:15	1	0	DRC5	15.3	to the left of HX188, white flag left near it	
+DH	2021-07-26	night	108		XC	outside	187	20:30	21:00	21:15	0:30	0:15	1	0	DRC4	12.4		
+DH	2021-07-26	night	109		C	inside	207	20:32	21:02	21:17	0:30	0:15	1	0	DRC1	11.1		
+DH	2021-07-26	night	107		H	inside	226	20:40	21:10	21:25	0:30	0:15	1	0	DRC10	5.8	smudged data sheet - may not be correct	
+DH	2021-07-26	night	110		C	inside	189	21:03	21:33	21:48	0:30	0:15	1	0	DRC1	20.6		
+DH	2021-07-26	night	134		XD	outside	71	21:05	21:36	21:53	0:31	0:17	1	0	DRC5	16.3	pump fell out very briefly	
+DH	2021-07-26	night	135		D	inside	12	21:20	21:50	22:05	0:30	0:15	1	0	DRC4	13.3		
+DH	2021-07-26	night	141		XD	outside	264	21:22	21:52	22:09	0:30	0:17	1	0	DRC1	12.8	pump changed to CW1 at 20:02	
+DH	2021-07-26	night	142		air	air	air	21:34	22:04	22:19	0:30	0:15	1	0	DRC10			
+DH	2021-07-26	night	143		D	inside	156	21:40	22:10	22:25	0:30	0:15	1	0	DRC4	9.6		
+DH	2021-07-26	night	144		C	inside	189	22:15	22:45	23:00	0:30	0:15	1	0	DRC10	10.6	redone because pump seemed low on battery.	
+JP	2021-07-26	night	111		B	inside	294	19:46	20:16	20:31	0:30	0:15	1	0	DRC3	13.1		
+JP	2021-07-26	night	112		B	inside	111	19:47	20:18	20:34	0:31	0:16	1	0	DRC8	10.4		
+JP	2021-07-26	night	113		B	inside	238	19:48	20:20	20:35	0:32	0:15	1	0	JMP3	7.9		
+JP	2021-07-26	night	114		XB	outside	193	19:49	20:22	20:37	0:33	0:15	1	0	JMP2	16.9		
+JP	2021-07-26	night	115		XB	air	air	20:14	20:46	21:03	0:32	0:17			DRC3		next to sagebrush	
+JP	2021-07-26	night	116		XB	outside	172	20:16	20:47	21:03	0:31	0:16	1	0	JMP3	11.3		
+JP	2021-07-26	night	117		XA	outside	191	20:27	20:58	21:13	0:31	0:15	1	0	DRC8	11.3		
+JP	2021-07-26	night	118		XA	outside	186	20:29	20:59	21:14	0:30	0:15	1	0	JMP2	10.8		
+JP	2021-07-26	night	119		A	inside	19	21:10	21:40	21:59	0:30	0:19	1	0	JMP2	6.8		
+JP	2021-07-26	night	120		A	inside	120	21:12	21:42	21:59	0:30	0:17	1	0	DRC8	13.1		
+JP	2021-07-26	night	136		E	inside	6	21:18	21:48	22:05	0:30	0:17	1	1	DRC3	14.7	flower fell off while pumping	
+JP	2021-07-26	night	137		E	inside	76	21:19	21:49	22:05	0:30	0:16	1	0	JMP3	16.1		
+JP	2021-07-26	night	138		XE	outside	27	21:45	22:15	22:32	0:30	0:17	1	0	DRC8	19.5		
+JP	2021-07-26	night	139		E	inside	6	21:55	22:26	22:42	0:31	0:16	1	0	JMP3	14.7	sample #2 new flower	
+JP	2021-07-26	night	149		XE	air	air	22:10	22:26	22:41	0:16	0:15			DRC3			
+CW	2021-07-26	night	121		I	inside	227	19:45	20:15	20:30	0:30	0:15	1	0	CW1	13.1		
+CW	2021-07-26	night	122		XI	air	air	19:47	20:17	20:32	0:30	0:15			DRC9			
+CW	2021-07-26	night	123		XI	outside	139	19:49	20:19	20:34	0:30	0:15	1	0	DRC7	22	fell out while pumping.  Unknown duration	
+CW	2021-07-26	night	124		I	inside	196	19:52	20:22	20:37	0:30	0:15	1	0	CW2	18.2		
+CW	2021-07-26	night	125		XI	outside	185	20:08	20:38	20:53	0:30	0:15	1	0	CW1	13.7		
+CW	2021-07-26	night	126		I	inside	139	20:34	21:04	21:19	0:30	0:15	1	0	DRC7	22	flower came off plant while pumping, but still in bag	
+CW	2021-07-26	night	127		G	inside	201	20:43	21:13	21:28	0:30	0:15	1	0	CW2	10.5	few flowers left.  Soil seemed recent gopher activity.	
+CW	2021-07-26	night	129		XG	outside	5	20:45	21:15	21:31	0:30	0:16	1	1	DRC9	20.1		
+CW	2021-07-26	night	130		G	inside	93	20:58	21:27	21:42	0:29	0:15	1	0	CW1	14.5		
+CW	2021-07-26	night	128		XF	outside	184	21:00	21:30	21:45	0:30	0:15	1	0		19.5		
+CW	2021-07-26	night	132		G	inside	99	21:10	21:40	21:55	0:30	0:15	1	0	CW2	15.5	few flowers left	
+CW	2021-07-26	night	131		XF	outside	221	21:23	21:53	22:08	0:30	0:15	1	0	DRC9	17.9		
+CW	2021-07-26	night	133		F	inside	220	21:33	22:03	22:18	0:30	0:15	1	0	CW2	14.6		
+CW	2021-07-26	night	146		F	inside	8	21:47	22:17	22:32	0:30	0:15	1	1	DRC7	12.8		
+CW	2021-07-26	night	147		XF	air	air	21:51	22:21	22:36	0:30	0:15			DRC9			
+CW	2021-07-26	night	148		C	inside	207	22:02	22:34	22:49	0:32	0:15	1	0	CW2			
