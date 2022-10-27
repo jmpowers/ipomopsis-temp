@@ -1,0 +1,142 @@
+---
+title: "Ipomopsis temperature experiments: OTC performance"
+author: "Carrie Wu, John Powers, David Hopp, Diane Campbell"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    self_contained: no
+    lib_dir: libs
+    code_folding: hide
+    toc: yes
+    toc_float: TRUE 
+editor_options: 
+  chunk_output_type: console
+---
+<style type="text/css">
+.main-container { max-width: 1000px; margin-left: 0; margin-right: auto; }
+img{ max-width:200%; height: auto; }
+td, th { padding : 6px }
+</style>
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
+                      fig.path = "plots/", dev="png", fig.height=10, fig.width=10)
+
+```
+
+```{r read_data}
+setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu/hobo")
+hobo_csvs <- tibble(file=list.files(recursive=T, pattern=".csv") %>% str_remove(".csv")) %>% 
+  separate(file, sep="[/-]", into=c("year","site","n1","n2","n3"), fill="right", remove = F) %>% 
+  mutate(file = paste0(file, ".csv")) %>% 
+  write_csv("hobo_csvs.csv")
+
+hobometa <- read_csv("CWu OTC Hobos - metadata.csv") %>% filter(replace_na(!str_detect(notes,"drop"), TRUE))
+#devtools::install_version("units", version = "0.6-7", repos = "http://cran.us.r-project.org")
+#Sys.unsetenv("GITHUB_PAT")
+#devtools::install_github("RyanLab/microclimloggers") #needs ud_units from old units version
+#library(microclimloggers)
+source("read_hobo_csv2.R") #tweaks to avoid units package
+#safely_read_hobo_csv2 <- safely(read_hobo_csv2)
+hobo_objects <- map(set_names(hobometa$file), read_hobo_csv2)
+
+hobo_startstop <- hobo_objects %>% map_dfr(~.x$df_logger, .id="file") %>% left_join(hobometa)
+ggplot(hobo_startstop, aes(x=timestamp, y=file, color=logger)) + geom_point() + facet_grid(rows=vars(year), scales="free", space="free") +
+  labs(title = "Logging Events")
+
+#trim to dates that OTCs were deployed (CWu OTC Hobos - duration.csv)
+#TODO changing some of these cutoff dates manually based on data
+hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa) %>% 
+  left_join(read_csv("CWu OTC Hobos - duration.csv")) %>%
+  filter(Timestamp > OTC_start+days(1), Timestamp < OTC_end) %>% 
+  rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %>% 
+  mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60)
+```
+
+```{r heatmap}
+ggplot(drop_na(hobos,temp_C), aes(x=yday(date)+time/24, fill=temp_C, y=paste(year, site, temp, plotid))) + 
+  facet_wrap(vars(year), ncol=1, scales="free_y") +
+  geom_tile() + scale_fill_viridis_c(option="inferno") +
+  labs(title = "Temperature over time")
+ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=intensity_lux, y=paste(year, site, temp, plotid))) + 
+  facet_wrap(vars(year), ncol=1, scales="free_y") +
+  geom_tile() + scale_fill_viridis_c(option="inferno")+
+  labs(title = "Light over time")
+```
+
+
+```{r hobos_mean}
+hobos.mean <- hobos %>% group_by(year, site, datetime, date, time, temp) %>% 
+  summarize(mean_temp_C = mean(temp_C, na.rm=T), mean_intensity_lux = mean(intensity_lux, na.rm=T))%>%
+  pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %>% drop_na(mean_temp_C_OTC) %>% 
+  mutate(OTC_diff_C = mean_temp_C_OTC - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_OTC - mean_intensity_lux_control) 
+
+hobos.mean.summary <- hobos.mean %>% ungroup() %>% group_by(year, site) %>% summarize(across(contains(c("C","lux")), list(mean=mean, sd=sd)))
+kable(hobos.mean.summary)
+
+
+ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_OTC, color=OTC_diff_C)) + 
+    facet_grid(rows=vars(site), cols=vars(year))+
+  geom_point(size=0.5) + geom_abline(slope=1, intercept=0, color="white") + coord_fixed() +
+  scale_color_viridis_c(option="magma") + geom_smooth(se=F, color="pink", span=0.2) + theme_dark() +
+  labs(title = "Average Hourly Temp Comparison (Scatter)")
+
+ggplot(hobos.mean, aes(x=time, y=OTC_diff_C, color=mean_intensity_lux_control)) + 
+  facet_grid(rows=vars(site), cols=vars(year))+
+  geom_line(aes(group=date),size=0.5) + geom_hline(yintercept=0)+
+  scale_color_viridis_c(option="magma") + theme_dark() + 
+  geom_smooth(aes(group=1), se=F, color="white", span=0.15, method="loess") +
+  labs(x="Time of day", y="Mean temperature difference OTCs - controls (C)", color="Sunlight on controls (lux)") +
+  scale_y_continuous(breaks=-2:11) + theme(legend.position = "top", legend.key.width=unit(4,"lines"))+
+  labs(title = "Average Hourly Temp Comparison (Time of day)")
+  
+
+hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_OTC, names_to="temp", values_to="temp_C") %>% 
+  ggplot(aes(x=time, y=temp_C, linetype=temp, group=date)) + 
+    facet_grid(rows=vars(site), cols=vars(year))+
+  #geom_line(aes(group=paste(date, temp)), size=0.2, alpha=0.4)+
+  geom_smooth(aes(group=temp), se=T, span=0.1, method="loess", size=1, color="black") + 
+  scale_linetype_manual(labels=c("control", "OTC"), values=c(2,1)) +
+  labs(y="Temperature (C)", x="Time of day", linetype="Temperature treatment") +
+  theme(legend.key.width=unit(2,"lines")) +
+  scale_y_continuous(breaks=seq(5, 40, by=5), expand=expansion(mult=0.1)) +
+  labs(title = "Average Hourly Temp Comparison, averaged across season")
+
+library(colorspace)
+circlecol <- hex(polarLAB(70, 60, seq(0, 2*pi, length.out = 20)*180/pi), fixup=T)
+ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(datetime)+minute(datetime)/60)) + 
+    facet_grid(rows=vars(site), cols=vars(year))+
+  geom_hline(yintercept=0) + geom_point() + geom_smooth(method="loess", se=F) +
+  scale_color_gradientn(colors=circlecol) +
+  labs(x="Mean light intensity at controls (lux)", y="Mean temperature difference OTCs - controls (C)", color="Hour")+
+  labs(title = "Temp vs. Light at different times of day")
+```
+
+
+```{r hobos_minmax}
+hobos.minmax <- hobos %>% group_by(year, site, temp, plotid, id, date) %>% 
+  drop_na(temp_C) %>% 
+  summarize(max_temp_C = max(temp_C), min_temp_C = min(temp_C)) %>% 
+  pivot_longer(max_temp_C:min_temp_C)
+hobos.minmax.date <- hobos.minmax %>% group_by(year, site, temp, date, name) %>% summarize(value=mean(value))
+ggplot(hobos.minmax, aes(x=yday(date), y=value, color=temp, linetype=name)) + geom_point() + 
+      facet_grid(rows=vars(site), cols=vars(year))+
+  geom_line(data=hobos.minmax.date)+
+  labs(y="Temperature (C)", x="Date", linetype="Statistic", color="Treatment") +
+  scale_color_hue(direction=-1) + scale_y_continuous(breaks=scales::breaks_pretty(10)) +
+  labs(title = "Min and Max Daily Temp across Season")
+
+hobos.max.long <- hobos.minmax.date %>% filter(name !="min_temp_C") %>% pivot_wider() %>% 
+  pivot_wider(names_from=temp, values_from=max_temp_C) %>% mutate(OTC_diff_C = OTC-control)
+ggplot(hobos.max.long, aes(x=control, y=OTC_diff_C)) + geom_point() + geom_smooth(span=0.6, se=F) + geom_hline(yintercept=0) +
+  labs(title = "Maximum daily temp")
+mean(hobos.max.long$OTC_diff_C, na.rm=T)
+sd(hobos.max.long$OTC_diff_C, na.rm=T)
+
+hobos.minmax.tally <- hobos.minmax %>% count(year, site, plotid, temp)
+kable(hobos.minmax.tally)
+```
+
