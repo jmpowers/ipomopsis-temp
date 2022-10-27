@@ -72,11 +72,12 @@ ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=in
 hobos.mean <- hobos %>% group_by(year, site, datetime, date, time, temp) %>% 
   summarize(mean_temp_C = mean(temp_C, na.rm=T), mean_intensity_lux = mean(intensity_lux, na.rm=T))%>%
   pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %>% drop_na(mean_temp_C_OTC) %>% 
-  mutate(OTC_diff_C = mean_temp_C_OTC - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_OTC - mean_intensity_lux_control) 
+  mutate(OTC_diff_C = mean_temp_C_OTC - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_OTC - mean_intensity_lux_control) %>%
+  write_csv("./data/hobos_mean.csv")
 
-hobos.mean.summary <- hobos.mean %>% ungroup() %>% group_by(year, site) %>% summarize(across(contains(c("C","lux")), list(mean=mean, sd=sd)))
-kable(hobos.mean.summary)
-
+hobos.mean %>% ungroup() %>% group_by(year, site) %>% 
+  summarize(across(contains(c("C","lux")), list(mean=mean, sd=sd))) %>% 
+  kable()
 
 ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_OTC, color=OTC_diff_C)) + 
     facet_grid(rows=vars(site), cols=vars(year))+

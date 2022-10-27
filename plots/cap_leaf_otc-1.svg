@@ -66,16 +66,16 @@
 <text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>OTCs: I. agg and I. ten leaves 2019</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
-<rect x='59.04' y='444.96' width='127.57' height='57.60' style='stroke-width: 0.75;' />
-<rect x='107.47' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #61D04F;' />
-<rect x='107.47' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
-<text x='122.83' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature P = 0.568</text>
-<text x='126.91' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>in</text>
-<text x='126.91' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>out</text>
+<rect x='59.04' y='444.96' width='120.90' height='57.60' style='stroke-width: 0.75;' />
+<rect x='104.13' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #61D04F;' />
+<rect x='104.13' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
+<text x='119.49' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature P = 0.57</text>
+<text x='123.57' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>in</text>
+<text x='123.57' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>out</text>
 <rect x='442.63' y='444.96' width='103.13' height='57.60' style='stroke-width: 0.75;' />
 <circle cx='481.49' cy='473.76' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
 <polygon points='478.79,490.86 484.19,490.86 484.19,485.46 478.79,485.46 ' style='stroke-width: 0.75; stroke: none; fill: #000000;' />
-<text x='494.20' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Species P = 0.002</text>
+<text x='494.20' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Species P = 0.001</text>
 <text x='492.29' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>agg</text>
 <text x='492.29' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>ten</text>
 <circle cx='289.86' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />

@@ -71,23 +71,23 @@
 <rect x='59.04' y='444.96' width='127.57' height='57.60' style='stroke-width: 0.75;' />
 <rect x='101.08' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #2297E6;' />
 <rect x='101.08' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
-<text x='122.83' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature P = 0.269</text>
+<text x='122.83' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature P = 0.251</text>
 <text x='120.52' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
 <text x='120.52' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
 <rect x='458.65' y='444.96' width='87.11' height='57.60' style='stroke-width: 0.75;' />
 <rect x='482.18' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75;' />
 <rect x='482.18' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #000000;' />
-<text x='502.21' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time P = 0.342</text>
+<text x='502.21' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time P = 0.347</text>
 <text x='501.62' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>day</text>
 <text x='501.62' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>night</text>
-<rect x='468.32' y='59.04' width='77.44' height='72.00' style='stroke-width: 0.75;' />
-<circle cx='491.00' cy='87.84' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
-<polygon points='488.30,104.94 493.70,104.94 493.70,99.54 488.30,99.54 ' style='stroke-width: 0.75; stroke: none; fill: #000000;' />
-<circle cx='491.00' cy='116.64' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
-<text x='507.04' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Year P = 0.43</text>
-<text x='501.80' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>2018</text>
-<text x='501.80' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>2019</text>
-<text x='501.80' y='121.01' style='font-size: 12.00px; font-family: "Arial";'>2021</text>
+<rect x='461.65' y='59.04' width='84.11' height='72.00' style='stroke-width: 0.75;' />
+<circle cx='487.66' cy='87.84' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
+<polygon points='484.96,104.94 490.36,104.94 490.36,99.54 484.96,99.54 ' style='stroke-width: 0.75; stroke: none; fill: #000000;' />
+<circle cx='487.66' cy='116.64' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
+<text x='503.71' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Year P = 0.406</text>
+<text x='498.46' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>2018</text>
+<text x='498.46' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>2019</text>
+<text x='498.46' y='121.01' style='font-size: 12.00px; font-family: "Arial";'>2021</text>
 <rect x='298.68' y='264.17' width='5.40' height='5.40' style='stroke-width: 0.75; stroke: #2297E6;' />
 <polygon points='352.62,108.29 358.02,108.29 358.02,102.89 352.62,102.89 ' style='stroke-width: 0.75; stroke: none; fill: #2297E6;' />
 <circle cx='217.18' cy='205.38' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />

@@ -32,7 +32,7 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
                       fig.path = "plots/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=8, fig.width=8)
 
 #setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu")
-source("read_shimadzu.R")
+#source("read_shimadzu.R")
 ```
 
 ```{r read_scents}
@@ -167,7 +167,14 @@ library(forcats)
 meta <- bind_rows(otc=bind_rows(otc2, otc21), perc=perc2, .id="expt") %>% 
   mutate_if(is.character, as.factor) %>%
   mutate(Equil=Pump-Bag, Duration=End-Pump, Total=End-Bag,
-         OI = fct_collapse(OI, "in" = c("in", "inside"), out = c("out","outside")))
+         OI = fct_collapse(OI, "in" = c("in", "inside"), out = c("out","outside")),
+         Pump_datehour = paste(Date, Pump) %>% ymd_hms(tz="America/Denver") %>% round_date("hour")) %>% 
+  #Add mean temperature of OTCs or controls at time of sampling
+  left_join(read_csv("data/hobos_mean.csv") %>% select(-date) %>% 
+              mutate(datetime = force_tz(datetime, "America/Denver")), 
+            by = c("Site"="site", "Pump_datehour"="datetime")) %>% 
+  mutate(mean_temp_C_treatment = if_else(OI=="in", mean_temp_C_OTC, mean_temp_C_control))
+
 meta %>% write.csv("data/CWu_meta21.csv")
 
 meta %>% count(Year, Temp, Tissue, PlantType, OI, DN, Expt)
@@ -220,6 +227,29 @@ ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(x=paste(Year, Site, OI, Sam
   ggtitle("Effects of OTCs on Soil Moisture")+
   ylab("Soil Volumetric Water Content (%)") +
   xlab("Year, in or out of the OTC, Date")
+```
+
+## OTC temperature during sampling
+```{r actualtemp}
+ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, OI), color=OI)) +
+  facet_wrap(vars(DN), scales="free_x")+
+  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_jitter(height=0, width=0.2)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
+  scale_color_brewer(palette = "Set1")+
+  ggtitle("Effects of OTCs on Temperature during Sampling")+
+  ylab("Temperature (C)") +
+  xlab("Year, in or out of the OTC")
+
+ggplot(meta %>% filter(Expt=="otc", OI !="air", PlantType=="agg"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, OI), color=OI)) +
+  facet_wrap(vars(Year), scales="free_x", nrow=1)+
+  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_jitter(height=0, width=0.2)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
+  scale_color_brewer(palette = "Set1")+
+  ggtitle("Effects of OTCs on Temperature during Sampling: I agg.")+
+  ylab("Temperature (C)") +
+  xlab("Year, in or out of the OTC")
 ```
 
 
@@ -413,7 +443,7 @@ cap.otcSC21 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="SC",Plan
 #cap.otc.all <- list(bb18=cap.otcbb18, GNA18=cap.otcGNA18, GNA19=cap.otcGNA19, SC19=cap.otcSC19)
 ```
 
-## CAP of all I. aggregata OTC datasets
+## CAP of all I. aggregata vs. OTCs
 ```{r otc_comb}
 #Combined I. aggregata OTC CAP
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg")
@@ -423,16 +453,65 @@ vol.otc <- vol[svf.otc$sample,]
 summ.cap <- summary(cap.otc.comb)
 prop.expl <- summ.cap$cont$importance
 ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 (anova.cap <- anova(cap.otc.comb, by="term"))
 plot(cap.otc.comb, type="n",xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
 title("OTC warming: I. agg at GNA or bb sites, 2018/2019")
-legend("topleft",  title=paste("OTC warming","P =",anova.cap["OI","Pr(>F)"]), levels(svf.otc$OI), fill=2:3)
-legend("topright",  title=paste("Year","P =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=c(15,19))
-legend("bottomleft",  title=paste("Site","P =",anova.cap["Site","Pr(>F)"]), levels(svf.otc$Site)[1:2])
+legend("topleft",  title=paste("OTC warming","P =",anova.cap["OI","Pr(>F)"]), legend=levels(svf.otc$OI), fill=2:3)
+legend("topright",  title=paste("Year","P =",anova.cap["Year","Pr(>F)"]), legend=levels(svf.otc$Year), pch=yearpch)
+legend("bottomleft",  title=paste("Site","P =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
-points(cap.otc.comb, display="sites", col=c(2:3)[svf.otc$OI], pch=c(15,19)[svf.otc$Year]) 
+points(cap.otc.comb, display="sites", col=c(2:3)[svf.otc$OI], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display="cn")
+```
+
+## CAP of all I. aggregata vs. actual temp, site, year
+```{r otc_comb_temp}
+#Combined I. aggregata OTC CAP
+svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg") %>% drop_na(mean_temp_C_treatment)
+vol.otc <- vol[svf.otc$sample,]
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+OI+mean_temp_C_treatment, distance="bray", data=svf.otc))
+
+summ.cap <- summary(cap.otc.comb)
+prop.expl <- summ.cap$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+(anova.cap <- anova(cap.otc.comb, by="term"))
+par(bg="grey40")
+plot(cap.otc.comb, type="n",xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
+title("OTC actual temp: I. agg at GNA or bb sites, all years\nvol ~ Year+Site+OI+temp")
+temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+legend("topleft",  title=paste("Temperature\n","P =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
+legend("topright",  title=paste("Year\n","P =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
+legend("bottomright",  title=paste("Site\n","P =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
+legend("left",  title=paste("OTC warming\n","P =",anova.cap["OI","Pr(>F)"]), levels(svf.otc$OI))
+text(cap.otc.comb, display="species", cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("pink",0.7),alpha("pink",0)))
+points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year]) 
+text(cap.otc.comb, display="cn", col="white")
+```
+
+## CAP of all I. aggregata vs. actual temp, year
+```{r otc_comb_tempyr}
+#Combined I. aggregata OTC CAP
+svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg") %>% drop_na(mean_temp_C_treatment)
+vol.otc <- vol[svf.otc$sample,]
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+mean_temp_C_treatment, distance="bray", data=svf.otc))
+
+summ.cap <- summary(cap.otc.comb)
+prop.expl <- summ.cap$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+(anova.cap <- anova(cap.otc.comb, by="term"))
+par(bg="grey40")
+plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
+title("OTC actual temp: I. agg at GNA or bb sites, all years\n vol ~ temp")
+temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+legend("bottomleft",  title=paste("Temperature\n","P =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
+legend("topright",  title=paste("Year\n","P =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
+text(cap.otc.comb, display="species", cex=0.7, srt=45,
+                     col=ifelse(abs(cap.otc.comb$CCA$v[,1])>0.1, alpha("pink",0.7),alpha("pink",0)))
+points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year])
+text(cap.otc.comb, display="cn", col="white")
 ```
 
 # Percivals warm vs. cool
