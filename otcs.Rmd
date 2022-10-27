@@ -23,25 +23,25 @@ library(tidyverse)
 library(lubridate)
 library(knitr)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
-                      fig.path = "plots/", dev="png", fig.height=10, fig.width=10)
+                      fig.path = "plots-otcs/", dev="png", fig.height=10, fig.width=10)
 
 ```
 
 ```{r read_data}
-setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu/hobo")
-hobo_csvs <- tibble(file=list.files(recursive=T, pattern=".csv") %>% str_remove(".csv")) %>% 
+
+hobo_csvs <- tibble(file=list.files("./data/hobo/", recursive=T, pattern=".csv") %>% str_remove(".csv")) %>% 
   separate(file, sep="[/-]", into=c("year","site","n1","n2","n3"), fill="right", remove = F) %>% 
   mutate(file = paste0(file, ".csv")) %>% 
-  write_csv("hobo_csvs.csv")
+  write_csv("data/hobo_csvs.csv")
 
-hobometa <- read_csv("CWu OTC Hobos - metadata.csv") %>% filter(replace_na(!str_detect(notes,"drop"), TRUE))
+hobometa <- read_csv("./data/CWu OTC Hobos - metadata.csv") %>% filter(replace_na(!str_detect(notes,"drop"), TRUE))
 #devtools::install_version("units", version = "0.6-7", repos = "http://cran.us.r-project.org")
 #Sys.unsetenv("GITHUB_PAT")
 #devtools::install_github("RyanLab/microclimloggers") #needs ud_units from old units version
 #library(microclimloggers)
 source("read_hobo_csv2.R") #tweaks to avoid units package
 #safely_read_hobo_csv2 <- safely(read_hobo_csv2)
-hobo_objects <- map(set_names(hobometa$file), read_hobo_csv2)
+hobo_objects <- map(set_names(paste0("./data/hobo/", hobometa$file), hobometa$file), read_hobo_csv2)
 
 hobo_startstop <- hobo_objects %>% map_dfr(~.x$df_logger, .id="file") %>% left_join(hobometa)
 ggplot(hobo_startstop, aes(x=timestamp, y=file, color=logger)) + geom_point() + facet_grid(rows=vars(year), scales="free", space="free") +
@@ -50,7 +50,7 @@ ggplot(hobo_startstop, aes(x=timestamp, y=file, color=logger)) + geom_point() + 
 #trim to dates that OTCs were deployed (CWu OTC Hobos - duration.csv)
 #TODO changing some of these cutoff dates manually based on data
 hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa) %>% 
-  left_join(read_csv("CWu OTC Hobos - duration.csv")) %>%
+  left_join(read_csv("./data/CWu OTC Hobos - duration.csv")) %>%
   filter(Timestamp > OTC_start+days(1), Timestamp < OTC_end) %>% 
   rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %>% 
   mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60)

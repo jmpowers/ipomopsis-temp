@@ -222,21 +222,6 @@ ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(x=paste(Year, Site, OI, Sam
   xlab("Year, in or out of the OTC, Date")
 ```
 
-```{r hobo, eval=FALSE}
- # Requirements: .csv files named with the site name or serial number.... 
-read.format.hobo <- function(dataFile, skiprows,...){ 
-  df4 <- read.csv(dataFile, header = TRUE, skip = skiprows, sep = ",") 
-  nametemp <- sub(".*temp.*", "TempC", colnames(df4), ignore.case = TRUE) 
-  colnames(df4) <- sub(".*date.*", "DateTime", nametemp, ignore.case = TRUE) 
-  df3<- df4[,c("DateTime", "TempC")] nameSep<-unlist(strsplit(dataFile, "[_.]")) # unlist/split filename. 
-  df1<- cbind(SiteName = paste(nameSep[1]), df2) # paste SiteName into 1st col. 
-  df<- na.omit(df1) }
-setwd("C:/Temperature/RawCSVfiles")
-Files <- Sys.glob("*.csv") # list all .csv files in working directory. 
-out <- lapply(Files, FUN = read.format.hobo, skiprows = 1) # apply custom function to each file. 
-output <- ldply(out, data.frame) # changes 'out' list to dataframe.
-```
-
 
 # Filtering criteria
 ```{r filtering}
