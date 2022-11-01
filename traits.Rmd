@@ -1,0 +1,77 @@
+---
+title: "Ipomopsis temperature experiments: Floral traits"
+author: "Carrie Wu, John Powers, David Hopp, Diane Campbell"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    self_contained: no
+    lib_dir: libs
+    code_folding: hide
+    toc: yes
+    toc_float: TRUE 
+editor_options: 
+  chunk_output_type: console
+---
+<style type="text/css">
+.main-container { max-width: 1000px; margin-left: 0; margin-right: auto; }
+img{ max-width:200%; height: auto; }
+td, th { padding : 6px }
+</style>
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
+                      fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=8, fig.width=8)
+```
+
+```{r read_data}
+census.maxf <- read_csv("data/traits/2021 Maxfield Rosettes - 2021OTCs.csv") %>% 
+  mutate(across(c(plant, plot), as.character)) %>% 
+  rename(OI = temp) %>% mutate(OI=fct_recode(OI, "out"="control", "in"="OTC"))
+
+morph <- bind_rows(GNA=read_csv("data/traits/GNA floral traits - 2021.csv", na="."),
+                SC=read_csv("data/traits/Spring Creek floral traits - 2021.csv", na="."), .id="site") %>% 
+  rename(plantid = plant, OI = location, plotid=OTC) %>% 
+  bind_rows(read_csv("data/traits/2021 Maxfield Floral Traits - Morphology21.csv") %>% 
+              mutate(plant = as.character(plant), site="Maxfield") %>% 
+              left_join(census.maxf) %>% drop_na(plot)) %>% 
+  mutate(species = if_else(site=="SC", "ten", "agg"))
+
+nectar <- read_csv("data/traits/2021 Maxfield Floral Traits - Nectar21.csv") %>% 
+  mutate(across(c(plant), as.character)) %>% 
+  left_join(census.maxf) %>% 
+  mutate(nectar_volume=nectar_48_h_mm*5/32,
+         nectar_sugar=nectar_volume*nectar_conc,
+         plantid=paste0(plotid,plant))
+
+ph21.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>% 
+  mutate(plot = as.character(plot), 
+         plotid = paste0(plot, subplot),
+         plantid = paste0(plotid, plant),
+         plant = as.character(plant),
+         julian = yday(date),
+         year="2021",
+         height_cm=as.integer(as.character(height_cm)),
+         open = rowSums(select(., starts_with("open")), na.rm=T),
+         buds = rowSums(select(., starts_with("buds")), na.rm=T),
+         eggs = rowSums(select(., starts_with("eggs")), na.rm=T)) %>% 
+  left_join(census.maxf) %>% 
+  mutate_if(is.character, as.factor) 
+
+#take means for each plant
+morph.mean <- morph %>% drop_na(corolla_length) %>% 
+  group_by(species, site, OI, plotid, plantid) %>%
+  summarize(across(c(corolla_length, corolla_width), mean, na.rm=T),
+            n = n())
+```
+
+```{r morph}
+morph %>% drop_na(corolla_length) %>% count(site, plantid) %>% 
+  ggplot(aes(x=n)) + geom_histogram(binwidth=1) + facet_wrap(vars(site), ncol=1)
+
+ggplot(morph.mean, aes(x=paste(species, site), y=corolla_length, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + geom_point(position=position_dodge(width=0.9))
+```
+

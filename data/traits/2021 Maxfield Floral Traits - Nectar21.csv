@@ -1,0 +1,81 @@
+observer,date,plotid,plant,time_marked,nectar_48_h_mm,nectar_conc,notes
+DC/DH,2021-07-07,1C,948,10:00,33,24.0,
+DC/DH,2021-07-07,1C,949,10:00,6,20.0,
+DC/DH,2021-07-07,1C,901,10:00,38,23.0,
+DC/DH,2021-07-07,1C,57,10:00,0,,
+DC/DH,2021-07-07,1C,53,10:00,,,
+DC/DH,2021-07-07,1B,666,10:15,0,,
+DC/DH,2021-07-07,1B,677,10:15,30,22.0,
+DC/DH,2021-07-07,1B,950,10:15,31,23.0,
+DC/DH,2021-07-07,1B,652,10:15,4,,
+DC/DH,2021-07-07,2A,903,10:15,60,23.0,
+DC/DH,2021-07-07,2B,905,10:15,9,32.0,
+DC/DH,2021-07-07,2B,904,10:15,68,17.0,
+DC/DH,2021-07-07,2B,93,10:15,46,19.0,
+DC/DH,2021-07-07,2B,184,10:15,84,23.0,
+DC/DH,2021-07-07,3B,624,10:15,54,24.0,
+DC/DH,2021-07-07,3B,623,10:15,9,23.0,
+DC/DH,2021-07-07,3B,906,10:15,9,22.0,
+DC/DH,2021-07-07,3B,821,10:15,,,
+DC/DH,2021-07-07,3B,952,10:15,32,26.0,
+DC/DH,2021-07-07,3D,858,10:15,32,30.0,
+DC/DH,2021-07-07,3D,888,10:15,53,24.0,
+DC/DH,2021-07-07,3D,255,10:15,9,,
+DC/DH,2021-07-07,3D,894,10:30,34,27.0,
+DC/DH,2021-07-07,4C,627,10:30,29,24.0,
+DC/DH,2021-07-07,4C,957,10:30,10,27.0,changed plant from 95 to probable 957
+DC/DH,2021-07-07,4C,957,10:30,38,24.0,changed plant from 95 to probable 957
+DC/DH,2021-07-07,4C,106,10:30,,,
+DC/DH,2021-07-07,4C,120,10:30,18,25.0,
+DC/DH,2021-07-07,4B,956,10:30,78,26.5,
+DC/DH,2021-07-07,4B,168,10:30,41,37.0,
+DC/DH,2021-07-07,4B,190,10:30,19,30.5,
+DC/DH,2021-07-07,4B,171,10:30,44,28.0,
+DC/DH,2021-07-07,4B,954,10:30,29,30.0,
+DC/DH,2021-07-07,4B,173,10:30,31,31.5,
+DC/DH,2021-07-07,4B,953,10:30,63,32.0,
+DC/DH,2021-07-07,4B,204,10:30,16,39.0,
+DC/DH,2021-07-07,5D,910,10:45,8,36.0,
+DC/DH,2021-07-07,5B,907,10:45,4,,
+DC/DH,2021-07-07,5B,908,10:45,21,20.5,
+DC/DH,2021-07-07,5B,7,10:45,47,32.5,
+DC/DH,2021-07-07,5B,909,10:45,74,23.0,
+DC/DH,2021-07-07,6C,81,10:45,37,29.5,
+DC/DH,2021-07-07,6C,95,10:45,41,30.0,
+DC/DH,2021-07-07,6A,912,10:45,30,27.0,
+DC/DH,2021-07-07,6A,131,10:45,27,31.0,
+DH,2021-07-14,1C,948,10:18,0,,Measurements taken during rain; 
+DH,2021-07-14,1C,57,10:21,28,18.0,Measurements taken during rain;
+DH,2021-07-14,1C,949,10:23,55,26,Measurements taken during rain;
+DH,2021-07-14,1C,901,10:27,27,25.0,Measurements taken during rain;
+DH,2021-07-14,1C,53,10:30,24,27.0,Measurements taken during rain;
+DH,2021-07-14,1B,666,10:33,10,25.0,Measurements taken during rain;
+DH,2021-07-14,1B,677,10:39,69,22.0,Measurements taken during rain;
+DH,2021-07-14,2A,903,10:43,21,27.0,Measurements taken during rain;
+DH,2021-07-14,2A,902,10:46,30,28.5,Measurements taken during rain;
+DH,2021-07-14,2B,93,10:50,24,28.5,Measurements taken during rain;
+DH,2021-07-14,3B,952,10:56,33,26.0,Measurements taken during rain;
+DH,2021-07-14,3B,624,10:58,47,23.0,Measurements taken during rain;
+DH,2021-07-14,3B,623,11:01,24,28.0,Measurements taken during rain;
+DH,2021-07-14,3B,906,11:04,20,15.0,Measurements taken during rain;
+DH,2021-07-14,3B,821,11:07,31,25.0,Measurements taken during rain;
+DH,2021-07-14,3D,894,11:11,50,24.0,Measurements taken during rain;
+DH,2021-07-14,3D,891,11:15,22,27.5,Measurements taken during rain;
+DH,2021-07-14,3D,858,11:18,43,27.0,Measurements taken during rain;
+DH,2021-07-14,3D,255,11:21,,,Measurements taken during rain;
+DH,2021-07-14,4C,627,11:24,33,26.5,Measurements taken during rain;
+DH,2021-07-14,4C,190,11:27,24,28.0,Measurements taken during rain;
+DH,2021-07-14,4C,957,11:29,10,25.0,Measurements taken during rain;
+DH,2021-07-14,4C,106,11:33,20,32.0,Measurements taken during rain;
+DH,2021-07-14,4C,108,11:36,10,33.5,Measurements taken during rain;
+DH,2021-07-14,4C,914,11:40,24,21.0,Measurements taken during rain;
+DH,2021-07-14,4B,956,11:44,5,12.0,Measurements taken during rain; unhealthy looking flower
+DH,2021-07-14,4B,955,11:47,12,15.0,Measurements taken during rain;
+DH,2021-07-14,4B,204,11:51,15,22.5,Measurements taken during rain;
+DH,2021-07-14,4B,953,11:55,0,,Measurements taken during rain;
+DH,2021-07-14,5B,907,13:26,27,24.0,Measurements taken during rain;
+DH,2021-07-14,5B,908,13:29,,,Measurements taken during rain; flower fell out
+DH,2021-07-14,5B,7,13:33,10,24.0,Measurements taken during rain;
+DH,2021-07-14,6C,81,13:42,24,21.5,Measurements taken during rain;
+DH,2021-07-14,6C,95,13:44,3,19.0,Measurements taken during rain;
+DH,2021-07-14,6C,913,13:46,13,24.0,Measurements taken during rain;
