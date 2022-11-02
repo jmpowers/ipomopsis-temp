@@ -273,11 +273,11 @@ td, th { padding : 6px }
 </style>
 <pre class="r"><code>census.maxf &lt;- read_csv(&quot;data/traits/2021 Maxfield Rosettes - 2021OTCs.csv&quot;) %&gt;% 
   mutate(across(c(plant, plot), as.character)) %&gt;% 
-  rename(OI = temp) %&gt;% mutate(OI=fct_recode(OI, &quot;out&quot;=&quot;control&quot;, &quot;in&quot;=&quot;OTC&quot;))
+  rename(OI = temp) %&gt;% mutate(OI=fct_relevel(fct_recode(OI,&quot;in&quot;=&quot;OTC&quot;, &quot;out&quot;=&quot;control&quot;),&quot;in&quot;))
 
 morph &lt;- bind_rows(GNA=read_csv(&quot;data/traits/GNA floral traits - 2021.csv&quot;, na=&quot;.&quot;),
                 SC=read_csv(&quot;data/traits/Spring Creek floral traits - 2021.csv&quot;, na=&quot;.&quot;), .id=&quot;site&quot;) %&gt;% 
-  rename(plantid = plant, OI = location, plotid=OTC) %&gt;% 
+  rename(plantid = plant, OI = location, plotid=OTC) %&gt;% drop_na(OI) %&gt;% 
   bind_rows(read_csv(&quot;data/traits/2021 Maxfield Floral Traits - Morphology21.csv&quot;) %&gt;% 
               mutate(plant = as.character(plant), site=&quot;Maxfield&quot;) %&gt;% 
               left_join(census.maxf) %&gt;% drop_na(plot)) %&gt;% 
@@ -288,9 +288,10 @@ nectar &lt;- read_csv(&quot;data/traits/2021 Maxfield Floral Traits - Nectar21.c
   left_join(census.maxf) %&gt;% 
   mutate(nectar_volume=nectar_48_h_mm*5/32,
          nectar_sugar=nectar_volume*nectar_conc,
-         plantid=paste0(plotid,plant))
+         plantid=paste0(plotid,plant), 
+         site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
 
-ph21.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quot;)%&gt;% 
+phen.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quot;)%&gt;% 
   mutate(plot = as.character(plot), 
          plotid = paste0(plot, subplot),
          plantid = paste0(plotid, plant),
@@ -304,17 +305,812 @@ ph21.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quo
   left_join(census.maxf) %&gt;% 
   mutate_if(is.character, as.factor) 
 
-#take means for each plant
+phen &lt;- phen.raw %&gt;% 
+  complete(nesting(plantid, plotid, plot, subplot, snow, OI),nesting(julian, date), fill=list(open=0,buds=0)) %&gt;% #add zeros to weeks the plant was not counted
+  mutate(flowering = open + buds &gt; 0,
+         has_egg = eggs &gt; 0, 
+         site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
+
+speclabs &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)
+templabs &lt;- c(&quot;in&quot;=&quot;warm&quot;, &quot;out&quot;=&quot;control&quot;)</code></pre>
+<div id="sample-sizes" class="section level1">
+<h1>Sample sizes</h1>
+<div id="measurements-per-plant" class="section level2">
+<h2>Measurements per plant</h2>
+<pre class="r"><code>morph %&gt;% drop_na(corolla_length) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;%
+  kable(caption=&quot;corolla_length&quot;)</code></pre>
+<table>
+<caption>corolla_length</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="right">n_per_plant</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2</td>
+<td align="right">63</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">4</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">18</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">3</td>
+<td align="right">13</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">4</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">5</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2</td>
+<td align="right">31</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>nectar %&gt;% drop_na(nectar_volume) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;% 
+  kable(caption=&quot;nectar_volume&quot;)</code></pre>
+<table>
+<caption>nectar_volume</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="right">n_per_plant</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">28</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">22</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">3</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>phen %&gt;% drop_na(height_cm) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;% 
+  kable(caption=&quot;height_cm&quot;)</code></pre>
+<table>
+<caption>height_cm</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="right">n_per_plant</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">3</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">4</td>
+<td align="right">19</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">5</td>
+<td align="right">12</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="number-of-plants" class="section level2">
+<h2>Number of plants</h2>
+<pre class="r"><code>morph %&gt;% drop_na(corolla_length) %&gt;% count(site, OI, plantid) %&gt;% count(site, OI) %&gt;% kable(caption=&quot;corolla_length&quot;)</code></pre>
+<table>
+<caption>corolla_length</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="left">OI</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="left">in</td>
+<td align="right">41</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="left">out</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">in</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="left">out</td>
+<td align="right">29</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="left">in</td>
+<td align="right">20</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="left">out</td>
+<td align="right">11</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>nectar%&gt;% drop_na(nectar_volume)  %&gt;% count(site, OI, plantid) %&gt;% count(site, OI) %&gt;% kable(caption=&quot;nectar_volume&quot;)</code></pre>
+<table>
+<caption>nectar_volume</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="left">OI</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">in</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="left">out</td>
+<td align="right">26</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>phen  %&gt;% drop_na(height_cm, OI)  %&gt;% count(site, OI, plantid) %&gt;% count(site, OI) %&gt;% kable(caption=&quot;height_cm&quot;)</code></pre>
+<table>
+<caption>height_cm</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="left">OI</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">in</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="left">out</td>
+<td align="right">31</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Average data by plant
 morph.mean &lt;- morph %&gt;% drop_na(corolla_length) %&gt;% 
-  group_by(species, site, OI, plotid, plantid) %&gt;%
-  summarize(across(c(corolla_length, corolla_width), mean, na.rm=T),
-            n = n())</code></pre>
-<pre class="r"><code>morph %&gt;% drop_na(corolla_length) %&gt;% count(site, plantid) %&gt;% 
-  ggplot(aes(x=n)) + geom_histogram(binwidth=1) + facet_wrap(vars(site), ncol=1)</code></pre>
-<p><img src="plots-traits/morph-1.svg" width="768" /></p>
+  group_by(species, site, OI, snow, plotid, plantid) %&gt;%
+  summarize(across(c(corolla_length, corolla_width), mean, na.rm=T), n = n())
+nectar.mean &lt;- nectar %&gt;% drop_na(nectar_volume) %&gt;% 
+  group_by(species, site, OI, snow, plotid, plantid) %&gt;%
+  summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
+phen.mean &lt;- phen %&gt;% drop_na(height_cm, OI) %&gt;% 
+  group_by(species, site, OI, snow, plotid, plantid) %&gt;% 
+  summarize(height_cm=mean(height_cm, na.rm=T))</code></pre>
+</div>
+</div>
+<div id="trait-correlations" class="section level1">
+<h1>Trait correlations</h1>
+<pre class="r"><code>ggplot(morph, aes(shape=site, y=corolla_width, x=corolla_length, color=OI)) + 
+  facet_wrap(vars(species), labeller = as_labeller(speclabs)) +
+  geom_point() + geom_smooth(aes(group=species), color=&quot;black&quot;) + 
+  labs(x=&quot;Corolla length&quot;, y=&quot;Corolla width&quot;, shape=&quot;Site&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_bw() + 
+  theme(strip.text=element_text(face=&quot;italic&quot;))</code></pre>
+<p><img src="plots-traits/corr-1.svg" width="480" /></p>
+<pre class="r"><code>ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=OI)) + 
+  geom_point() + geom_smooth(color=&quot;black&quot;) + 
+  labs(x=&quot;Nectar volume (uL)&quot;, y=&quot;Nectar concentration&quot;, shape=&quot;Site&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_bw() + 
+  theme(strip.text=element_text(face=&quot;italic&quot;))</code></pre>
+<p><img src="plots-traits/corr-2.svg" width="480" /></p>
+</div>
+<div id="trait-plasticity" class="section level1">
+<h1>Trait plasticity</h1>
 <pre class="r"><code>ggplot(morph.mean, aes(x=paste(species, site), y=corolla_length, color=OI)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + geom_point(position=position_dodge(width=0.9))</code></pre>
-<p><img src="plots-traits/morph-2.svg" width="768" /></p>
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1)) +
+  labs(x=&quot;Species, site&quot;, y=&quot;Corolla length&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-1.svg" width="480" /></p>
+<pre class="r"><code>ggplot(morph.mean, aes(x=paste(species, site), y=corolla_width, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x=&quot;Species, site&quot;, y=&quot;Corolla width&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-2.svg" width="480" /></p>
+<pre class="r"><code>ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_volume, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x=&quot;Species, site&quot;, y=&quot;Nectar volume (uL)&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-3.svg" width="480" /></p>
+<pre class="r"><code>ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_conc, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x=&quot;Species, site&quot;, y=&quot;Nectar concentration (%)&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-4.svg" width="480" /></p>
+<pre class="r"><code>ggplot(phen.mean, aes(x=paste(species, site), y=height_cm, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x=&quot;Species, site&quot;, y=&quot;Plant height (cm)&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-5.svg" width="480" /></p>
+</div>
+<div id="effect-of-snowmelt" class="section level1">
+<h1>Effect of snowmelt</h1>
+<pre class="r"><code>lmer(corolla_length~OI*snow+(1|plotid)+(1|plantid),data=filter(morph, site==&quot;Maxfield&quot;)) %&gt;% anova %&gt;%
+  kable(caption=&quot;corolla_length&quot;)</code></pre>
+<table>
+<caption>corolla_length</caption>
+<colgroup>
+<col width="12%" />
+<col width="16%" />
+<col width="16%" />
+<col width="9%" />
+<col width="13%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">67.7092273</td>
+<td align="right">67.7092273</td>
+<td align="right">1</td>
+<td align="right">50.23738</td>
+<td align="right">5.9467016</td>
+<td align="right">0.0183217</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">0.0076964</td>
+<td align="right">0.0076964</td>
+<td align="right">1</td>
+<td align="right">50.23738</td>
+<td align="right">0.0006760</td>
+<td align="right">0.9793611</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">4.4053643</td>
+<td align="right">4.4053643</td>
+<td align="right">1</td>
+<td align="right">50.23738</td>
+<td align="right">0.3869101</td>
+<td align="right">0.5367410</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(corolla_width ~OI*snow+(1|plotid)+(1|plantid),data=filter(morph, site==&quot;Maxfield&quot;)) %&gt;% anova %&gt;%
+  kable(caption=&quot;corolla_width&quot;)</code></pre>
+<table>
+<caption>corolla_width</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">0.0206937</td>
+<td align="right">0.0206937</td>
+<td align="right">1</td>
+<td align="right">47.25554</td>
+<td align="right">0.2318347</td>
+<td align="right">0.6323890</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">0.1333798</td>
+<td align="right">0.1333798</td>
+<td align="right">1</td>
+<td align="right">47.25554</td>
+<td align="right">1.4942744</td>
+<td align="right">0.2276166</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">0.0233401</td>
+<td align="right">0.0233401</td>
+<td align="right">1</td>
+<td align="right">47.25554</td>
+<td align="right">0.2614829</td>
+<td align="right">0.6114843</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(nectar_volume ~OI*snow+(1|plotid)+(1|plantid),data=nectar) %&gt;% anova %&gt;% 
+  kable(caption=&quot;nectar_volume&quot;)</code></pre>
+<table>
+<caption>nectar_volume</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">46.5024108</td>
+<td align="right">46.5024108</td>
+<td align="right">1</td>
+<td align="right">71</td>
+<td align="right">5.0485987</td>
+<td align="right">0.0277561</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">6.4097818</td>
+<td align="right">6.4097818</td>
+<td align="right">1</td>
+<td align="right">71</td>
+<td align="right">0.6958868</td>
+<td align="right">0.4069672</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">0.8225343</td>
+<td align="right">0.8225343</td>
+<td align="right">1</td>
+<td align="right">71</td>
+<td align="right">0.0892996</td>
+<td align="right">0.7659424</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(nectar_conc   ~OI*snow+(1|plotid)+(1|plantid),data=nectar) %&gt;% anova %&gt;% 
+  kable(caption=&quot;nectar_conc&quot;)</code></pre>
+<table>
+<caption>nectar_conc</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">7.17312</td>
+<td align="right">7.17312</td>
+<td align="right">1</td>
+<td align="right">64</td>
+<td align="right">0.2885804</td>
+<td align="right">0.5929945</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">83.58354</td>
+<td align="right">83.58354</td>
+<td align="right">1</td>
+<td align="right">64</td>
+<td align="right">3.3626330</td>
+<td align="right">0.0713417</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">40.77064</td>
+<td align="right">40.77064</td>
+<td align="right">1</td>
+<td align="right">64</td>
+<td align="right">1.6402357</td>
+<td align="right">0.2049150</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(height_cm   ~OI*snow+(1|plotid)+(1|plantid),data=phen) %&gt;% anova %&gt;% 
+  kable(caption=&quot;height_cm&quot;)</code></pre>
+<table>
+<caption>height_cm</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">3.9670994</td>
+<td align="right">3.9670994</td>
+<td align="right">1</td>
+<td align="right">57.13399</td>
+<td align="right">0.3584534</td>
+<td align="right">0.5517329</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">3.8147682</td>
+<td align="right">3.8147682</td>
+<td align="right">1</td>
+<td align="right">57.13399</td>
+<td align="right">0.3446893</td>
+<td align="right">0.5594479</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">0.5020839</td>
+<td align="right">0.5020839</td>
+<td align="right">1</td>
+<td align="right">57.13399</td>
+<td align="right">0.0453666</td>
+<td align="right">0.8320896</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="effect-of-temperature" class="section level1">
+<h1>Effect of temperature</h1>
+<pre class="r"><code>lmer(corolla_length~OI*species+(1|plantid),data=morph) %&gt;% anova %&gt;% kable(caption=&quot;corolla_length&quot;)</code></pre>
+<table>
+<caption>corolla_length</caption>
+<colgroup>
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+<col width="8%" />
+<col width="13%" />
+<col width="16%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">2.72977</td>
+<td align="right">2.72977</td>
+<td align="right">1</td>
+<td align="right">186.2849</td>
+<td align="right">0.3947111</td>
+<td align="right">0.5306029</td>
+</tr>
+<tr class="even">
+<td align="left">species</td>
+<td align="right">661.88844</td>
+<td align="right">661.88844</td>
+<td align="right">1</td>
+<td align="right">186.2849</td>
+<td align="right">95.7057893</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:species</td>
+<td align="right">10.63747</td>
+<td align="right">10.63747</td>
+<td align="right">1</td>
+<td align="right">186.2849</td>
+<td align="right">1.5381260</td>
+<td align="right">0.2164568</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(corolla_width ~OI*species+(1|plantid),data=morph) %&gt;% anova %&gt;% kable(caption=&quot;corolla_width&quot;)</code></pre>
+<table>
+<caption>corolla_width</caption>
+<colgroup>
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="8%" />
+<col width="13%" />
+<col width="15%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">0.2427111</td>
+<td align="right">0.2427111</td>
+<td align="right">1</td>
+<td align="right">138.4017</td>
+<td align="right">5.126515</td>
+<td align="right">0.0251177</td>
+</tr>
+<tr class="even">
+<td align="left">species</td>
+<td align="right">10.8947627</td>
+<td align="right">10.8947627</td>
+<td align="right">1</td>
+<td align="right">138.4017</td>
+<td align="right">230.117882</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:species</td>
+<td align="right">0.0493726</td>
+<td align="right">0.0493726</td>
+<td align="right">1</td>
+<td align="right">138.4017</td>
+<td align="right">1.042842</td>
+<td align="right">0.3089431</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(nectar_volume ~OI+(1|plantid),data=nectar)        %&gt;% anova %&gt;% kable(caption=&quot;nectar_volume&quot;)</code></pre>
+<table>
+<caption>nectar_volume</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">43.35161</td>
+<td align="right">43.35161</td>
+<td align="right">1</td>
+<td align="right">73</td>
+<td align="right">4.790112</td>
+<td align="right">0.031823</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(nectar_conc   ~OI+(1|plantid),data=nectar)        %&gt;% anova %&gt;% kable(caption=&quot;nectar_conc&quot;)</code></pre>
+<table>
+<caption>nectar_conc</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">1.40046</td>
+<td align="right">1.40046</td>
+<td align="right">1</td>
+<td align="right">66</td>
+<td align="right">0.0541714</td>
+<td align="right">0.8166778</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(height_cm     ~OI+(1|plantid),data=phen)          %&gt;% anova %&gt;% kable(caption=&quot;height_cm&quot;)</code></pre>
+<table>
+<caption>height_cm</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">3.426821</td>
+<td align="right">3.426821</td>
+<td align="right">1</td>
+<td align="right">59.11337</td>
+<td align="right">0.3096294</td>
+<td align="right">0.5800082</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="phenology-and-fly-eggs" class="section level1">
+<h1>Phenology and fly eggs</h1>
+<div id="snowmelt-effects" class="section level2">
+<h2>Snowmelt effects</h2>
+<pre class="r"><code>phen %&gt;% drop_na(snow,OI) %&gt;% group_by(snow, OI, julian) %&gt;% summarize_at(c(&quot;open&quot;,&quot;buds&quot;), mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=open, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y=&quot;Mean total flowers&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;, shape=&quot;Snowmelt&quot;, linetype=&quot;Snowmelt&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, &quot;lines&quot;))</code></pre>
+<p><img src="plots-traits/phenology_snow-1.svg" width="480" /></p>
+<pre class="r"><code>phen %&gt;% drop_na(snow,OI)%&gt;% group_by(snow, OI, julian) %&gt;% summarize_at(&quot;flowering&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=flowering, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y=&quot;Proportion flowering&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;, shape=&quot;Snowmelt&quot;, linetype=&quot;Snowmelt&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, &quot;lines&quot;))</code></pre>
+<p><img src="plots-traits/phenology_snow-2.svg" width="480" /></p>
+<pre class="r"><code>phen %&gt;% drop_na(snow,OI)%&gt;% group_by(snow, OI, julian) %&gt;% summarize_at(&quot;eggs&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=eggs, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y=&quot;Mean total eggs&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;, shape=&quot;Snowmelt&quot;, linetype=&quot;Snowmelt&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, &quot;lines&quot;))</code></pre>
+<p><img src="plots-traits/phenology_snow-3.svg" width="480" /></p>
+<pre class="r"><code>phen%&gt;% drop_na(snow,OI) %&gt;% group_by(year, snow, OI, julian) %&gt;% summarize_at(&quot;has_egg&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=has_egg, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y=&quot;Proportion of plants with eggs&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;, shape=&quot;Snowmelt&quot;, linetype=&quot;Snowmelt&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, &quot;lines&quot;))</code></pre>
+<p><img src="plots-traits/phenology_snow-4.svg" width="480" /></p>
+</div>
+<div id="temperature-effects" class="section level2">
+<h2>Temperature effects</h2>
+<pre class="r"><code>ggplot(phen %&gt;% drop_na(height_cm, OI), aes(x=julian, y=height_cm, color=OI))+ geom_point() + geom_path(aes(group=plantid))+
+  labs(y=&quot;Plant height&quot;, x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+ 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) +theme_minimal() </code></pre>
+<p><img src="plots-traits/phenology_temp-1.svg" width="480" /></p>
+<pre class="r"><code>phen %&gt;% drop_na(snow,OI) %&gt;% group_by(OI, julian) %&gt;% summarize_at(c(&quot;open&quot;,&quot;buds&quot;), mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=open, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y=&quot;Mean total flowers&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/phenology_temp-2.svg" width="480" /></p>
+<pre class="r"><code>phen %&gt;% drop_na(OI)%&gt;% group_by(OI, julian) %&gt;% summarize_at(&quot;flowering&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=flowering, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y=&quot;Proportion flowering&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/phenology_temp-3.svg" width="480" /></p>
+<pre class="r"><code>phen %&gt;% drop_na(OI)%&gt;% group_by(OI, julian) %&gt;% summarize_at(&quot;eggs&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=eggs, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y=&quot;Mean total eggs&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal() </code></pre>
+<p><img src="plots-traits/phenology_temp-4.svg" width="480" /></p>
+<pre class="r"><code>phen%&gt;% drop_na(OI) %&gt;% group_by(year, OI, julian) %&gt;% summarize_at(&quot;has_egg&quot;, mean, na.rm=T) %&gt;% 
+  ggplot(aes(x=julian, y=has_egg, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y=&quot;Proportion of plants with eggs&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal() </code></pre>
+<p><img src="plots-traits/phenology_temp-5.svg" width="480" /></p>
+</div>
+</div>
 
 
 

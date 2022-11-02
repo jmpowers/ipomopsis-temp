@@ -22,18 +22,21 @@ td, th { padding : 6px }
 library(tidyverse)
 library(lubridate)
 library(knitr)
+library(lme4)
+library(lmerTest)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
-                      fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=8, fig.width=8)
+                      fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), 
+                      fig.height=5, fig.width=5)
 ```
 
 ```{r read_data}
 census.maxf <- read_csv("data/traits/2021 Maxfield Rosettes - 2021OTCs.csv") %>% 
   mutate(across(c(plant, plot), as.character)) %>% 
-  rename(OI = temp) %>% mutate(OI=fct_recode(OI, "out"="control", "in"="OTC"))
+  rename(OI = temp) %>% mutate(OI=fct_relevel(fct_recode(OI,"in"="OTC", "out"="control"),"in"))
 
 morph <- bind_rows(GNA=read_csv("data/traits/GNA floral traits - 2021.csv", na="."),
                 SC=read_csv("data/traits/Spring Creek floral traits - 2021.csv", na="."), .id="site") %>% 
-  rename(plantid = plant, OI = location, plotid=OTC) %>% 
+  rename(plantid = plant, OI = location, plotid=OTC) %>% drop_na(OI) %>% 
   bind_rows(read_csv("data/traits/2021 Maxfield Floral Traits - Morphology21.csv") %>% 
               mutate(plant = as.character(plant), site="Maxfield") %>% 
               left_join(census.maxf) %>% drop_na(plot)) %>% 
@@ -44,9 +47,10 @@ nectar <- read_csv("data/traits/2021 Maxfield Floral Traits - Nectar21.csv") %>%
   left_join(census.maxf) %>% 
   mutate(nectar_volume=nectar_48_h_mm*5/32,
          nectar_sugar=nectar_volume*nectar_conc,
-         plantid=paste0(plotid,plant))
+         plantid=paste0(plotid,plant), 
+         site="Maxfield", species="agg")
 
-ph21.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>% 
+phen.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>% 
   mutate(plot = as.character(plot), 
          plotid = paste0(plot, subplot),
          plantid = paste0(plotid, plant),
@@ -60,18 +64,203 @@ ph21.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>%
   left_join(census.maxf) %>% 
   mutate_if(is.character, as.factor) 
 
-#take means for each plant
+phen <- phen.raw %>% 
+  complete(nesting(plantid, plotid, plot, subplot, snow, OI),nesting(julian, date), fill=list(open=0,buds=0)) %>% #add zeros to weeks the plant was not counted
+  mutate(flowering = open + buds > 0,
+         has_egg = eggs > 0, 
+         site="Maxfield", species="agg")
+
+speclabs <- c(agg="I. aggregata", ten="I. tenuituba")
+templabs <- c("in"="warm", "out"="control")
+```
+
+# Sample sizes
+
+## Measurements per plant
+```{r n_per_plant}
+morph %>% drop_na(corolla_length) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>%
+  kable(caption="corolla_length")
+nectar %>% drop_na(nectar_volume) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
+  kable(caption="nectar_volume")
+phen %>% drop_na(height_cm) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
+  kable(caption="height_cm")
+```
+
+## Number of plants
+```{r n_total}
+morph %>% drop_na(corolla_length) %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="corolla_length")
+nectar%>% drop_na(nectar_volume)  %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="nectar_volume")
+phen  %>% drop_na(height_cm, OI)  %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="height_cm")
+
+#Average data by plant
 morph.mean <- morph %>% drop_na(corolla_length) %>% 
-  group_by(species, site, OI, plotid, plantid) %>%
-  summarize(across(c(corolla_length, corolla_width), mean, na.rm=T),
-            n = n())
+  group_by(species, site, OI, snow, plotid, plantid) %>%
+  summarize(across(c(corolla_length, corolla_width), mean, na.rm=T), n = n())
+nectar.mean <- nectar %>% drop_na(nectar_volume) %>% 
+  group_by(species, site, OI, snow, plotid, plantid) %>%
+  summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
+phen.mean <- phen %>% drop_na(height_cm, OI) %>% 
+  group_by(species, site, OI, snow, plotid, plantid) %>% 
+  summarize(height_cm=mean(height_cm, na.rm=T))
 ```
 
-```{r morph}
-morph %>% drop_na(corolla_length) %>% count(site, plantid) %>% 
-  ggplot(aes(x=n)) + geom_histogram(binwidth=1) + facet_wrap(vars(site), ncol=1)
 
+# Trait correlations
+```{r corr}
+ggplot(morph, aes(shape=site, y=corolla_width, x=corolla_length, color=OI)) + 
+  facet_wrap(vars(species), labeller = as_labeller(speclabs)) +
+  geom_point() + geom_smooth(aes(group=species), color="black") + 
+  labs(x="Corolla length", y="Corolla width", shape="Site", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_bw() + 
+  theme(strip.text=element_text(face="italic"))
+ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=OI)) + 
+  geom_point() + geom_smooth(color="black") + 
+  labs(x="Nectar volume (uL)", y="Nectar concentration", shape="Site", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_bw() + 
+  theme(strip.text=element_text(face="italic"))
+```
+
+# Trait plasticity
+```{r plasticity}
 ggplot(morph.mean, aes(x=paste(species, site), y=corolla_length, color=OI)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + geom_point(position=position_dodge(width=0.9))
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1)) +
+  labs(x="Species, site", y="Corolla length", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+ggplot(morph.mean, aes(x=paste(species, site), y=corolla_width, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x="Species, site", y="Corolla width", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_volume, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x="Species, site", y="Nectar volume (uL)", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_conc, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x="Species, site", y="Nectar concentration (%)", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+ggplot(phen.mean, aes(x=paste(species, site), y=height_cm, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x="Species, site", y="Plant height (cm)", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
 ```
 
+# Effect of snowmelt
+
+```{r snow}
+lmer(corolla_length~OI*snow+(1|plotid)+(1|plantid),data=filter(morph, site=="Maxfield")) %>% anova %>%
+  kable(caption="corolla_length")
+lmer(corolla_width ~OI*snow+(1|plotid)+(1|plantid),data=filter(morph, site=="Maxfield")) %>% anova %>%
+  kable(caption="corolla_width")
+lmer(nectar_volume ~OI*snow+(1|plotid)+(1|plantid),data=nectar) %>% anova %>% 
+  kable(caption="nectar_volume")
+lmer(nectar_conc   ~OI*snow+(1|plotid)+(1|plantid),data=nectar) %>% anova %>% 
+  kable(caption="nectar_conc")
+lmer(height_cm   ~OI*snow+(1|plotid)+(1|plantid),data=phen) %>% anova %>% 
+  kable(caption="height_cm")
+```
+
+# Effect of temperature
+
+```{r temp}
+lmer(corolla_length~OI*species+(1|plantid),data=morph) %>% anova %>% kable(caption="corolla_length")
+lmer(corolla_width ~OI*species+(1|plantid),data=morph) %>% anova %>% kable(caption="corolla_width")
+lmer(nectar_volume ~OI+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_volume")
+lmer(nectar_conc   ~OI+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_conc")
+lmer(height_cm     ~OI+(1|plantid),data=phen)          %>% anova %>% kable(caption="height_cm")
+```
+
+# Phenology and fly eggs
+
+## Snowmelt effects
+
+```{r phenology_snow}
+phen %>% drop_na(snow,OI) %>% group_by(snow, OI, julian) %>% summarize_at(c("open","buds"), mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=open, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y="Mean total flowers", 
+       x="Day of year", color="Temperature", shape="Snowmelt", linetype="Snowmelt") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette="Set1", labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, "lines"))
+
+phen %>% drop_na(snow,OI)%>% group_by(snow, OI, julian) %>% summarize_at("flowering", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=flowering, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y="Proportion flowering", 
+       x="Day of year", color="Temperature", shape="Snowmelt", linetype="Snowmelt") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette="Set1", labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, "lines"))
+
+phen %>% drop_na(snow,OI)%>% group_by(snow, OI, julian) %>% summarize_at("eggs", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=eggs, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y="Mean total eggs", 
+       x="Day of year", color="Temperature", shape="Snowmelt", linetype="Snowmelt") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette="Set1", labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, "lines"))
+
+phen%>% drop_na(snow,OI) %>% group_by(year, snow, OI, julian) %>% summarize_at("has_egg", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=has_egg, shape=snow, linetype=snow, color=OI))+ geom_point() + 
+  geom_path(aes(group=paste(snow, OI))) +
+  labs(y="Proportion of plants with eggs", 
+       x="Day of year", color="Temperature", shape="Snowmelt", linetype="Snowmelt") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette="Set1", labels=templabs) +
+  scale_linetype_manual(values=c(2,1)) + theme_minimal() + 
+  theme(legend.key.size = unit(2, "lines"))
+```
+
+## Temperature effects
+
+```{r phenology_temp}
+ggplot(phen %>% drop_na(height_cm, OI), aes(x=julian, y=height_cm, color=OI))+ geom_point() + geom_path(aes(group=plantid))+
+  labs(y="Plant height", x="Day of year", color="Temperature") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+ 
+  scale_color_brewer(palette="Set1", labels=templabs) +theme_minimal() 
+
+phen %>% drop_na(snow,OI) %>% group_by(OI, julian) %>% summarize_at(c("open","buds"), mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=open, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y="Mean total flowers", 
+       x="Day of year", color="Temperature") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+
+phen %>% drop_na(OI)%>% group_by(OI, julian) %>% summarize_at("flowering", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=flowering, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y="Proportion flowering", 
+       x="Day of year", color="Temperature") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+
+phen %>% drop_na(OI)%>% group_by(OI, julian) %>% summarize_at("eggs", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=eggs, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y="Mean total eggs", 
+       x="Day of year", color="Temperature") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal() 
+
+phen%>% drop_na(OI) %>% group_by(year, OI, julian) %>% summarize_at("has_egg", mean, na.rm=T) %>% 
+  ggplot(aes(x=julian, y=has_egg, color=OI))+ geom_point() + 
+  geom_path(aes(group=OI)) +
+  labs(y="Proportion of plants with eggs", 
+       x="Day of year", color="Temperature") +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_y_continuous(labels = scales::percent)+
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal() 
+```
