@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2022-11-01" />
+<meta name="date" content="2022-11-02" />
 
 <title>Ipomopsis temperature experiments: Floral traits</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 traits</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2022-11-01</h4>
+<h4 class="date">2022-11-02</h4>
 
 </div>
 
@@ -290,6 +290,25 @@ nectar &lt;- read_csv(&quot;data/traits/2021 Maxfield Floral Traits - Nectar21.c
          nectar_sugar=nectar_volume*nectar_conc,
          plantid=paste0(plotid,plant), 
          site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
+
+flrcol.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Flower Color - 2021.csv&quot;, name_repair=&quot;minimal&quot;) %&gt;% as.data.frame()
+wl &lt;- flrcol.raw[,1] #350:1000
+flrcol.raw &lt;- flrcol.raw[,seq(2,length(flrcol.raw),2)]
+
+flrcol.long &lt;- cbind(wl,stack(flrcol.raw)) %&gt;% 
+  mutate(red=wl&gt;=626&amp;wl&lt;=700, #sum red and green regions to calculate redness index
+         green=wl&gt;=476&amp;wl&lt;=550,
+         total=wl&gt;=401&amp;wl&lt;=750,
+         color=ifelse(red,&quot;red&quot;,ifelse(green,&quot;green&quot;,NA)))
+flrcol.total &lt;- flrcol.long %&gt;% group_by(color,total,ind) %&gt;% summarize(values=sum(values))
+
+flrcol &lt;- pivot_wider(flrcol.total,names_from=c(&quot;color&quot;,&quot;total&quot;),values_from=&quot;values&quot;) %&gt;% 
+  mutate(total = green_TRUE+red_TRUE+NA_TRUE,
+         redness = (red_TRUE-green_TRUE)/total,
+         ind = str_replace(ind,fixed(&quot;.&quot;),&quot;_&quot;)) %&gt;% 
+  separate(ind, into=c(&quot;plantid&quot;,&quot;rep&quot;), sep=&quot;_&quot;, fill=&quot;right&quot;, remove=F) %&gt;%
+  mutate(rep=as.integer(replace_na(rep, &quot;0&quot;))+1) %&gt;% 
+  left_join(census.maxf) %&gt;% mutate(site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
 
 phen.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quot;)%&gt;% 
   mutate(plot = as.character(plot), 
@@ -444,6 +463,30 @@ templabs &lt;- c(&quot;in&quot;=&quot;warm&quot;, &quot;out&quot;=&quot;control&
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>flrcol %&gt;% drop_na(redness) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;% 
+  kable(caption=&quot;redness&quot;)</code></pre>
+<table>
+<caption>redness</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="right">n_per_plant</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">26</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="number-of-plants" class="section level2">
 <h2>Number of plants</h2>
@@ -536,6 +579,29 @@ templabs &lt;- c(&quot;in&quot;=&quot;warm&quot;, &quot;out&quot;=&quot;control&
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>flrcol%&gt;% drop_na(redness, OI)    %&gt;% count(site, OI, plantid) %&gt;% count(site, OI) %&gt;% kable(caption=&quot;redness&quot;)</code></pre>
+<table>
+<caption>redness</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="left">OI</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">in</td>
+<td align="right">26</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="left">out</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>#Average data by plant
 morph.mean &lt;- morph %&gt;% drop_na(corolla_length) %&gt;% 
   group_by(species, site, OI, snow, plotid, plantid) %&gt;%
@@ -545,7 +611,10 @@ nectar.mean &lt;- nectar %&gt;% drop_na(nectar_volume) %&gt;%
   summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
 phen.mean &lt;- phen %&gt;% drop_na(height_cm, OI) %&gt;% 
   group_by(species, site, OI, snow, plotid, plantid) %&gt;% 
-  summarize(height_cm=mean(height_cm, na.rm=T))</code></pre>
+  summarize(height_cm=mean(height_cm, na.rm=T))
+flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, OI) %&gt;% 
+  group_by(species, site, OI, snow, plotid, plantid) %&gt;% 
+  summarize(redness=mean(redness, na.rm=T))</code></pre>
 </div>
 </div>
 <div id="trait-correlations" class="section level1">
@@ -596,6 +665,12 @@ phen.mean &lt;- phen %&gt;% drop_na(height_cm, OI) %&gt;%
   labs(x=&quot;Species, site&quot;, y=&quot;Plant height (cm)&quot;, color=&quot;Temperature&quot;) + 
   scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
 <p><img src="plots-traits/plasticity-5.svg" width="480" /></p>
+<pre class="r"><code>ggplot(flrcol, aes(x=paste(species, site), y=redness, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x=&quot;Species, site&quot;, y=&quot;Redness index&quot;, color=&quot;Temperature&quot;) + 
+  scale_color_brewer(palette=&quot;Set1&quot;, labels=templabs) + theme_minimal()</code></pre>
+<p><img src="plots-traits/plasticity-6.svg" width="480" /></p>
 </div>
 <div id="effect-of-snowmelt" class="section level1">
 <h1>Effect of snowmelt</h1>
@@ -833,6 +908,51 @@ phen.mean &lt;- phen %&gt;% drop_na(height_cm, OI) %&gt;%
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>lmer(redness     ~OI*snow+(1|plotid)+(1|plantid), data=flrcol) %&gt;% anova %&gt;% 
+  kable(caption=&quot;redness&quot;)</code></pre>
+<table>
+<caption>redness</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">0.0034027</td>
+<td align="right">0.0034027</td>
+<td align="right">1</td>
+<td align="right">62</td>
+<td align="right">0.8620574</td>
+<td align="right">0.3567643</td>
+</tr>
+<tr class="even">
+<td align="left">snow</td>
+<td align="right">0.0147175</td>
+<td align="right">0.0147175</td>
+<td align="right">1</td>
+<td align="right">62</td>
+<td align="right">3.7286085</td>
+<td align="right">0.0580634</td>
+</tr>
+<tr class="odd">
+<td align="left">OI:snow</td>
+<td align="right">0.0000153</td>
+<td align="right">0.0000153</td>
+<td align="right">1</td>
+<td align="right">62</td>
+<td align="right">0.0038819</td>
+<td align="right">0.9505204</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="effect-of-temperature" class="section level1">
 <h1>Effect of temperature</h1>
@@ -1020,6 +1140,127 @@ phen.mean &lt;- phen %&gt;% drop_na(height_cm, OI) %&gt;%
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>lmer(redness       ~OI+(1|plantid), data=flrcol)       %&gt;% anova %&gt;% kable(caption=&quot;redness&quot;)</code></pre>
+<table>
+<caption>redness</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">OI</td>
+<td align="right">0.0028207</td>
+<td align="right">0.0028207</td>
+<td align="right">1</td>
+<td align="right">64</td>
+<td align="right">0.6936907</td>
+<td align="right">0.4080093</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="flower-color" class="section level1">
+<h1>Flower color</h1>
+<div id="spectra" class="section level2">
+<h2>Spectra</h2>
+<pre class="r"><code>library(pavo)
+# use human range to estimate perceived color (requires interpolated 300 nm data)
+flrspec.human &lt;- cbind(wl, flrcol.raw) %&gt;% as.rspec(lim = c(300,700))#no UV data below 350 nm, interpolate
+#plot(flrspec.human, col = turbo(ncol(flrspec)), main=&quot;Raw data&quot;)
+#plot(flrspec.human, col = spec2rgb(flrspec.human), main=&quot;Raw data&quot;)
+flrspec.human.nm &lt;- procspec(flrspec.human, opt = c(&quot;smooth&quot;, &quot;max&quot;), span=0.08) #smooth and normalize
+#plot(flrspec.human.nm, col = turbo(ncol(flrspec)), main=&quot;Divide by max&quot;)
+flrspec.human.nm.zero &lt;- procspec(flrspec.human.nm, fixneg=&quot;zero&quot;) #throw out negative reflectance
+#plot(flrspec.human.nm.zero, col = turbo(ncol(flrspec)), main=&quot;Divide by max&quot;)
+#plot(flrspec.human.nm.zero, col = spec2rgb(flrspec.human.nm.zero), main=&quot;Divide by max&quot;)
+flrcol$RGB &lt;- spec2rgb(flrspec.human.nm.zero)</code></pre>
+<pre class="r"><code>ggplot(flrcol.long, aes(x=wl, y=values, color=ind)) + geom_line() + 
+  annotate(&quot;rect&quot;, xmin=401, xmax=750, ymin=0, ymax=100, fill=NA, color=&quot;black&quot;, size=1) +
+  annotate(&quot;rect&quot;, xmin=476, xmax=550, ymin=0, ymax=100, fill=NA, color=&quot;green&quot;, size=1) +
+  annotate(&quot;rect&quot;, xmin=626, xmax=700, ymin=0, ymax=100, fill=NA, color=&quot;red&quot;, size=1) +
+  labs(x=&quot;Wavelength (nm)&quot;, y=&quot;Reflectance (%)&quot;)+ guides(color=&quot;none&quot;) + theme_minimal() +
+  scale_x_continuous(n.breaks=10, limits=c(350, 1000)) + scale_color_viridis_d(option=&quot;turbo&quot;)</code></pre>
+<p><img src="plots-traits/flrcol-1.png" width="480" /></p>
+<pre class="r"><code>plot_colranges &lt;- function() {
+  abline(v=476, lwd=2, col=&quot;green&quot;); abline(v=550, lwd=2, col=&quot;green&quot;)
+  abline(v=626, lwd=2, col=&quot;red&quot;);   abline(v=700, lwd=2, col=&quot;red&quot;)
+  abline(v=401, lwd=2, col=&quot;black&quot;); abline(v=750, lwd=2, col=&quot;black&quot;)
+}
+
+flrspec &lt;- cbind(wl, flrcol.raw) %&gt;% as.rspec(lim = c(401,750))
+plot(flrspec, col = turbo(ncol(flrspec)), main=&quot;Raw data&quot;); plot_colranges()</code></pre>
+<p><img src="plots-traits/flrcol-2.png" width="480" /></p>
+<pre class="r"><code>heatmap(t(as.matrix(flrspec)[,-1]), Rowv = NA, Colv=NA, scale=&quot;none&quot;, col=viridis(128), main=&quot;Raw data&quot;) #block of samples zeroed wrong?</code></pre>
+<p><img src="plots-traits/flrcol-3.png" width="480" /></p>
+<pre class="r"><code>ggplot(flrcol.total %&gt;% mutate(index=row_number()), aes(x=index, y=values, color=paste(color, total))) +
+  geom_point() + geom_smooth(span=0.2) + labs(x=&quot;Sample number&quot;, y=&quot;Summed reflectance&quot;, color=&quot;Wavelength range&quot;)+
+  scale_color_manual(values=c(&quot;green&quot;, &quot;grey50&quot; ,&quot;black&quot;,&quot;red&quot;), 
+                     labels=c(&quot;green&quot;,&quot;outside 400-750 nm&quot;, &quot;other inside 400-750 nm&quot;, &quot;red&quot;))</code></pre>
+<p><img src="plots-traits/flrcol-4.png" width="480" /></p>
+<pre class="r"><code>ggplot(flrcol %&gt;% mutate(index=row_number()), aes(x=index, y=redness)) +
+  geom_point() + geom_smooth(span=0.3) + labs(x=&quot;Sample number&quot;, y=&quot;Redness&quot;)</code></pre>
+<p><img src="plots-traits/flrcol-5.png" width="480" /></p>
+<pre class="r"><code>flrspec.nm.zero &lt;- procspec(flrspec, opt = c(&quot;smooth&quot;, &quot;max&quot;), span=0.08, fixneg=&quot;zero&quot;) #smooth, normalize, zero negatives
+plot(flrspec.nm.zero, col = turbo(ncol(flrspec)), main=&quot;Divide by max&quot;); plot_colranges()</code></pre>
+<p><img src="plots-traits/flrcol-6.png" width="480" /></p>
+<pre class="r"><code>heatmap(t(as.matrix(flrspec.nm.zero)[,-1]), Rowv = NA, Colv=NA, scale=&quot;none&quot;, col=viridis(128), main=&quot;Divide by max&quot;) #block fixed by normalizing</code></pre>
+<p><img src="plots-traits/flrcol-7.png" width="480" /></p>
+<pre class="r"><code>plot(flrspec.nm.zero, col = flrcol$RGB, main=&quot;Divide by max&quot;); plot_colranges()</code></pre>
+<p><img src="plots-traits/flrcol-8.png" width="480" /></p>
+<pre class="r"><code>plot(flrspec.nm.zero, col = viridis(100)[300*(flrcol$redness-0.1)], main=&quot;Divide by max, color by redness&quot;); plot_colranges()</code></pre>
+<p><img src="plots-traits/flrcol-9.png" width="480" /></p>
+<pre class="r"><code>flrspec.sum.zero &lt;- procspec(flrspec, opt = c(&quot;smooth&quot;, &quot;sum&quot;), span=0.08, fixneg=&quot;zero&quot;) #smooth, normalize, zero negatives
+plot(flrspec.sum.zero, col = viridis(100)[300*(flrcol$redness-0.1)], main=&quot;Divide by sum, color by redness&quot;); plot_colranges()</code></pre>
+<p><img src="plots-traits/flrcol-10.png" width="480" /></p>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<pre class="r"><code>flrspec.nm.zero.bin &lt;- procspec(flrspec.nm.zero, opt = c(&quot;bin&quot;, &quot;center&quot;), bins=16) 
+rownames(flrspec.nm.zero.bin) &lt;- flrspec.nm.zero.bin[,1]
+library(vegan)
+flrcol.pca &lt;- rda(t(flrspec.nm.zero.bin[,-1]), scale = TRUE)
+flrcol &lt;- bind_cols(flrcol, scores(flrcol.pca, display=&quot;sites&quot;))
+plot(flrcol.pca, type=&quot;none&quot;, main=paste(&quot;PCA of&quot;, nrow(flrspec.nm.zero.bin),&quot;wavelength bins&quot;))
+ordispider(flrcol.pca, flrcol$plantid, col=&quot;grey40&quot;)
+points(flrcol.pca, display=&quot;sites&quot;, col=flrcol$RGB, pch=c(17,19)[flrcol$OI])
+text(flrcol.pca, display=&quot;species&quot;, col=&quot;black&quot;, cex=0.8)</code></pre>
+<p><img src="plots-traits/flrcol_pca-1.svg" width="480" /></p>
+<pre class="r"><code>library(GGally)
+ggpairs(select(flrcol, total, red_TRUE, green_TRUE, redness, PC1), 
+        lower=list(continuous=wrap(&quot;smooth&quot;, method = &quot;loess&quot;)))</code></pre>
+<p><img src="plots-traits/flrcol_pca-2.svg" width="480" /></p>
+</div>
+<div id="cap" class="section level2">
+<h2>CAP</h2>
+<pre class="r"><code>flrcol.cap &lt;- capscale(t(flrspec.nm.zero.bin[,-1]) ~ OI, scale = TRUE, data=flrcol)
+anova(flrcol.cap, by=&quot;term&quot;)</code></pre>
+<pre><code>Permutation test for capscale under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+Model: capscale(formula = t(flrspec.nm.zero.bin[, -1]) ~ OI, data = flrcol, scale = TRUE)
+         Df SumOfSqs      F Pr(&gt;F)
+OI        1   0.0674 1.0572  0.323
+Residual 64   4.0795              </code></pre>
+</div>
+<div id="spectrum-vs.-temp" class="section level2">
+<h2>Spectrum vs. temp</h2>
+<pre class="r"><code>aggplot(procspec(flrspec, opt=&quot;smooth&quot;, span=0.08), flrcol$OI, legend= T, main=&quot;Raw data&quot;)</code></pre>
+<p><img src="plots-traits/flrcol_avg-1.svg" width="480" /></p>
+<pre class="r"><code>aggplot(flrspec.nm.zero, flrcol$OI, legend= T,main= &quot;Divided by max&quot;)</code></pre>
+<p><img src="plots-traits/flrcol_avg-2.svg" width="480" /></p>
+<pre class="r"><code>aggplot(flrspec.sum.zero, flrcol$OI, legend= T, main=&quot;Divided by sum&quot;)</code></pre>
+<p><img src="plots-traits/flrcol_avg-3.svg" width="480" /></p>
+</div>
 </div>
 <div id="phenology-and-fly-eggs" class="section level1">
 <h1>Phenology and fly eggs</h1>

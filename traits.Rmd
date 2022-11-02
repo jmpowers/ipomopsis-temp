@@ -24,6 +24,7 @@ library(lubridate)
 library(knitr)
 library(lme4)
 library(lmerTest)
+library(viridis)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
                       fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), 
                       fig.height=5, fig.width=5)
@@ -49,6 +50,25 @@ nectar <- read_csv("data/traits/2021 Maxfield Floral Traits - Nectar21.csv") %>%
          nectar_sugar=nectar_volume*nectar_conc,
          plantid=paste0(plotid,plant), 
          site="Maxfield", species="agg")
+
+flrcol.raw <- read_csv("data/traits/2021 Maxfield Flower Color - 2021.csv", name_repair="minimal") %>% as.data.frame()
+wl <- flrcol.raw[,1] #350:1000
+flrcol.raw <- flrcol.raw[,seq(2,length(flrcol.raw),2)]
+
+flrcol.long <- cbind(wl,stack(flrcol.raw)) %>% 
+  mutate(red=wl>=626&wl<=700, #sum red and green regions to calculate redness index
+         green=wl>=476&wl<=550,
+         total=wl>=401&wl<=750,
+         color=ifelse(red,"red",ifelse(green,"green",NA)))
+flrcol.total <- flrcol.long %>% group_by(color,total,ind) %>% summarize(values=sum(values))
+
+flrcol <- pivot_wider(flrcol.total,names_from=c("color","total"),values_from="values") %>% 
+  mutate(total = green_TRUE+red_TRUE+NA_TRUE,
+         redness = (red_TRUE-green_TRUE)/total,
+         ind = str_replace(ind,fixed("."),"_")) %>% 
+  separate(ind, into=c("plantid","rep"), sep="_", fill="right", remove=F) %>%
+  mutate(rep=as.integer(replace_na(rep, "0"))+1) %>% 
+  left_join(census.maxf) %>% mutate(site="Maxfield", species="agg")
 
 phen.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>% 
   mutate(plot = as.character(plot), 
@@ -84,6 +104,8 @@ nectar %>% drop_na(nectar_volume) %>% count(site, plantid, name="n_per_plant") %
   kable(caption="nectar_volume")
 phen %>% drop_na(height_cm) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
   kable(caption="height_cm")
+flrcol %>% drop_na(redness) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
+  kable(caption="redness")
 ```
 
 ## Number of plants
@@ -91,6 +113,7 @@ phen %>% drop_na(height_cm) %>% count(site, plantid, name="n_per_plant") %>% cou
 morph %>% drop_na(corolla_length) %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="corolla_length")
 nectar%>% drop_na(nectar_volume)  %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="nectar_volume")
 phen  %>% drop_na(height_cm, OI)  %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="height_cm")
+flrcol%>% drop_na(redness, OI)    %>% count(site, OI, plantid) %>% count(site, OI) %>% kable(caption="redness")
 
 #Average data by plant
 morph.mean <- morph %>% drop_na(corolla_length) %>% 
@@ -102,6 +125,9 @@ nectar.mean <- nectar %>% drop_na(nectar_volume) %>%
 phen.mean <- phen %>% drop_na(height_cm, OI) %>% 
   group_by(species, site, OI, snow, plotid, plantid) %>% 
   summarize(height_cm=mean(height_cm, na.rm=T))
+flrcol.mean <- flrcol %>% drop_na(redness, OI) %>% 
+  group_by(species, site, OI, snow, plotid, plantid) %>% 
+  summarize(redness=mean(redness, na.rm=T))
 ```
 
 
@@ -147,6 +173,11 @@ ggplot(phen.mean, aes(x=paste(species, site), y=height_cm, color=OI)) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
   labs(x="Species, site", y="Plant height (cm)", color="Temperature") + 
   scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
+ggplot(flrcol, aes(x=paste(species, site), y=redness, color=OI)) + 
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
+  labs(x="Species, site", y="Redness index", color="Temperature") + 
+  scale_color_brewer(palette="Set1", labels=templabs) + theme_minimal()
 ```
 
 # Effect of snowmelt
@@ -162,6 +193,8 @@ lmer(nectar_conc   ~OI*snow+(1|plotid)+(1|plantid),data=nectar) %>% anova %>%
   kable(caption="nectar_conc")
 lmer(height_cm   ~OI*snow+(1|plotid)+(1|plantid),data=phen) %>% anova %>% 
   kable(caption="height_cm")
+lmer(redness     ~OI*snow+(1|plotid)+(1|plantid), data=flrcol) %>% anova %>% 
+  kable(caption="redness")
 ```
 
 # Effect of temperature
@@ -172,7 +205,91 @@ lmer(corolla_width ~OI*species+(1|plantid),data=morph) %>% anova %>% kable(capti
 lmer(nectar_volume ~OI+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_volume")
 lmer(nectar_conc   ~OI+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_conc")
 lmer(height_cm     ~OI+(1|plantid),data=phen)          %>% anova %>% kable(caption="height_cm")
+lmer(redness       ~OI+(1|plantid), data=flrcol)       %>% anova %>% kable(caption="redness")
 ```
+
+# Flower color
+
+## Spectra
+
+```{r flrcol_uv}
+library(pavo)
+# use human range to estimate perceived color (requires interpolated 300 nm data)
+flrspec.human <- cbind(wl, flrcol.raw) %>% as.rspec(lim = c(300,700))#no UV data below 350 nm, interpolate
+#plot(flrspec.human, col = turbo(ncol(flrspec)), main="Raw data")
+#plot(flrspec.human, col = spec2rgb(flrspec.human), main="Raw data")
+flrspec.human.nm <- procspec(flrspec.human, opt = c("smooth", "max"), span=0.08) #smooth and normalize
+#plot(flrspec.human.nm, col = turbo(ncol(flrspec)), main="Divide by max")
+flrspec.human.nm.zero <- procspec(flrspec.human.nm, fixneg="zero") #throw out negative reflectance
+#plot(flrspec.human.nm.zero, col = turbo(ncol(flrspec)), main="Divide by max")
+#plot(flrspec.human.nm.zero, col = spec2rgb(flrspec.human.nm.zero), main="Divide by max")
+flrcol$RGB <- spec2rgb(flrspec.human.nm.zero)
+```
+
+```{r flrcol, dev="png", dev.args=list()}
+ggplot(flrcol.long, aes(x=wl, y=values, color=ind)) + geom_line() + 
+  annotate("rect", xmin=401, xmax=750, ymin=0, ymax=100, fill=NA, color="black", size=1) +
+  annotate("rect", xmin=476, xmax=550, ymin=0, ymax=100, fill=NA, color="green", size=1) +
+  annotate("rect", xmin=626, xmax=700, ymin=0, ymax=100, fill=NA, color="red", size=1) +
+  labs(x="Wavelength (nm)", y="Reflectance (%)")+ guides(color="none") + theme_minimal() +
+  scale_x_continuous(n.breaks=10, limits=c(350, 1000)) + scale_color_viridis_d(option="turbo")
+
+plot_colranges <- function() {
+  abline(v=476, lwd=2, col="green"); abline(v=550, lwd=2, col="green")
+  abline(v=626, lwd=2, col="red");   abline(v=700, lwd=2, col="red")
+  abline(v=401, lwd=2, col="black"); abline(v=750, lwd=2, col="black")
+}
+
+flrspec <- cbind(wl, flrcol.raw) %>% as.rspec(lim = c(401,750))
+plot(flrspec, col = turbo(ncol(flrspec)), main="Raw data"); plot_colranges()
+heatmap(t(as.matrix(flrspec)[,-1]), Rowv = NA, Colv=NA, scale="none", col=viridis(128), main="Raw data") #block of samples zeroed wrong?
+ggplot(flrcol.total %>% mutate(index=row_number()), aes(x=index, y=values, color=paste(color, total))) +
+  geom_point() + geom_smooth(span=0.2) + labs(x="Sample number", y="Summed reflectance", color="Wavelength range")+
+  scale_color_manual(values=c("green", "grey50" ,"black","red"), 
+                     labels=c("green","outside 400-750 nm", "other inside 400-750 nm", "red"))
+ggplot(flrcol %>% mutate(index=row_number()), aes(x=index, y=redness)) +
+  geom_point() + geom_smooth(span=0.3) + labs(x="Sample number", y="Redness")
+
+flrspec.nm.zero <- procspec(flrspec, opt = c("smooth", "max"), span=0.08, fixneg="zero") #smooth, normalize, zero negatives
+plot(flrspec.nm.zero, col = turbo(ncol(flrspec)), main="Divide by max"); plot_colranges()
+heatmap(t(as.matrix(flrspec.nm.zero)[,-1]), Rowv = NA, Colv=NA, scale="none", col=viridis(128), main="Divide by max") #block fixed by normalizing
+plot(flrspec.nm.zero, col = flrcol$RGB, main="Divide by max"); plot_colranges()
+plot(flrspec.nm.zero, col = viridis(100)[300*(flrcol$redness-0.1)], main="Divide by max, color by redness"); plot_colranges()
+flrspec.sum.zero <- procspec(flrspec, opt = c("smooth", "sum"), span=0.08, fixneg="zero") #smooth, normalize, zero negatives
+plot(flrspec.sum.zero, col = viridis(100)[300*(flrcol$redness-0.1)], main="Divide by sum, color by redness"); plot_colranges()
+```
+
+## PCA
+```{r flrcol_pca}
+flrspec.nm.zero.bin <- procspec(flrspec.nm.zero, opt = c("bin", "center"), bins=16) 
+rownames(flrspec.nm.zero.bin) <- flrspec.nm.zero.bin[,1]
+library(vegan)
+flrcol.pca <- rda(t(flrspec.nm.zero.bin[,-1]), scale = TRUE)
+flrcol <- bind_cols(flrcol, scores(flrcol.pca, display="sites"))
+plot(flrcol.pca, type="none", main=paste("PCA of", nrow(flrspec.nm.zero.bin),"wavelength bins"))
+ordispider(flrcol.pca, flrcol$plantid, col="grey40")
+points(flrcol.pca, display="sites", col=flrcol$RGB, pch=c(17,19)[flrcol$OI])
+text(flrcol.pca, display="species", col="black", cex=0.8)
+
+library(GGally)
+ggpairs(select(flrcol, total, red_TRUE, green_TRUE, redness, PC1), 
+        lower=list(continuous=wrap("smooth", method = "loess")))
+```
+
+## CAP
+```{r flrcol_cap}
+flrcol.cap <- capscale(t(flrspec.nm.zero.bin[,-1]) ~ OI, scale = TRUE, data=flrcol)
+anova(flrcol.cap, by="term")
+```
+
+## Spectrum vs. temp
+
+```{r flrcol_avg}
+aggplot(procspec(flrspec, opt="smooth", span=0.08), flrcol$OI, legend= T, main="Raw data")
+aggplot(flrspec.nm.zero, flrcol$OI, legend= T,main= "Divided by max")
+aggplot(flrspec.sum.zero, flrcol$OI, legend= T, main="Divided by sum")
+```
+
 
 # Phenology and fly eggs
 
