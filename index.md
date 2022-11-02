@@ -1,4 +1,6 @@
 # Ipomopsis Temperature Experiments
 
-[Floral plasticity analyses](./ipotemp.html)
-[Temperature treatments](./otcs.html)
+[Floral and leaf volatile plasticity](./ipotemp.html)
+[Floral trait plasticity](./traits.html)
+[OTC efficacy](./otcs.html)
+
