@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2022-11-02" />
+<meta name="date" content="2022-11-03" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2022-11-02</h4>
+<h4 class="date">2022-11-03</h4>
 
 </div>
 
@@ -298,7 +298,26 @@ ipo.cut &lt;- ipo.all[,colSums(ipo.all)&gt;4e6]
 
 write(rownames(ipo.all), &quot;data/CWu_samples.txt&quot;)
 
-ipos &lt;- read.csv(&quot;data/CWu_samples.csv&quot;, colClasses=list(RunDate=&quot;Date&quot;))</code></pre>
+ipos &lt;- read.csv(&quot;data/CWu_samples.csv&quot;, colClasses=list(RunDate=&quot;Date&quot;))
+
+
+# Maxfield
+
+# setwd(&quot;~/Downloads/MaxfieldVols21/batches&quot;)
+# source(&quot;../read_shimadzu.R&quot;)
+# datafiles &lt;- list.files(pattern=&quot;.txt&quot;) # TODO had to copy over newer Maxfield_210802.txt and add Maxfield_SC_210802b.txt
+# GCMS_output &lt;- map(datafiles, read.shimadzu)
+# filenames &lt;- set_names(GCMS_output,datafiles) %&gt;% bind_rows(.id=&quot;Batch&quot;) %&gt;% as_tibble %&gt;% 
+#   group_by(Batch, Filename) %&gt;% tally
+# setwd(&quot;~/Downloads/MaxfieldVols21/&quot;)#&quot;data&quot; folder
+# write_csv(filenames, &quot;filenames.csv&quot;)
+#... load in GCMS_metadata 
+#GCMS_Maxfield_21 &lt;- GCMS_output %&gt;% bind_rows() %&gt;% filter(Filename %in% GCMS_metadata$Filename)
+#save(GCMS_Maxfield_21, file=&quot;Maxfield_21.Rdata&quot;)
+
+load(&quot;data/Maxfield_21.Rdata&quot;) #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
+
+ipo.data &lt;- bind_rows(ipo.data, GCMS_Maxfield_21)</code></pre>
 <div id="overview---no-metadata" class="section level1">
 <h1>Overview - no metadata</h1>
 <div id="inventory" class="section level2">
@@ -417,11 +436,45 @@ otc21 &lt;- bind_rows(SC=sc21, GNA=gna21, .id=&quot;site&quot;) %&gt;%
 #TODO find missing chromatogram files (6) and missing metdata (4)
 #otc21 %&gt;% filter(is.na(FileName), is.na(lost))
 
-library(forcats)
-meta &lt;- bind_rows(otc=bind_rows(otc2, otc21), perc=perc2, .id=&quot;expt&quot;) %&gt;% 
+# Maxfield metadata
+maxfiles &lt;- read_csv(&quot;data/filenames_metadata - filenames_metadata.csv&quot;) %&gt;% 
+  mutate(Is2021 = str_detect(Filename,&quot;_210&quot;)) %&gt;% 
+  filter(Maxfield==1 &amp; Year==&quot;2021&quot;) %&gt;% 
+  separate(Filename2, into=c(&quot;plantid&quot;,&quot;vial&quot;,&quot;date&quot;,&quot;rundate&quot;,&quot;sequence&quot;,&quot;ext&quot;),remove=F) %&gt;% 
+  mutate(across(c(plantid, vial), na_if,&quot;NA&quot;)) %&gt;% 
+  mutate(date = ymd(date), vial=as.character(vial),
+         filament = ifelse(date&gt;ymd(&quot;2021-07-21&quot;),&quot;after&quot;,&quot;before&quot;))
+
+GCMS_metadata1 &lt;- read_csv(&quot;data/2021 Maxfield Volatiles - 2021.csv&quot;) %&gt;% mutate(plotid=paste0(plot, subplot)) %&gt;% 
+  left_join(read_csv(&quot;data/2021 Maxfield Rosettes - 2021OTCs.csv&quot;) %&gt;% mutate(plant=as.character(plant)),
+            by=c(&quot;plotid&quot;,&quot;plant&quot;,&quot;plantid&quot;))
+
+max21.oldformat &lt;- bind_rows(
+left_join(maxfiles %&gt;% filter(vial %in% c(&quot;A&quot;,&quot;B&quot;)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;vial&quot;,&quot;date&quot;)),
+left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp; is.na(plantid)), GCMS_metadata1, by=c(&quot;vial&quot;,&quot;date&quot;)), #vial numbers only
+left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp;!is.na(plantid)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;date&quot;))) %&gt;%  #plantid
+  mutate(type=factor(ifelse(plant==&quot;air&quot;,&quot;ambient&quot;,&quot;floral&quot;)), 
+         temp=factor(temp.y), snow=factor(snow),
+         plantid= coalesce(plantid, plantid.y)) 
+
+max21 &lt;- max21.oldformat %&gt;% #put in line with CWu metadata
+  rename(Date=date, RunDate_text=rundate,
+         Comments=notes, Collector=observer, Bag=bag, Pump=pump,End=end, 
+         NumFlrs=flowers, NumBuds=buds, PumpID=pump_id, SoilVWC=VWC,
+         PlantType=type) %&gt;% 
+  mutate(vial=as.integer(recode(vial, &quot;A&quot;=&quot;1001&quot;, &quot;B&quot;=&quot;1002&quot;)),
+         RunDate_text = as.integer(RunDate_text),
+         PlantType=recode(PlantType, &quot;ambient&quot;=&quot;air&quot;, &quot;floral&quot;=&quot;agg&quot;),
+         Tissue=recode(PlantType, &quot;agg&quot;=&quot;flower&quot;),
+         Expt=&quot;otc&quot;,Site=&quot;Maxfield&quot;,DN=&quot;day&quot;,
+         temp=recode(temp,&quot;OTC&quot;=&quot;warmed&quot;))
+  
+
+meta &lt;- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id=&quot;expt&quot;) %&gt;% 
   mutate_if(is.character, as.factor) %&gt;%
   mutate(Equil=Pump-Bag, Duration=End-Pump, Total=End-Bag,
-         Pump_datehour = paste(Date, Pump) %&gt;% ymd_hms(tz=&quot;America/Denver&quot;) %&gt;% round_date(&quot;hour&quot;)) %&gt;% 
+         Pump_datehour = paste(Date, Pump) %&gt;% ymd_hms(tz=&quot;America/Denver&quot;) %&gt;% round_date(&quot;hour&quot;),
+         Expt=expt) %&gt;% #TODO sort thru Expt==NA
   #Add mean temperature of OTCs or controls at time of sampling
   left_join(read_csv(&quot;data/hobos_mean.csv&quot;) %&gt;% select(-date) %&gt;% 
               mutate(datetime = force_tz(datetime, &quot;America/Denver&quot;)), 
@@ -430,7 +483,7 @@ meta &lt;- bind_rows(otc=bind_rows(otc2, otc21), perc=perc2, .id=&quot;expt&quot
 
 meta %&gt;% write.csv(&quot;data/CWu_meta21.csv&quot;)
 
-meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(caption=&quot;Sample size&quot;)</code></pre>
+meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% kable(caption=&quot;Sample size&quot;)</code></pre>
 <table>
 <caption>Sample size</caption>
 <thead>
@@ -439,6 +492,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <th align="left">Temp</th>
 <th align="left">Tissue</th>
 <th align="left">PlantType</th>
+<th align="left">Site</th>
 <th align="left">temp</th>
 <th align="left">DN</th>
 <th align="left">Expt</th>
@@ -452,6 +506,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">air</td>
 <td align="left">air</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
 <td align="right">4</td>
@@ -462,6 +517,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">air</td>
 <td align="left">air</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
 <td align="right">4</td>
@@ -471,6 +527,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">cool</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
@@ -482,6 +539,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">flower</td>
 <td align="left">agg</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
 <td align="right">9</td>
@@ -491,6 +549,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">cool</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
@@ -502,6 +561,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">flower</td>
 <td align="left">ten</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
 <td align="right">9</td>
@@ -512,6 +572,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">air</td>
 <td align="left">air</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
 <td align="right">4</td>
@@ -521,6 +582,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">warm</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
@@ -532,6 +594,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">flower</td>
 <td align="left">agg</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
 <td align="right">8</td>
@@ -541,6 +604,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">warm</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
@@ -552,6 +616,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">flower</td>
 <td align="left">ten</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">perc</td>
 <td align="right">8</td>
@@ -562,6 +627,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">flower</td>
 <td align="left">ten</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">perc</td>
 <td align="right">8</td>
@@ -571,296 +637,326 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">bb</td>
 <td align="left">air</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">10</td>
-</tr>
-<tr class="even">
-<td align="right">2018</td>
-<td align="left">NA</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">control</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">29</td>
-</tr>
-<tr class="odd">
-<td align="right">2018</td>
-<td align="left">NA</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">warmed</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">43</td>
-</tr>
-<tr class="even">
-<td align="right">2018</td>
-<td align="left">NA</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">warmed</td>
-<td align="left">day</td>
-<td align="left">NA</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="right">2018</td>
-<td align="left">NA</td>
-<td align="left">leaf</td>
-<td align="left">agg</td>
-<td align="left">control</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">2018</td>
-<td align="left">NA</td>
-<td align="left">leaf</td>
-<td align="left">agg</td>
-<td align="left">warmed</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
 <td align="right">4</td>
 </tr>
 <tr class="even">
-<td align="right">2019</td>
-<td align="left">cool</td>
+<td align="right">2018</td>
+<td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
+<td align="left">GNA</td>
+<td align="left">air</td>
 <td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">flower</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
+<td align="left">otc</td>
 <td align="right">6</td>
 </tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">flower</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">5</td>
-</tr>
 <tr class="odd">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">leaf</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">cool</td>
-<td align="left">leaf</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">6</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">NA</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">flower</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">flower</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">night</td>
-<td align="left">perc</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">leaf</td>
-<td align="left">agg</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">warm</td>
-<td align="left">leaf</td>
-<td align="left">ten</td>
-<td align="left">NA</td>
-<td align="left">day</td>
-<td align="left">perc</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
-<td align="left">NA</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">NA</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">air</td>
-<td align="left">night</td>
-<td align="left">otc</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="right">2019</td>
+<td align="right">2018</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">bb</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">10</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">NA</td>
-<td align="left">flower</td>
-<td align="left">agg</td>
-<td align="left">control</td>
-<td align="left">day</td>
-<td align="left">NA</td>
-<td align="right">1</td>
+<td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="right">2019</td>
+<td align="right">2018</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">bb</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
 <td align="right">13</td>
 </tr>
 <tr class="odd">
+<td align="right">2018</td>
+<td align="left">NA</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">GNA</td>
+<td align="left">control</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">16</td>
+</tr>
+<tr class="even">
+<td align="right">2018</td>
+<td align="left">NA</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">GNA</td>
+<td align="left">warmed</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">32</td>
+</tr>
+<tr class="odd">
+<td align="right">2018</td>
+<td align="left">NA</td>
+<td align="left">leaf</td>
+<td align="left">agg</td>
+<td align="left">bb</td>
+<td align="left">warmed</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2018</td>
+<td align="left">NA</td>
+<td align="left">leaf</td>
+<td align="left">agg</td>
+<td align="left">GNA</td>
+<td align="left">control</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">flower</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">flower</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">leaf</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">cool</td>
+<td align="left">leaf</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">flower</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">flower</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">perc</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">leaf</td>
+<td align="left">agg</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">warm</td>
+<td align="left">leaf</td>
+<td align="left">ten</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">perc</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">NA</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">GNA</td>
+<td align="left">air</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">NA</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">SC</td>
+<td align="left">air</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">NA</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">SC</td>
+<td align="left">air</td>
+<td align="left">night</td>
+<td align="left">otc</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">GNA</td>
+<td align="left">control</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">NA</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">GNA</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
-<td align="left">NA</td>
-<td align="right">5</td>
+<td align="left">otc</td>
+<td align="right">18</td>
 </tr>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -871,66 +967,51 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">night</td>
 <td align="left">otc</td>
-<td align="right">8</td>
+<td align="right">9</td>
 </tr>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
-<td align="left">control</td>
-<td align="left">night</td>
-<td align="left">NA</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">NA</td>
-<td align="left">flower</td>
-<td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
 <td align="right">11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">warmed</td>
 <td align="left">night</td>
 <td align="left">otc</td>
 <td align="right">9</td>
 </tr>
-<tr class="odd">
-<td align="right">2019</td>
-<td align="left">NA</td>
-<td align="left">leaf</td>
-<td align="left">agg</td>
-<td align="left">control</td>
-<td align="left">day</td>
-<td align="left">otc</td>
-<td align="right">8</td>
-</tr>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">leaf</td>
 <td align="left">agg</td>
+<td align="left">GNA</td>
 <td align="left">control</td>
 <td align="left">day</td>
-<td align="left">NA</td>
-<td align="right">2</td>
+<td align="left">otc</td>
+<td align="right">10</td>
 </tr>
 <tr class="odd">
 <td align="right">2019</td>
 <td align="left">NA</td>
 <td align="left">leaf</td>
 <td align="left">agg</td>
+<td align="left">GNA</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -941,6 +1022,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">leaf</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -951,26 +1033,51 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">leaf</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">9</td>
+<td align="right">12</td>
 </tr>
 <tr class="even">
-<td align="right">2019</td>
+<td align="right">2021</td>
 <td align="left">NA</td>
-<td align="left">leaf</td>
-<td align="left">ten</td>
-<td align="left">warmed</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">GNA</td>
+<td align="left">control</td>
 <td align="left">day</td>
-<td align="left">NA</td>
-<td align="right">3</td>
+<td align="left">otc</td>
+<td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">GNA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">Maxfield</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">air</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -981,6 +1088,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">air</td>
 <td align="left">night</td>
 <td align="left">otc</td>
@@ -991,16 +1099,18 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">4</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">night</td>
 <td align="left">otc</td>
@@ -1011,16 +1121,18 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">NA</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">7</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">NA</td>
 <td align="left">air</td>
 <td align="left">air</td>
+<td align="left">SC</td>
 <td align="left">NA</td>
 <td align="left">night</td>
 <td align="left">otc</td>
@@ -1031,6 +1143,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">GNA</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -1041,6 +1154,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">agg</td>
+<td align="left">GNA</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -1050,7 +1164,30 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="right">2021</td>
 <td align="left">NA</td>
 <td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">Maxfield</td>
+<td align="left">control</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">38</td>
+</tr>
+<tr class="even">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">flower</td>
+<td align="left">agg</td>
+<td align="left">Maxfield</td>
+<td align="left">warmed</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">44</td>
+</tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -1061,6 +1198,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">control</td>
 <td align="left">night</td>
 <td align="left">otc</td>
@@ -1071,6 +1209,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
@@ -1081,6 +1220,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %&gt;% kable(ca
 <td align="left">NA</td>
 <td align="left">flower</td>
 <td align="left">ten</td>
+<td align="left">SC</td>
 <td align="left">warmed</td>
 <td align="left">night</td>
 <td align="left">otc</td>
@@ -1445,23 +1585,19 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 </div>
 <div id="otc-soil-moisture" class="section level2">
 <h2>OTC Soil moisture</h2>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(x=paste(Year, Site, temp), y=SoilVWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point()+
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(x=paste(Year, Site), y=SoilVWC, color=temp)) +
+  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point(position=position_dodge(width=0.8))+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;)+
-  ggtitle(&quot;Effects of OTCs on Soil Moisture&quot;)+
-  ylab(&quot;Soil Volumetric Water Content (%)&quot;) +
-  xlab(&quot;Year, temperature&quot;)</code></pre>
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
+  labs(title=&quot;Effects of OTCs on Soil Moisture&quot;,y=&quot;Soil Volumetric Water Content (%)&quot;,
+       x=&quot;Year, site&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/soil-1.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(x=paste(Year, Site, temp, SampleDate_text), y=SoilVWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point()+
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(x=paste(Year, Site, Date), y=SoilVWC, color=temp)) +
+  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;)+
-  ggtitle(&quot;Effects of OTCs on Soil Moisture&quot;)+
-  ylab(&quot;Soil Volumetric Water Content (%)&quot;) +
-  xlab(&quot;Year, temperature, date&quot;)</code></pre>
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
+  labs(title=&quot;Effects of OTCs on Soil Moisture&quot;,y=&quot;Soil Volumetric Water Content (%)&quot;,
+       x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/soil-2.svg" width="768" /></p>
 </div>
 <div id="otc-temperature-during-sampling" class="section level2">
@@ -1471,7 +1607,7 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_jitter(height=0, width=0.2)+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   ggtitle(&quot;Effects of OTCs on Temperature during Sampling&quot;)+
   ylab(&quot;Temperature (C)&quot;) +
   xlab(&quot;Year, temperature&quot;)</code></pre>
@@ -1481,7 +1617,7 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_jitter(height=0, width=0.2)+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;)+
+  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   ggtitle(&quot;Effects of OTCs on Temperature during Sampling: I agg.&quot;)+
   ylab(&quot;Temperature (C)&quot;) +
   xlab(&quot;Year, temperature&quot;)</code></pre>
@@ -1490,8 +1626,10 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 </div>
 <div id="filtering-criteria" class="section level1">
 <h1>Filtering criteria</h1>
+<div id="flowers" class="section level2">
+<h2>Flowers</h2>
 <pre class="r"><code>sv &lt;- meta %&gt;% drop_na(Filename)
-ipo.gc &lt;- ipo.all[sv$Filename,]
+#ipo.gc &lt;- ipo.all[sv$Filename,]
 
 library(bouquet)
 ipo.data.cut &lt;- ipo.data[ipo.data$Filename %in% sv$Filename,]
@@ -1504,38 +1642,53 @@ metadata &lt;- sv %&gt;% mutate(Tissue = fct_recode(Tissue, ambient=&quot;air&qu
 vol.all &lt;- make_sampletable(longdata, metadata)
 chems &lt;- make_chemtable(longdata, metadata)
 
+
+#TODO update this code to convert to nanograms
+# classes &lt;- read_csv(&quot;Ipo volatile compounds - max21_chemtable.csv&quot;)
+# table(classes$class)
+# stds &lt;- read_csv(&quot;shimadzu_standards.xlsx - conversions_2021.csv&quot;)
+# longdata.ng &lt;- longdata %&gt;% left_join(select(GCMS_metadata, sample=Filename, filament)) %&gt;% 
+#   left_join(select(classes, class, name), by=&quot;name&quot;) %&gt;% 
+#   left_join(stds) %&gt;% 
+#   mutate(area = area / area_per_ng) #area is no longer area!!! it&#39;s nanograms
+# sampletable.ng = make_sampletable(longdata.ng, metadata)[,names(sampletable)]
+
 ### Flower filtering
 chemsf &lt;- chems %&gt;%
   filter_RT(2, 17) %&gt;% 
   filter_match(0.8) %&gt;% 
-  filter_freq(0.05, group = FALSE) %&gt;% 
+  filter_freq(0.1, group = FALSE) %&gt;% 
   filter_contaminant(cont.list = c(&quot;Cyclotetrasiloxane, octamethyl-&quot;)) %&gt;% 
-  filter_area(min_maximum = 5e5) %&gt;% 
+  filter_area(min_maximum = 1e6) %&gt;% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %&gt;%
   filter_ambient_ttest(vol.all, metadata, alpha = 0.05, adjust = &quot;fdr&quot;) %&gt;%
   combine_filters() 
 chemsf$filter_final &lt;- with(chemsf, filter_RT == &quot;OK&quot; &amp; filter_match ==&quot;OK&quot; &amp; filter_freq.floral == &quot;OK&quot; &amp; filter_area == &quot;OK&quot; &amp; 
-                              (filter_ambient_ratio == &quot;OK&quot; | filter_ambient_ttest == &quot;OK&quot;) &amp; filter_contaminant == &quot;OK&quot;)
+                              (filter_ambient_ratio == &quot;OK&quot; | (filter_ambient_ttest == &quot;OK&quot; &amp; ambient_ratio &gt;1)) &amp; filter_contaminant == &quot;OK&quot;)
 bouquet::plot_filters(chemsf, option=&quot;rarity&quot;)</code></pre>
 <p><img src="plots/filtering-1.svg" width="1152" /></p>
 <pre class="r"><code>bouquet::plot_filters(chemsf, option=&quot;ambient&quot;)</code></pre>
 <p><img src="plots/filtering-2.svg" width="1152" /></p>
 <pre class="r"><code>bouquet::plot_filters(chemsf, option=&quot;prop&quot;)</code></pre>
 <p><img src="plots/filtering-3.svg" width="1152" /></p>
+</div>
+<div id="leaves" class="section level2">
+<h2>Leaves</h2>
 <pre class="r"><code>### Leaf filtering
 meta.leaf &lt;- metadata %&gt;% mutate(type = fct_recode(type, floral = &quot;leaf&quot;, flower = &quot;floral&quot;)) #trick bouquet to think the leaf samples are floral TODO: hacky!
 chems.leaf &lt;- make_chemtable(longdata, meta.leaf) 
 chemsf.leaf &lt;- chems.leaf %&gt;%
   filter_RT(2, 17) %&gt;% 
   filter_match(0.8) %&gt;% 
-  filter_freq(0.1, group = FALSE) %&gt;% 
+  filter_freq(0.2, group = FALSE) %&gt;% 
   filter_contaminant(cont.list = c(&quot;Caprolactam&quot;)) %&gt;% 
   filter_area(min_maximum = 5e5) %&gt;% 
   filter_ambient_ratio(vol.all, meta.leaf, ratio = 4) %&gt;%
   filter_ambient_ttest(vol.all, meta.leaf, alpha = 0.05, adjust = &quot;fdr&quot;) %&gt;%
   combine_filters()
 chemsf.leaf$filter_final &lt;- with(chemsf.leaf, filter_RT == &quot;OK&quot; &amp; filter_match ==&quot;OK&quot; &amp; filter_freq.floral == &quot;OK&quot; &amp; #floral are actually leafs
-                                   filter_area == &quot;OK&quot; &amp; (filter_ambient_ratio == &quot;OK&quot; | filter_ambient_ttest == &quot;OK&quot;) &amp; filter_contaminant == &quot;OK&quot;)
+                                   filter_area == &quot;OK&quot; &amp; (filter_ambient_ratio == &quot;OK&quot; | (filter_ambient_ttest == &quot;OK&quot; &amp; ambient_ratio &gt;1)) &amp; filter_contaminant == &quot;OK&quot;)
+#TODO bouquet needs to do a one-sided t-test! some compounds lower in blanks got a pass with low p value!
 bouquet::plot_filters(chemsf.leaf, option=&quot;rarity&quot;)</code></pre>
 <p><img src="plots/filtering_leaf-1.svg" width="768" /></p>
 <pre class="r"><code>bouquet::plot_filters(chemsf.leaf, option=&quot;ambient&quot;)</code></pre>
@@ -1577,7 +1730,7 @@ colnames(vol.all) &lt;- chemsf3$name
 #vol &lt;- prune_sampletable(vol.all, chemsf3, metadata)
 #TODO use chesf3 (manual list instead)
 vol &lt;- prune_sampletable(vol.all, chemsf3, metadata)
-files_exclude &lt;- c(&quot;T196DAug16_09012018.qgd&quot;, &quot;A188DAug16_09012018.qgd&quot;, &quot;OTC_Z3_190805_8102019_24.qgd&quot;, &quot;T139_day_190725_862019_06.qgd&quot;, &quot;GNA_17_210716_7202021_18.qgd&quot;)#no filtered volatiles
+files_exclude &lt;- c(&quot;T196DAug16_09012018.qgd&quot;, &quot;A188DAug16_09012018.qgd&quot;, &quot;OTC_Z3_190805_8102019_24.qgd&quot;, &quot;T139_day_190725_862019_06.qgd&quot;, &quot;GNA_17_210716_7202021_18.qgd&quot;,&quot;Maxfield_27_210723_822021_03.qgd&quot;)#no filtered volatiles
 svf &lt;- metadata[metadata$type == &quot;floral&quot; &amp; !(metadata$sample %in% files_exclude),]
 svf$Year &lt;- factor(svf$Year)
 svf &lt;- svf %&gt;% mutate_if(is.factor, droplevels) %&gt;% 
@@ -1596,6 +1749,10 @@ vol.leaf &lt;- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
 svl$LeafDryWtGrams[c(8,3)] &lt;- svl$LeafDryWtGrams[c(8,3)]/10
 vol.leaf &lt;- vol.leaf / 0.75 / svl$LeafDryWtGrams #area per hour per dry gram
 #TODO fix svf$Total data entry errors for leaves</code></pre>
+</div>
+</div>
+<div id="all-filtered-samples" class="section level1">
+<h1>All filtered samples</h1>
 <div id="flower-heatmap" class="section level2">
 <h2>Flower heatmap</h2>
 <pre class="r"><code>#cairo_pdf(&quot;ipo_heatmap.pdf&quot;, width=12, height=12)
@@ -1611,9 +1768,8 @@ ph  &lt;- pheatmap(as.matrix(t(vol))^(1/3),
 <p><img src="plots/heatmap-1.png" width="1152" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
-</div>
-<div id="nmds-of-all-filtered-samples" class="section level1">
-<h1>NMDS of all filtered samples</h1>
+<div id="flower-nmds" class="section level2">
+<h2>Flower NMDS</h2>
 <pre class="r"><code>set.seed(1)
 nmds.vol &lt;- metaMDS(sqrt(vol), dist=&quot;bray&quot;, autotransform = FALSE, trace=F)
 
@@ -1622,15 +1778,16 @@ TEYcols &lt;- brewer.pal(9, &quot;Paired&quot;)#[c(1:4,8,5:6)]
 spcols &lt;- c(agg=&quot;red&quot;, ten=&quot;violet&quot;)
 ordiplot(nmds.vol, type = &quot;n&quot;)
 text(nmds.vol, display=&quot;species&quot;, cex=0.7, col=&quot;grey20&quot;)
+legend(&quot;topleft&quot;, levels(svf$DN), pch=c(13,19))
+#legend(&quot;topright&quot;, levels(svf$PlantType), fill=spcols)
+legend(&quot;bottomright&quot;, levels(svf$Year), fill=1:3)
+#legend(&quot;bottomleft&quot;, levels(TEY), fill=TEYcols, cex=0.9)
 points(nmds.vol, display=&quot;sites&quot;, col=TEYcols[TEY], pch=c(13,19)[svf$DN])
 points(nmds.vol, display=&quot;sites&quot;, col=spcols[svf$PlantType], pch=c(13,19)[svf$DN])
-points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(13,19)[svf$DN])
-legend(&quot;topleft&quot;, levels(svf$DN), pch=c(13,19))
-legend(&quot;topright&quot;, levels(svf$PlantType), fill=spcols)
-legend(&quot;bottomright&quot;, levels(svf$Year), fill=1:3)
-#points(nmds.vol, display=&quot;sites&quot;, col=viridis(100)[sqrt(rowSums(vol))/100], pch=19)
-legend(&quot;bottomleft&quot;, levels(TEY), fill=TEYcols, cex=0.9)</code></pre>
+points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(13,19)[svf$DN])</code></pre>
 <p><img src="plots/nmds_filtered-1.svg" width="768" /></p>
+<pre class="r"><code>#points(nmds.vol, display=&quot;sites&quot;, col=viridis(100)[sqrt(rowSums(vol))/100], pch=19)</code></pre>
+</div>
 </div>
 <div id="otcs-vs.-ambient" class="section level1">
 <h1>OTCs vs. Ambient</h1>
@@ -1686,12 +1843,20 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
+<td align="left">control</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">38</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
 <td align="left">warmed</td>
 <td align="left">2018</td>
 <td align="left">bb</td>
 <td align="right">13</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">warmed</td>
@@ -1699,7 +1864,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="left">GNA</td>
 <td align="right">30</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">warmed</td>
@@ -1707,13 +1872,21 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="left">GNA</td>
 <td align="right">12</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">warmed</td>
 <td align="left">2021</td>
 <td align="left">GNA</td>
 <td align="right">32</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">warmed</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">43</td>
 </tr>
 <tr class="odd">
 <td align="left">ten</td>
@@ -1788,7 +1961,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
     summ.cap &lt;- summary(cap.otc)
     prop.expl &lt;- summ.cap$cont$importance
     ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
-    anova.cap &lt;- anova(cap.otc, by=&quot;term&quot;)
+    anova.cap &lt;- anova(cap.otc, by=&quot;margin&quot;)
     
     plot(cap.otc, type=&quot;n&quot;, xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     with(svf.otc, title(paste(&quot;OTC warming:&quot;,&quot;I.&quot;,unique(PlantType), &quot;at&quot;, unique(Site),&quot;site,&quot;,unique(Year),
@@ -1816,10 +1989,12 @@ cap.otcbb18 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;
 <p><img src="plots/otc-3.svg" width="768" /></p>
 <pre class="r"><code>cap.otcGNA21 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;GNA&quot;,PlantType==&quot;agg&quot;))</code></pre>
 <p><img src="plots/otc-4.svg" width="768" /></p>
-<pre class="r"><code>cap.otcSC19 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2019&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;),plot.DN=T)</code></pre>
+<pre class="r"><code>cap.otcGNA21 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;Maxfield&quot;,PlantType==&quot;agg&quot;))</code></pre>
 <p><img src="plots/otc-5.svg" width="768" /></p>
-<pre class="r"><code>cap.otcSC21 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;),plot.DN=T)</code></pre>
+<pre class="r"><code>cap.otcSC19 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2019&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;),plot.DN=T)</code></pre>
 <p><img src="plots/otc-6.svg" width="768" /></p>
+<pre class="r"><code>cap.otcSC21 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;),plot.DN=T)</code></pre>
+<p><img src="plots/otc-7.svg" width="768" /></p>
 <pre class="r"><code>#cap.otc.all &lt;- list(bb18=cap.otcbb18, GNA18=cap.otcGNA18, GNA19=cap.otcGNA19, SC19=cap.otcSC19)</code></pre>
 </div>
 <div id="cap-of-all-i.-aggregata-vs.-otcs" class="section level2">
@@ -1831,45 +2006,45 @@ vol.otc &lt;- vol[svf.otc$sample,]
 <pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + Site + temp, data =
 svf.otc, distance = &quot;bray&quot;)
 
-              Inertia Proportion Rank
-Total         34.6143     1.0000     
-Constrained    5.0357     0.1455    4
-Unconstrained 37.1562     1.0734   69
-Imaginary     -7.5776    -0.2189   82
+               Inertia Proportion Rank
+Total          46.3273     1.0000     
+Constrained     6.4982     0.1403    5
+Unconstrained  54.9801     1.1868   73
+Imaginary     -15.1511    -0.3270  159
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
-  CAP1   CAP2   CAP3   CAP4 
-2.3666 1.9312 0.4481 0.2899 
+  CAP1   CAP2   CAP3   CAP4   CAP5 
+2.8938 2.1956 0.9627 0.2578 0.1884 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-4.310 3.474 2.736 2.060 1.724 1.560 1.433 1.308 
-(Showing 8 of 69 unconstrained eigenvalues)</code></pre>
+7.725 5.156 4.155 3.664 2.788 2.460 2.258 2.010 
+(Showing 8 of 73 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
 ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
-(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
+(anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
-Terms added sequentially (first to last)
+Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + temp, data = svf.otc, distance = &quot;bray&quot;)
           Df SumOfSqs      F Pr(&gt;F)    
-Year       2    4.181 8.2701  0.001 ***
-Site       1    0.481 1.9012  0.016 *  
-temp       1    0.374 1.4813  0.053 .  
-Residual 147   37.156                  
+Year       2    4.115 8.4956  0.001 ***
+Site       2    1.416 2.9230  0.001 ***
+temp       1    0.449 1.8522  0.012 *  
+Residual 227   54.980                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>plot(cap.otc.comb, type=&quot;n&quot;,xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title(&quot;OTC warming: I. agg at GNA or bb sites, 2018/2019&quot;)
-legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), legend=levels(svf.otc$temp), fill=tempcol)
-legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=levels(svf.otc$Year), pch=yearpch)
-legend(&quot;bottomleft&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site)[1:2])
+<pre class="r"><code>plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])#xlim=range(cap.otc.comb$CCA$wa[,1])
+title(&quot;OTC warming: all I. agg&quot;)
+legend(&quot;bottomleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), legend=levels(svf.otc$temp), fill=tempcol)
+legend(&quot;left&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=levels(svf.otc$Year), pch=yearpch)
+#legend(&quot;bottomleft&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 points(cap.otc.comb, display=&quot;sites&quot;, col=c(tempcol)[svf.otc$temp], pch=yearpch[svf.otc$Year]) 
@@ -1886,38 +2061,38 @@ vol.otc &lt;- vol[svf.otc$sample,]
 <pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + Site +
 mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
-              Inertia Proportion Rank
-Total         32.5579     1.0000     
-Constrained    5.0596     0.1554    5
-Unconstrained 34.4960     1.0595   67
-Imaginary     -6.9977    -0.2149   77
+               Inertia Proportion Rank
+Total          44.5277     1.0000     
+Constrained     6.6299     0.1489    6
+Unconstrained  52.3459     1.1756   71
+Imaginary     -14.4480    -0.3245  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
-  CAP1   CAP2   CAP3   CAP4   CAP5 
-2.4136 1.5019 0.5743 0.3423 0.2274 
+  CAP1   CAP2   CAP3   CAP4   CAP5   CAP6 
+2.8957 2.0051 1.0365 0.3452 0.2380 0.1093 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-3.994 3.257 2.650 2.007 1.539 1.451 1.339 1.225 
-(Showing 8 of 67 unconstrained eigenvalues)</code></pre>
+7.488 4.946 4.118 3.564 2.658 2.327 2.151 1.924 
+(Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
 ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
-(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
+(anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
-Terms added sequentially (first to last)
+Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    3.752 7.5595  0.001 ***
-Site                    1    0.479 1.9283  0.008 ** 
-mean_temp_C_treatment   1    0.510 2.0565  0.004 ** 
-temp                    1    0.319 1.2837  0.145    
-Residual              139   34.496                  
+Year                    2    3.627 7.5876  0.001 ***
+Site                    2    1.453 3.0396  0.001 ***
+mean_temp_C_treatment   1    0.566 2.3690  0.001 ***
+temp                    1    0.375 1.5700  0.061 .  
+Residual              219   52.346                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)
@@ -1944,36 +2119,36 @@ vol.otc &lt;- vol[svf.otc$sample,]
 <pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + mean_temp_C_treatment,
 data = svf.otc, distance = &quot;bray&quot;)
 
-              Inertia Proportion Rank
-Total         32.5579     1.0000     
-Constrained    4.2665     0.1310    3
-Unconstrained 35.2891     1.0839   67
-Imaginary     -6.9977    -0.2149   77
+               Inertia Proportion Rank
+Total          44.5277     1.0000     
+Constrained     4.8069     0.1080    3
+Unconstrained  54.1689     1.2165   71
+Imaginary     -14.4480    -0.3245  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3 
-2.3248 1.4623 0.4795 
+2.7583 1.6338 0.4148 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-4.052 3.374 2.705 2.021 1.573 1.508 1.353 1.256 
-(Showing 8 of 67 unconstrained eigenvalues)</code></pre>
+7.600 5.080 4.253 3.739 2.944 2.389 2.303 1.939 
+(Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
 ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
-(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
+(anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
-Terms added sequentially (first to last)
+Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    3.752 7.4960  0.001 ***
-mean_temp_C_treatment   1    0.514 2.0552  0.005 ** 
-Residual              141   35.289                  
+Year                    2    4.096 8.3929  0.001 ***
+mean_temp_C_treatment   1    0.560 2.2949  0.002 ** 
+Residual              222   54.169                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)
@@ -2127,7 +2302,7 @@ svf %&gt;% filter(expt==&quot;perc&quot;) %&gt;%  count(PlantType, DN, Temp,Year
     summ.cap &lt;- summary(cap.perc)
     prop.expl &lt;- summ.cap$cont$importance[2,c(&quot;CAP1&quot;,&quot;CAP2&quot;)]
     ax.labs &lt;- paste0(&quot;CAP&quot;, 1:2, &quot; (&quot;,round(100*prop.expl),&quot;% explained)&quot;)
-    anova.cap &lt;- anova(cap.perc, by=&quot;term&quot;)
+    anova.cap &lt;- anova(cap.perc, by=&quot;margin&quot;)
     
     plot(cap.perc, type=&quot;n&quot;, xlim=range(cap.perc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     with(svf.perc, title(paste0(&quot;Percivals: I. &quot;, unique(PlantType),&quot; in &quot;, unique(Year))))
@@ -2151,7 +2326,7 @@ cap.perc.agg18 &lt;-  plot.perc(svf %&gt;% filter(expt==&quot;perc&quot;,Year==&
 <pre class="r"><code>cap.perc.ten19 &lt;-  plot.perc(svf %&gt;% filter(expt==&quot;perc&quot;,Year==&quot;2019&quot;,PlantType==&quot;ten&quot;))</code></pre>
 <p><img src="plots/perc-4.svg" width="768" /></p>
 <pre class="r"><code>#cap.perc.all &lt;- list(agg18=cap.perc.agg18, agg19=cap.perc.agg19, ten18=cap.perc.ten18, ten19=cap.perc.ten19)
-#lapply(cap.perc.all, anova, by=&quot;term&quot;)</code></pre>
+#lapply(cap.perc.all, anova, by=&quot;margin&quot;)</code></pre>
 </div>
 <div id="cap-of-percival-dataset-combined-for-each-species"
 class="section level2">
@@ -2162,7 +2337,7 @@ class="section level2">
     summ.cap &lt;- summary(cap.perc.comb)
     prop.expl &lt;- summ.cap$cont$importance[2,c(&quot;CAP1&quot;,&quot;CAP2&quot;)]
     ax.labs &lt;- paste0(&quot;CAP&quot;, 1:2, &quot; (&quot;,round(100*prop.expl),&quot;% explained)&quot;)
-    anova.cap &lt;- anova(cap.perc.comb, by=&quot;term&quot;)
+    anova.cap &lt;- anova(cap.perc.comb, by=&quot;margin&quot;)
     
     plot(cap.perc.comb, type=&quot;n&quot;, xlim=range(cap.perc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     title(paste(&quot;Percivals: I.&quot;,unique(svf.perc$PlantType), &quot;2018/2019&quot;))
@@ -2181,9 +2356,11 @@ svf.perc.agg &lt;- plot.perc.comb(svf %&gt;% filter(expt==&quot;perc&quot;, Plan
 <pre class="r"><code>#svf.perc.both &lt;- plot.perc.comb(svf %&gt;% filter(expt==&quot;perc&quot;))</code></pre>
 </div>
 </div>
-<div id="barplots" class="section level1">
-<h1>Barplots</h1>
-<pre class="r"><code>vols.plot &lt;- chemsf3 %&gt;% filter(filter_final, freq.floral&gt;0.21) %&gt;% pull(&quot;name&quot;) %&gt;% as.character
+<div id="individual-volatiles" class="section level1">
+<h1>Individual volatiles</h1>
+<div id="treatment-effects" class="section level2">
+<h2>Treatment effects</h2>
+<pre class="r"><code>vols.plot &lt;- chemsf3 %&gt;% filter(filter_final, freq.floral&gt;0.3) %&gt;% pull(&quot;name&quot;) %&gt;% as.character
 #vols.plot[vols.plot==&quot;b-caryophyllene&quot;] &lt;- &quot;b-caryophyllene.1&quot;#c(&quot;b-ocimene&quot;,&quot;a-pinene&quot;,&quot;a-farnesene&quot;,&quot;b-caryophyllene.1&quot;,&quot;petasitene&quot;,&quot;b-myrcene&quot;,&quot;longifolene&quot;,&quot;tridec-1-ene  &quot;,&quot;benzophenone&quot;)
 vol.long &lt;- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key=&quot;chem&quot;,value=&quot;area&quot;, 2:(length(vols.plot)+2), factor_key=T)
 vol.plot &lt;- left_join(vol.long, svf)
@@ -2192,14 +2369,30 @@ specDNcols &lt;- c( &quot;#943390&quot;,&quot;#FF5056&quot;, &quot;#A894FF&quot;
 #Treatcols &lt;- c(&quot;#DA9E18&quot;,&quot;#6B744F&quot;)
 DNcols &lt;- c(&quot;grey90&quot;,&quot;grey20&quot;)
 ggplot(drop_na(vol.plot, PlantType, expt),#TODO track down NAs
-       aes(x=paste(PlantType,expt),y=area,  fill=DN, color=paste(PlantType,Treat))) +
-  geom_boxplot(size=1, position=position_dodge2(preserve=&quot;single&quot;)) + 
+       aes(x=paste(PlantType,ifelse(is.na(Site), &quot;&quot;, Site),expt),y=area,  fill=DN, color=paste(Year, Treat))) +
+  geom_boxplot(size=0.7, outlier.size=0.7, position=position_dodge2(preserve=&quot;single&quot;)) + 
   facet_wrap(vars(chem), scales=&quot;free&quot;) + 
   scale_y_sqrt(&quot;Peak area per flower per hour&quot;) + 
-  scale_color_manual(&quot;Species, Treatment&quot;, values=specDNcols) + 
+  scale_color_brewer(&quot;Year, treatment&quot;, palette = &quot;Paired&quot;)+
+  scale_x_discrete(&quot;Species, site, experiment&quot;)+
+  #scale_color_manual(&quot;Species, Treatment&quot;, values=specDNcols) + 
   scale_fill_manual(&quot;Time of day&quot;,values=DNcols) + 
   theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))</code></pre>
-<p><img src="plots/barplots-1.svg" width="1344" /></p>
+<p><img src="plots/barplots-1.svg" width="1440" /></p>
+</div>
+<div id="actual-temperature-effects" class="section level2">
+<h2>Actual temperature effects</h2>
+<pre class="r"><code>ggplot(drop_na(vol.plot, PlantType, expt) %&gt;% filter(expt==&quot;otc&quot;),#TODO track down NAs
+       aes(x=mean_temp_C_treatment, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
+  geom_point() + geom_smooth(se=F, method=&quot;lm&quot;)+
+  facet_wrap(vars(chem), scales=&quot;free_y&quot;) + 
+  scale_y_sqrt(&quot;Peak area per flower per hour&quot;) + 
+  scale_x_continuous(&quot;Mean temperature in controls or OTCs (C)&quot;)+
+  scale_color_brewer(&quot;Species, site, year&quot;, palette = &quot;Dark2&quot;, direction=-1)+#scale_color_manual(&quot;Species&quot;, values=spcols) + 
+  scale_shape_manual(&quot;Time of day&quot;,values=c(1,19)) + 
+  theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))</code></pre>
+<p><img src="plots/temptrend-1.svg" width="1440" /></p>
+</div>
 </div>
 <div id="leaf-volatiles" class="section level1">
 <h1>Leaf volatiles</h1>
@@ -2221,39 +2414,27 @@ peak area per hour per gram dry leaf.</p>
 <tbody>
 <tr class="odd">
 <td align="left">agg</td>
-<td align="left">warmed</td>
+<td align="left">control</td>
 <td align="left">otc</td>
 <td align="right">8</td>
 </tr>
 <tr class="even">
 <td align="left">agg</td>
-<td align="left">warmed</td>
+<td align="left">control</td>
 <td align="left">perc</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">agg</td>
-<td align="left">control</td>
+<td align="left">warmed</td>
 <td align="left">otc</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">agg</td>
-<td align="left">control</td>
+<td align="left">warmed</td>
 <td align="left">perc</td>
 <td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">ten</td>
-<td align="left">warmed</td>
-<td align="left">otc</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="left">ten</td>
-<td align="left">warmed</td>
-<td align="left">perc</td>
-<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">ten</td>
@@ -2266,6 +2447,18 @@ peak area per hour per gram dry leaf.</p>
 <td align="left">control</td>
 <td align="left">perc</td>
 <td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">warmed</td>
+<td align="left">otc</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">warmed</td>
+<td align="left">perc</td>
+<td align="right">2</td>
 </tr>
 </tbody>
 </table>
@@ -2292,17 +2485,17 @@ cap.leaf &lt;- capscale(sqrt(vol.leaf[svl$expt==&quot;otc&quot;,]) ~ PlantType+t
 summ.cap &lt;- summary(cap.leaf)
 prop.expl &lt;- summ.cap$cont$importance[2,c(&quot;CAP1&quot;,&quot;CAP2&quot;)]
 ax.labs &lt;- paste0(&quot;CAP&quot;, 1:2, &quot; (&quot;,round(100*prop.expl),&quot;% explained)&quot;)
-(anova.cap &lt;- anova(cap.leaf, by=&quot;term&quot;))</code></pre>
+(anova.cap &lt;- anova(cap.leaf, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
-Terms added sequentially (first to last)
+Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.leaf[svl$expt == &quot;otc&quot;, ]) ~ PlantType + temp, data = svl.otc, distance = &quot;bray&quot;)
           Df SumOfSqs      F Pr(&gt;F)    
-PlantType  1   0.8476 4.6143  0.001 ***
-temp       1   0.1270 0.6915  0.765    
-Residual  33   6.0616                  
+PlantType  1   0.8984 5.3916  0.001 ***
+temp       1   0.1149 0.6894  0.732    
+Residual  33   5.4986                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>plot(cap.leaf, type=&quot;n&quot;, xlim=range(cap.leaf$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
@@ -2321,17 +2514,17 @@ cap.leaf.perc &lt;- capscale(sqrt(vol.leaf[svl$expt==&quot;perc&quot;,]) ~ Plant
 summ.cap &lt;- summary(cap.leaf.perc)
 prop.expl &lt;- summ.cap$cont$importance[2,c(&quot;CAP1&quot;,&quot;CAP2&quot;)]
 ax.labs &lt;- paste0(&quot;CAP&quot;, 1:2, &quot; (&quot;,round(100*prop.expl),&quot;% explained)&quot;)
-(anova.cap &lt;- anova(cap.leaf.perc, by=&quot;term&quot;))</code></pre>
+(anova.cap &lt;- anova(cap.leaf.perc, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
-Terms added sequentially (first to last)
+Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.leaf[svl$expt == &quot;perc&quot;, ]) ~ PlantType + Temp, data = svl.perc, distance = &quot;bray&quot;)
           Df SumOfSqs      F Pr(&gt;F)
-PlantType  1   0.1367 0.4287  0.896
-Temp       1   0.2827 0.8867  0.489
-Residual  10   3.1879              </code></pre>
+PlantType  1   0.1145 0.3552  0.925
+Temp       1   0.2044 0.6339  0.660
+Residual  10   3.2237              </code></pre>
 </div>
 </div>
 
