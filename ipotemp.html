@@ -1658,7 +1658,8 @@ chemsf &lt;- chems %&gt;%
   filter_RT(2, 17) %&gt;% 
   filter_match(0.8) %&gt;% 
   filter_freq(0.1, group = FALSE) %&gt;% 
-  filter_contaminant(cont.list = c(&quot;Cyclotetrasiloxane, octamethyl-&quot;)) %&gt;% 
+  filter_contaminant(cont.list = c(&quot;Cyclotetrasiloxane, octamethyl-&quot;,
+  &quot;2,2,4-Trimethyl-1,3-pentanediol diisobutyrate&quot;)) %&gt;% 
   filter_area(min_maximum = 1e6) %&gt;% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %&gt;%
   filter_ambient_ttest(vol.all, metadata, alpha = 0.05, adjust = &quot;fdr&quot;) %&gt;%
@@ -2007,20 +2008,20 @@ vol.otc &lt;- vol[svf.otc$sample,]
 svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          46.3273     1.0000     
-Constrained     6.4982     0.1403    5
-Unconstrained  54.9801     1.1868   73
-Imaginary     -15.1511    -0.3270  159
+Total          45.8059     1.0000     
+Constrained     6.4160     0.1401    5
+Unconstrained  54.5027     1.1899   73
+Imaginary     -15.1128    -0.3299  159
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5 
-2.8938 2.1956 0.9627 0.2578 0.1884 
+2.8122 2.1943 0.9687 0.2519 0.1889 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-7.725 5.156 4.155 3.664 2.788 2.460 2.258 2.010 
+7.777 5.119 4.205 3.625 2.811 2.389 2.240 2.017 
 (Showing 8 of 73 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
@@ -2034,10 +2035,10 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + temp, data = svf.otc, distance = &quot;bray&quot;)
           Df SumOfSqs      F Pr(&gt;F)    
-Year       2    4.115 8.4956  0.001 ***
-Site       2    1.416 2.9230  0.001 ***
-temp       1    0.449 1.8522  0.012 *  
-Residual 227   54.980                  
+Year       2    4.077 8.4905  0.001 ***
+Site       2    1.421 2.9599  0.001 ***
+temp       1    0.449 1.8709  0.012 *  
+Residual 227   54.503                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])#xlim=range(cap.otc.comb$CCA$wa[,1])
@@ -2062,20 +2063,20 @@ vol.otc &lt;- vol[svf.otc$sample,]
 mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          44.5277     1.0000     
-Constrained     6.6299     0.1489    6
-Unconstrained  52.3459     1.1756   71
-Imaginary     -14.4480    -0.3245  154
+Total          44.0127     1.0000     
+Constrained     6.5590     0.1490    6
+Unconstrained  51.8583     1.1783   71
+Imaginary     -14.4046    -0.3273  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5   CAP6 
-2.8957 2.0051 1.0365 0.3452 0.2380 0.1093 
+2.8194 2.0030 1.0400 0.3512 0.2345 0.1109 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-7.488 4.946 4.118 3.564 2.658 2.327 2.151 1.924 
+7.541 4.898 4.171 3.536 2.676 2.254 2.132 1.929 
 (Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
@@ -2088,11 +2089,11 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    3.627 7.5876  0.001 ***
-Site                    2    1.453 3.0396  0.001 ***
-mean_temp_C_treatment   1    0.566 2.3690  0.001 ***
-temp                    1    0.375 1.5700  0.061 .  
-Residual              219   52.346                  
+Year                    2    3.597 7.5961  0.001 ***
+Site                    2    1.460 3.0828  0.001 ***
+mean_temp_C_treatment   1    0.571 2.4097  0.001 ***
+temp                    1    0.377 1.5903  0.054 .  
+Residual              219   51.858                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)
@@ -2120,20 +2121,20 @@ vol.otc &lt;- vol[svf.otc$sample,]
 data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          44.5277     1.0000     
-Constrained     4.8069     0.1080    3
-Unconstrained  54.1689     1.2165   71
-Imaginary     -14.4480    -0.3245  154
+Total          44.0127     1.0000     
+Constrained     4.7280     0.1074    3
+Unconstrained  53.6892     1.2199   71
+Imaginary     -14.4046    -0.3273  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3 
-2.7583 1.6338 0.4148 
+2.6772 1.6324 0.4184 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-7.600 5.080 4.253 3.739 2.944 2.389 2.303 1.939 
+7.652 5.033 4.289 3.742 2.946 2.313 2.292 1.943 
 (Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
@@ -2146,9 +2147,9 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    4.096 8.3929  0.001 ***
-mean_temp_C_treatment   1    0.560 2.2949  0.002 ** 
-Residual              222   54.169                  
+Year                    2    4.024 8.3193  0.001 ***
+mean_temp_C_treatment   1    0.563 2.3264  0.002 ** 
+Residual              222   53.689                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)

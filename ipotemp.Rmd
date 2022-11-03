@@ -341,7 +341,8 @@ chemsf <- chems %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
   filter_freq(0.1, group = FALSE) %>% 
-  filter_contaminant(cont.list = c("Cyclotetrasiloxane, octamethyl-")) %>% 
+  filter_contaminant(cont.list = c("Cyclotetrasiloxane, octamethyl-",
+  "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate")) %>% 
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   filter_ambient_ttest(vol.all, metadata, alpha = 0.05, adjust = "fdr") %>%
