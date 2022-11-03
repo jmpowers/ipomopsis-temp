@@ -1,5 +1,5 @@
 ---
-title: "Ipomopsis temperature experiments"
+title: "Ipomopsis temperature experiments: Volatiles"
 author: "Carrie Wu, John Powers, David Hopp, Diane Campbell"
 date: "`r Sys.Date()`"
 output: 
@@ -129,9 +129,11 @@ legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, 
 
 # Read metadata
 ```{r metadata}
-files <- read_tsv("data/CWu_samples_text2.csv") 
+files <- read_tsv("data/CWu_samples_text2.csv") %>% 
+  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
 perc <- read_tsv("data/Percivals2018_2019.csv")
-otc <- read_tsv("data/OTC2018_2019.csv")
+otc <- read_tsv("data/OTC2018_2019.csv")  %>%  
+  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
 
 sc21 <- read_tsv("data/2021 Spring Creek Volatiles - 2021.tsv") %>% 
    mutate(PlantType=if_else(plant=="air", "air", "ten"))
@@ -147,16 +149,17 @@ files21 <- tibble(Filename = rownames(ipo.all)) %>%
 files21 <- read_tsv("data/files21.tsv")
 
 perc2 <- left_join(perc,files, by=c("Date","DN","Tissue","Sample2"), suffix=c("",".f"))
-otc2 <- left_join(otc,files, by=c("Date","Site","OI","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
-  mutate(PlantType = if_else(OI == "air", "air", PlantType))
+otc2 <- left_join(otc,files, by=c("Date","Site","temp","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
+  mutate(PlantType = if_else(temp == "air", "air", PlantType))
 
 drop2021 <- c("SC_126_210727_8182021_04.qgd", "SC_101_210727_8202021_02.qgd", "GNA_121_210730_7312021_05.qgd")#don't include these
 otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>% 
   left_join(files21, by=c("vial","site")) %>% 
   filter(!Filename %in% drop2021 | is.na(Filename)) %>% 
   mutate(sampledate = as.character(sampledate),
-         Year = 2021, Tissue = if_else(plant == "air", "air", "flower"), Expt="otc") %>% 
-  rename(Site=site, Collector=observer, Date=date, DN=time, OI=location, Bag=bag, Pump=pump, End=end, Equil=equil, Duration=pumping,
+         Year = 2021, Tissue = if_else(plant == "air", "air", "flower"), Expt="otc",
+         location = recode(location,"inside"="warmed","outside"="control")) %>% 
+  rename(Site=site, Collector=observer, Date=date, DN=time, temp=location, Bag=bag, Pump=pump, End=end, Equil=equil, Duration=pumping,
          NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate_text=sampledate,
          RunDate_text=rundate,GCOrder=GCn)
 
@@ -167,17 +170,19 @@ library(forcats)
 meta <- bind_rows(otc=bind_rows(otc2, otc21), perc=perc2, .id="expt") %>% 
   mutate_if(is.character, as.factor) %>%
   mutate(Equil=Pump-Bag, Duration=End-Pump, Total=End-Bag,
-         OI = fct_collapse(OI, "in" = c("in", "inside"), out = c("out","outside")),
          Pump_datehour = paste(Date, Pump) %>% ymd_hms(tz="America/Denver") %>% round_date("hour")) %>% 
   #Add mean temperature of OTCs or controls at time of sampling
   left_join(read_csv("data/hobos_mean.csv") %>% select(-date) %>% 
               mutate(datetime = force_tz(datetime, "America/Denver")), 
             by = c("Site"="site", "Pump_datehour"="datetime")) %>% 
-  mutate(mean_temp_C_treatment = if_else(OI=="in", mean_temp_C_OTC, mean_temp_C_control))
+  mutate(mean_temp_C_treatment = if_else(temp=="in", mean_temp_C_warmed, mean_temp_C_control))
 
 meta %>% write.csv("data/CWu_meta21.csv")
 
-meta %>% count(Year, Temp, Tissue, PlantType, OI, DN, Expt)
+meta %>% count(Year, Temp, Tissue, PlantType, temp, DN, Expt) %>% kable(caption="Sample size")
+
+tempcol <- set_names(brewer.pal(3, "Set1")[c(2,1)], c("control", "warmed"))#OTCs
+Tempcol <- set_names(brewer.pal(3, "Set1")[c(2,1)], c("cool", "warm"))#Percivals
 ```
 
 ## Missing files
@@ -190,7 +195,7 @@ meta %>% filter(is.na(Filename) & nomatch!="NR") %>% select(1:24) %>% kable
 ## Missing metadata
 ```{r nometa}
 #files %>% filter(!(Filename %in% meta$Filename)) %>% select("n") %>% write.csv("CWu_samples_nomatch.csv")
-files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","OI","DN","Tissue","Sample2")) %>% kable
+files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","temp","DN","Tissue","Sample2")) %>% kable
 ```
 
 ## Times
@@ -210,28 +215,28 @@ ggplot(meta, aes(x=paste(Expt, DN,Year), y=Total/60, color=DN)) +
 
 ## OTC Soil moisture
 ```{r soil}
-ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(x=paste(Year, Site, OI), y=SoilVWC, color=OI)) +
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), aes(x=paste(Year, Site, temp), y=SoilVWC, color=temp)) +
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_point()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = "Set1")+
   ggtitle("Effects of OTCs on Soil Moisture")+
   ylab("Soil Volumetric Water Content (%)") +
-  xlab("Year, in or out of the OTC")
+  xlab("Year, temperature")
 
-ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(x=paste(Year, Site, OI, SampleDate_text), y=SoilVWC, color=OI)) +
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), aes(x=paste(Year, Site, temp, SampleDate_text), y=SoilVWC, color=temp)) +
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_point()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = "Set1")+
   ggtitle("Effects of OTCs on Soil Moisture")+
   ylab("Soil Volumetric Water Content (%)") +
-  xlab("Year, in or out of the OTC, Date")
+  xlab("Year, temperature, date")
 ```
 
 ## OTC temperature during sampling
 ```{r actualtemp}
-ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, OI), color=OI)) +
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
   facet_wrap(vars(DN), scales="free_x")+
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_jitter(height=0, width=0.2)+
@@ -239,9 +244,9 @@ ggplot(meta %>% filter(Expt=="otc", OI !="air"), aes(y=mean_temp_C_treatment, x=
   scale_color_brewer(palette = "Set1")+
   ggtitle("Effects of OTCs on Temperature during Sampling")+
   ylab("Temperature (C)") +
-  xlab("Year, in or out of the OTC")
+  xlab("Year, temperature")
 
-ggplot(meta %>% filter(Expt=="otc", OI !="air", PlantType=="agg"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, OI), color=OI)) +
+ggplot(meta %>% filter(Expt=="otc", temp !="air", PlantType=="agg"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
   facet_wrap(vars(Year), scales="free_x", nrow=1)+
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_jitter(height=0, width=0.2)+
@@ -249,12 +254,12 @@ ggplot(meta %>% filter(Expt=="otc", OI !="air", PlantType=="agg"), aes(y=mean_te
   scale_color_brewer(palette = "Set1")+
   ggtitle("Effects of OTCs on Temperature during Sampling: I agg.")+
   ylab("Temperature (C)") +
-  xlab("Year, in or out of the OTC")
+  xlab("Year, temperature")
 ```
 
 
 # Filtering criteria
-```{r filtering}
+```{r filtering, fig.height=12, fig.width=12}
 sv <- meta %>% drop_na(Filename)
 ipo.gc <- ipo.all[sv$Filename,]
 
@@ -284,7 +289,9 @@ chemsf$filter_final <- with(chemsf, filter_RT == "OK" & filter_match =="OK" & fi
 bouquet::plot_filters(chemsf, option="rarity")
 bouquet::plot_filters(chemsf, option="ambient")
 bouquet::plot_filters(chemsf, option="prop")
+```
 
+```{r filtering_leaf}
 ### Leaf filtering
 meta.leaf <- metadata %>% mutate(type = fct_recode(type, floral = "leaf", flower = "floral")) #trick bouquet to think the leaf samples are floral TODO: hacky!
 chems.leaf <- make_chemtable(longdata, meta.leaf) 
@@ -313,7 +320,9 @@ ggplot(chemsf, aes(x=mean.floral, y= chemsf.leaf$mean.floral, label=name, color=
                    alpha=filter_final|chemsf.leaf$filter_final))+ theme_minimal()+
   geom_abline(slope=1, intercept=1) + geom_text()+ scale_x_log10()+ scale_y_log10() +
   labs(x="Mean area in flowers", y= "Mean area in leaves", alpha="Kept in either dataset", color="Kept in floral, leaf datasets")
-  
+```
+
+```{r pruning}
 ### Manual filtering
 #write.csv(chemsf, "chemsf_ipo.csv")
 #annotated this in a google sheet
@@ -341,32 +350,29 @@ vol <- prune_sampletable(vol.all, chemsf3, metadata)
 files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd")#no filtered volatiles
 svf <- metadata[metadata$type == "floral" & !(metadata$sample %in% files_exclude),]
 svf$Year <- factor(svf$Year)
-svf <- svf %>% mutate_if(is.factor, droplevels)
-svf$Treat <- factor(paste(svf$OI,svf$Temp))
-levels(svf$Treat) <- c("warm or in","cool or out", "warm or in","cool or out")
+svf <- svf %>% mutate_if(is.factor, droplevels) %>% 
+  mutate(Treat = paste(temp, Temp) %>% 
+           fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol <- vol / 0.75 / 1 #30 min of equilibration plus 15 minpumping, one flower 
 #TODO fix svf$Total data entry errors
+```
 
+```{r pruning_leaf}
 vol.leaf <- prune_sampletable(vol.all, chemsf3 %>% mutate(filter_final=filter_final_leaf), meta.leaf)
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", "T164_leaf_190731_882019_18.qgd","OTC_Z2_leaf_190805_8102019_23.qgd")#fist two lack leaf mass, secodn two have no filtered volatiles
 svl <- metadata[metadata$type == "leaf" & !(metadata$sample %in% files_exclude_leaf),]
-svl <- svl %>% mutate_if(is.factor, droplevels)
-svl$Treat <- factor(paste(svl$OI,svl$Temp))
-levels(svl$Treat) <- c("warm or in","cool or out", "warm or in","cool or out")
+svl <- svl %>% mutate_if(is.factor, droplevels) %>% 
+  mutate(Treat = paste(temp, Temp) %>% 
+           fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
-svl$LeafDryWtGrams[c(44,3)] <- svl$LeafDryWtGrams[c(44,3)]/10
+svl$LeafDryWtGrams[c(8,3)] <- svl$LeafDryWtGrams[c(8,3)]/10
 vol.leaf <- vol.leaf / 0.75 / svl$LeafDryWtGrams #area per hour per dry gram
 #TODO fix svf$Total data entry errors for leaves
-
-#save.image("ipo_workspace.Rdata")
-```
-```{r load_filtering, cache=FALSE}
-#load("ipo_workspace.Rdata")
 ```
 
 ## Flower heatmap
-```{r heatmap, fig.height=12, fig.width=12}
+```{r heatmap, dev="png", dev.args=list(), fig.height=12, fig.width=12}
 #cairo_pdf("ipo_heatmap.pdf", width=12, height=12)
 ph  <- pheatmap(as.matrix(t(vol))^(1/3), 
          cluster_cols=T, show_colnames=F,
@@ -383,7 +389,7 @@ ph  <- pheatmap(as.matrix(t(vol))^(1/3),
 # NMDS of all filtered samples
 ```{r nmds_filtered}
 set.seed(1)
-nmds.vol <- metaMDS(sqrt(vol), dist="bray", autotransform = FALSE)
+nmds.vol <- metaMDS(sqrt(vol), dist="bray", autotransform = FALSE, trace=F)
 
 TEY <- with(svf, factor(paste(PlantType,expt,Year)))
 TEYcols <- brewer.pal(9, "Paired")#[c(1:4,8,5:6)]
@@ -405,12 +411,12 @@ legend("bottomleft", levels(TEY), fill=TEYcols, cex=0.9)
 ## CAP analysis of each OTC site and year
 ```{r otc}
 #inventory of samples
-with(svf %>% filter(expt=="otc"), table(paste(PlantType, DN, OI),Year, Site))
+svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site) %>% kable(caption="Sample size")
 
 plot.otc <- function(svf.otc, plot.DN=F, plot.chems=T) {
     vol.otc <- vol[svf.otc$sample,]
-    cap.otc <- capscale(sqrt(vol.otc) ~ OI, distance="bray", data=svf.otc)
-    if(plot.DN) cap.otc <- capscale(sqrt(vol.otc) ~ DN+OI, distance="bray", data=svf.otc)
+    cap.otc <- capscale(sqrt(vol.otc) ~ temp, distance="bray", data=svf.otc)
+    if(plot.DN) cap.otc <- capscale(sqrt(vol.otc) ~ DN+temp, distance="bray", data=svf.otc)
     summ.cap <- summary(cap.otc)
     prop.expl <- summ.cap$cont$importance
     ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
@@ -419,11 +425,11 @@ plot.otc <- function(svf.otc, plot.DN=F, plot.chems=T) {
     plot(cap.otc, type="n", xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     with(svf.otc, title(paste("OTC warming:","I.",unique(PlantType), "at", unique(Site),"site,",unique(Year),
                               do.call(paste0, list(unique(DN), collapse="/")))))
-    legend("topleft", title=paste("OTC warming","P =",anova.cap["OI","Pr(>F)"]), 
-           levels(svf.otc$OI), fill=2:3)
-            if(plot.DN) legend("topright", title=paste("Time","P =",anova.cap["DN","Pr(>F)"]), 
+    legend("topleft", title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), 
+           levels(svf.otc$temp), fill=tempcol)
+            if(plot.DN) legend("topright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), 
                        levels(svf.otc$DN), pch=c(1,19))
-    points(cap.otc, display="sites", col=c(2:3)[svf.otc$OI], pch=c(1,19)[svf.otc$DN]) 
+    points(cap.otc, display="sites", col=c(tempcol)[svf.otc$temp], pch=c(1,19)[svf.otc$DN]) 
     text(cap.otc, display="cn")
     if(plot.chems) {
       if(plot.DN) text(cap.otc, display="species", cex=0.8, srt=45,
@@ -448,7 +454,7 @@ cap.otcSC21 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="SC",Plan
 #Combined I. aggregata OTC CAP
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg")
 vol.otc <- vol[svf.otc$sample,]
-(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+OI, distance="bray", data=svf.otc))
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+temp, distance="bray", data=svf.otc))
 
 summ.cap <- summary(cap.otc.comb)
 prop.expl <- summ.cap$cont$importance
@@ -457,12 +463,12 @@ yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 (anova.cap <- anova(cap.otc.comb, by="term"))
 plot(cap.otc.comb, type="n",xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
 title("OTC warming: I. agg at GNA or bb sites, 2018/2019")
-legend("topleft",  title=paste("OTC warming","P =",anova.cap["OI","Pr(>F)"]), legend=levels(svf.otc$OI), fill=2:3)
-legend("topright",  title=paste("Year","P =",anova.cap["Year","Pr(>F)"]), legend=levels(svf.otc$Year), pch=yearpch)
-legend("bottomleft",  title=paste("Site","P =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
+legend("topleft",  title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), legend=levels(svf.otc$temp), fill=tempcol)
+legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=levels(svf.otc$Year), pch=yearpch)
+legend("bottomleft",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
-points(cap.otc.comb, display="sites", col=c(2:3)[svf.otc$OI], pch=yearpch[svf.otc$Year]) 
+points(cap.otc.comb, display="sites", col=c(tempcol)[svf.otc$temp], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display="cn")
 ```
 
@@ -471,7 +477,7 @@ text(cap.otc.comb, display="cn")
 #Combined I. aggregata OTC CAP
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
-(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+OI+mean_temp_C_treatment, distance="bray", data=svf.otc))
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+mean_temp_C_treatment+temp, distance="bray", data=svf.otc))
 
 summ.cap <- summary(cap.otc.comb)
 prop.expl <- summ.cap$cont$importance
@@ -479,12 +485,12 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 (anova.cap <- anova(cap.otc.comb, by="term"))
 par(bg="grey40")
 plot(cap.otc.comb, type="n",xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC actual temp: I. agg at GNA or bb sites, all years\nvol ~ Year+Site+OI+temp")
+title("OTC actual temp: I. agg at GNA or bb sites, all years\nvol ~ Year+Site+temp+temp")
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("topleft",  title=paste("Temperature\n","P =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year\n","P =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
-legend("bottomright",  title=paste("Site\n","P =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
-legend("left",  title=paste("OTC warming\n","P =",anova.cap["OI","Pr(>F)"]), levels(svf.otc$OI))
+legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
+legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
+legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
+legend("left",  title=paste("OTC warming","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("pink",0.7),alpha("pink",0)))
 points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year]) 
@@ -506,8 +512,8 @@ par(bg="grey40")
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
 title("OTC actual temp: I. agg at GNA or bb sites, all years\n vol ~ temp")
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("bottomleft",  title=paste("Temperature\n","P =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year\n","P =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
+legend("bottomleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
+legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(abs(cap.otc.comb$CCA$v[,1])>0.1, alpha("pink",0.7),alpha("pink",0)))
 points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year])
@@ -519,7 +525,7 @@ text(cap.otc.comb, display="cn", col="white")
 ## CAP analysis of each Percival dataset
 ```{r perc}
 #inventory of samples
-with(svf %>% filter(expt=="perc"), table(paste(PlantType, DN, Temp),Year))
+svf %>% filter(expt=="perc") %>%  count(PlantType, DN, Temp,Year) %>% kable(caption="Sample size")
 
 plot.perc <- function(svf.perc, plot.chems=T) {
     vol.perc <- vol[svf.perc$sample,]
@@ -532,13 +538,13 @@ plot.perc <- function(svf.perc, plot.chems=T) {
     plot(cap.perc, type="n", xlim=range(cap.perc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     with(svf.perc, title(paste0("Percivals: I. ", unique(PlantType)," in ", unique(Year))))
     #, " (",round(100*summ.cap$constr.chi / summ.cap$tot.chi),"% explained)")
-    legend("topleft", title=paste("Temperature","P =",anova.cap["Temp","Pr(>F)"]), 
-           levels(svf.perc$Temp), fill=c(4,2))
-    legend("topright", title=paste("Time","P =",anova.cap["DN","Pr(>F)"]), 
+    legend("topleft", title=paste("Temperature","\nP =",anova.cap["Temp","Pr(>F)"]), 
+           levels(svf.perc$Temp), fill=Tempcol)
+    legend("topright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), 
            levels(svf.perc$DN), pch=c(1,19))
     if(plot.chems) text(cap.perc, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.perc$CCA$v[,1]^2 + cap.perc$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
-    points(cap.perc, display="sites", col=c(4,2)[svf.perc$Temp], pch=c(1,19)[svf.perc$DN]) 
+    points(cap.perc, display="sites", col=Tempcol[svf.perc$Temp], pch=c(1,19)[svf.perc$DN]) 
     text(cap.perc, display="cn")
     return(cap.perc)
 }
@@ -563,10 +569,10 @@ plot.perc.comb <- function(svf.perc, plot.chems=F) {
     
     plot(cap.perc.comb, type="n", xlim=range(cap.perc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
     title(paste("Percivals: I.",unique(svf.perc$PlantType), "2018/2019"))
-    legend("bottomleft", title=paste("Temperature","P =",anova.cap["Temp","Pr(>F)"]), levels(svf.perc$Temp), fill=c(4,2))
-  legend("bottomright", title=paste("Time","P =",anova.cap["DN","Pr(>F)"]), levels(svf.perc$DN), fil=c(0,1))
-  legend("topright", title=paste("Year","P =",anova.cap["Year","Pr(>F)"]), levels(svf.perc$Year), pch=c(19,15))
-  points(cap.perc.comb, display="sites", col=c(4,2)[svf.perc$Temp], pch=c(1,0,19,15)[factor(paste(svf.perc$DN, svf.perc$Year))]) 
+    legend("bottomleft", title=paste("Temperature","\nP =",anova.cap["Temp","Pr(>F)"]), levels(svf.perc$Temp), fill=Tempcol)
+  legend("bottomright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), levels(svf.perc$DN), fil=c(0,1))
+  legend("topright", title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.perc$Year), pch=c(19,15))
+  points(cap.perc.comb, display="sites", col=Tempcol[svf.perc$Temp], pch=c(1,0,19,15)[factor(paste(svf.perc$DN, svf.perc$Year))]) 
   text(cap.perc.comb, display="cn")
   text(cap.perc.comb, display="species", cex=0.7, srt=45, col=ifelse(sqrt(cap.perc.comb$CCA$v[,1]^2 + cap.perc.comb$CCA$v[,2]^2)>0.2, alpha("purple",1),alpha("purple",0)))
   return(cap.perc.comb)
@@ -603,11 +609,11 @@ ggplot(drop_na(vol.plot, PlantType, expt),#TODO track down NAs
 Dropped 2 samples from 2018 without leaf mass. Volatiles units are peak area per hour per gram dry leaf.
 
 ```{r inventory_leaf}
-with(svl, table(PlantType, Treat, expt))
+svl %>% count(PlantType, Treat, expt) %>% kable(caption="Sample size")
 ```
 
 ## Heatmap
-```{r heatmap_leaf, fig.height=8, fig.width=12}
+```{r heatmap_leaf, dev="png", dev.args = list(), fig.height=8, fig.width=12}
 #cairo_pdf("ipo_heatmap_leaf.pdf", width=12, height=12)
 ph_leaf  <- pheatmap(as.matrix(t(vol.leaf))^(1/3), 
          cluster_cols=T, show_colnames=F,
@@ -624,7 +630,7 @@ ph_leaf  <- pheatmap(as.matrix(t(vol.leaf))^(1/3),
 ## CAP - OTCs
 ```{r cap_leaf_otc}
 svl.otc <- svl %>% filter(expt=="otc")
-cap.leaf <- capscale(sqrt(vol.leaf[svl$expt=="otc",]) ~ PlantType+OI, distance="bray", data=svl.otc)
+cap.leaf <- capscale(sqrt(vol.leaf[svl$expt=="otc",]) ~ PlantType+temp, distance="bray", data=svl.otc)
 summ.cap <- summary(cap.leaf)
 prop.expl <- summ.cap$cont$importance[2,c("CAP1","CAP2")]
 ax.labs <- paste0("CAP", 1:2, " (",round(100*prop.expl),"% explained)")
@@ -632,9 +638,9 @@ ax.labs <- paste0("CAP", 1:2, " (",round(100*prop.expl),"% explained)")
 
 plot(cap.leaf, type="n", xlim=range(cap.leaf$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
 title(paste("OTCs: I. agg and I. ten leaves 2019"))
-legend("bottomleft", title=paste("Temperature","P =",anova.cap["OI","Pr(>F)"]), levels(svl.otc$OI), fill=c(3,2))
-legend("bottomright", title=paste("Species","P =",anova.cap["PlantType","Pr(>F)"]), levels(svl.otc$PlantType), pch=c(19,15))
-points(cap.leaf, display="sites", col=c(3,2)[svl.otc$OI], pch=c(19,15)[svl.otc$PlantType]) 
+legend("bottomleft", title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), levels(svl.otc$temp), fill=tempcol)
+legend("bottomright", title=paste("Species","\nP =",anova.cap["PlantType","Pr(>F)"]), levels(svl.otc$PlantType), pch=c(19,15))
+points(cap.leaf, display="sites", col=tempcol[svl.otc$temp], pch=c(19,15)[svl.otc$PlantType]) 
 text(cap.leaf, display="cn")
 text(cap.leaf, display="species", cex=0.7, col=ifelse(sqrt(cap.leaf$CCA$v[,1]^2 + cap.leaf$CCA$v[,2]^2)>0.2, alpha("purple",1),alpha("purple",0)))
 ```

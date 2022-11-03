@@ -28,13 +28,14 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 ```
 
 ```{r read_data}
-
 hobo_csvs <- tibble(file=list.files("./data/hobo/", recursive=T, pattern=".csv") %>% str_remove(".csv")) %>% 
   separate(file, sep="[/-]", into=c("year","site","n1","n2","n3"), fill="right", remove = F) %>% 
   mutate(file = paste0(file, ".csv")) %>% 
   write_csv("data/hobo_csvs.csv")
 
-hobometa <- read_csv("./data/CWu OTC Hobos - metadata.csv") %>% filter(replace_na(!str_detect(notes,"drop"), TRUE))
+hobometa <- read_csv("./data/CWu OTC Hobos - metadata.csv") %>%
+  filter(replace_na(!str_detect(notes,"drop"), TRUE)) %>% 
+  mutate(temp=fct_relevel(fct_recode(temp,"warmed"="OTC"),"control"))
 #devtools::install_version("units", version = "0.6-7", repos = "http://cran.us.r-project.org")
 #Sys.unsetenv("GITHUB_PAT")
 #devtools::install_github("RyanLab/microclimloggers") #needs ud_units from old units version
@@ -71,15 +72,15 @@ ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=in
 ```{r hobos_mean}
 hobos.mean <- hobos %>% group_by(year, site, datetime, date, time, temp) %>% 
   summarize(mean_temp_C = mean(temp_C, na.rm=T), mean_intensity_lux = mean(intensity_lux, na.rm=T))%>%
-  pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %>% drop_na(mean_temp_C_OTC) %>% 
-  mutate(OTC_diff_C = mean_temp_C_OTC - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_OTC - mean_intensity_lux_control) %>%
+  pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %>% drop_na(mean_temp_C_warmed) %>% 
+  mutate(OTC_diff_C = mean_temp_C_warmed - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_warmed - mean_intensity_lux_control) %>%
   write_csv("./data/hobos_mean.csv")
 
 hobos.mean %>% ungroup() %>% group_by(year, site) %>% 
   summarize(across(contains(c("C","lux")), list(mean=mean, sd=sd))) %>% 
   kable()
 
-ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_OTC, color=OTC_diff_C)) + 
+ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_warmed, color=OTC_diff_C)) + 
     facet_grid(rows=vars(site), cols=vars(year))+
   geom_point(size=0.5) + geom_abline(slope=1, intercept=0, color="white") + coord_fixed() +
   scale_color_viridis_c(option="magma") + geom_smooth(se=F, color="pink", span=0.2) + theme_dark() +
@@ -95,12 +96,12 @@ ggplot(hobos.mean, aes(x=time, y=OTC_diff_C, color=mean_intensity_lux_control)) 
   labs(title = "Average Hourly Temp Comparison (Time of day)")
   
 
-hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_OTC, names_to="temp", values_to="temp_C") %>% 
+hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, names_to="temp", values_to="temp_C") %>% 
   ggplot(aes(x=time, y=temp_C, linetype=temp, group=date)) + 
     facet_grid(rows=vars(site), cols=vars(year))+
   #geom_line(aes(group=paste(date, temp)), size=0.2, alpha=0.4)+
   geom_smooth(aes(group=temp), se=T, span=0.1, method="loess", size=1, color="black") + 
-  scale_linetype_manual(labels=c("control", "OTC"), values=c(2,1)) +
+  scale_linetype_manual(values=c(2,1)) +
   labs(y="Temperature (C)", x="Time of day", linetype="Temperature treatment") +
   theme(legend.key.width=unit(2,"lines")) +
   scale_y_continuous(breaks=seq(5, 40, by=5), expand=expansion(mult=0.1)) +
@@ -126,12 +127,12 @@ hobos.minmax.date <- hobos.minmax %>% group_by(year, site, temp, date, name) %>%
 ggplot(hobos.minmax, aes(x=yday(date), y=value, color=temp, linetype=name)) + geom_point() + 
       facet_grid(rows=vars(site), cols=vars(year))+
   geom_line(data=hobos.minmax.date)+
-  labs(y="Temperature (C)", x="Date", linetype="Statistic", color="Treatment") +
-  scale_color_hue(direction=-1) + scale_y_continuous(breaks=scales::breaks_pretty(10)) +
+  labs(y="Temperature (C)", x="Date", linetype="Statistic", color="Temperature") +
+  scale_color_brewer(palette="Set1", direction=-1) + scale_y_continuous(breaks=scales::breaks_pretty(10)) +
   labs(title = "Min and Max Daily Temp across Season")
 
 hobos.max.long <- hobos.minmax.date %>% filter(name !="min_temp_C") %>% pivot_wider() %>% 
-  pivot_wider(names_from=temp, values_from=max_temp_C) %>% mutate(OTC_diff_C = OTC-control)
+  pivot_wider(names_from=temp, values_from=max_temp_C) %>% mutate(OTC_diff_C = warmed-control)
 ggplot(hobos.max.long, aes(x=control, y=OTC_diff_C)) + geom_point() + geom_smooth(span=0.6, se=F) + geom_hline(yintercept=0) +
   labs(title = "Maximum daily temp")
 mean(hobos.max.long$OTC_diff_C, na.rm=T)

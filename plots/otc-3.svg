@@ -68,36 +68,37 @@
 <text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>OTC warming: I. agg at GNA site, 2019 day</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
-<rect x='59.04' y='59.04' width='127.42' height='57.60' style='stroke-width: 0.75;' />
-<rect x='107.39' y='84.24' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
-<rect x='107.39' y='98.64' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #61D04F;' />
-<text x='122.75' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OTC warming P = 0.25</text>
-<text x='126.83' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>in</text>
-<text x='126.83' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>out</text>
-<circle cx='53.37' cy='266.71' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='206.34' cy='314.83' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='130.78' cy='195.24' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='254.98' cy='314.85' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='111.23' cy='286.35' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='337.53' cy='321.82' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='248.48' cy='392.13' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='6.70' cy='249.11' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='207.04' cy='382.87' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='194.07' cy='230.18' r='2.70' style='stroke-width: 0.75; stroke: #61D04F;' />
-<circle cx='335.57' cy='336.40' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='649.39' cy='75.47' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='529.19' cy='106.65' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='412.45' cy='240.04' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='279.03' cy='406.90' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='505.17' cy='369.04' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='328.27' cy='447.99' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='223.23' cy='427.92' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='227.79' cy='257.62' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='513.40' cy='156.81' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='229.62' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='405.69' cy='233.95' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<text x='386.57' y='299.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OIin</text>
-<text x='175.05' y='299.78' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>OIout</text>
+<rect x='59.04' y='59.04' width='78.43' height='66.22' style='stroke-width: 0.75;' />
+<rect x='69.84' y='92.86' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
+<rect x='69.84' y='107.26' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
+<text x='98.26' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
+<text x='98.26' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.25</text>
+<text x='89.28' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>control</text>
+<text x='89.28' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>warmed</text>
+<circle cx='53.37' cy='266.71' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='206.34' cy='314.83' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='130.78' cy='195.24' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='254.98' cy='314.85' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='111.23' cy='286.35' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='337.53' cy='321.82' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='248.48' cy='392.13' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='6.70' cy='249.11' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='207.04' cy='382.87' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='194.07' cy='230.18' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='335.57' cy='336.40' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='649.39' cy='75.47' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='529.19' cy='106.65' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='412.45' cy='240.04' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='279.03' cy='406.90' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='505.17' cy='369.04' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='328.27' cy='447.99' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='223.23' cy='427.92' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='227.79' cy='257.62' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='513.40' cy='156.81' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='229.62' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='405.69' cy='233.95' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<text x='175.05' y='298.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>tempcontrol</text>
+<text x='386.57' y='298.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>tempwarmed</text>
 <text transform='translate(312.06,296.99) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: #A020F0; font-family: "Arial";'>a-farnesene</text>
 <text transform='translate(296.43,320.30) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-myrcene</text>
 <text transform='translate(298.33,319.26) rotate(-45)' text-anchor='middle' style='font-size: 9.60px;fill: none; font-family: "Arial";'>b-ocimene</text>

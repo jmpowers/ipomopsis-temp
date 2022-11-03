@@ -62,18 +62,20 @@
 <text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>Percivals: I. ten in 2018</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
-<rect x='59.04' y='59.04' width='127.57' height='57.60' style='stroke-width: 0.75;' />
-<rect x='101.08' y='84.24' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #2297E6;' />
-<rect x='101.08' y='98.64' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #DF536B;' />
-<text x='122.83' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature P = 0.738</text>
-<text x='120.52' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
-<text x='120.52' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
-<rect x='458.65' y='59.04' width='87.11' height='57.60' style='stroke-width: 0.75;' />
-<circle cx='486.50' cy='87.84' r='2.70' style='stroke-width: 0.75;' />
-<circle cx='486.50' cy='102.24' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
-<text x='502.21' y='73.44' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time P = 0.175</text>
-<text x='497.30' y='92.21' style='font-size: 12.00px; font-family: "Arial";'>day</text>
-<text x='497.30' y='106.61' style='font-size: 12.00px; font-family: "Arial";'>night</text>
+<rect x='59.04' y='59.04' width='75.86' height='66.22' style='stroke-width: 0.75;' />
+<rect x='75.23' y='92.86' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
+<rect x='75.23' y='107.26' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
+<text x='96.97' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
+<text x='96.97' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.738</text>
+<text x='94.67' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
+<text x='94.67' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
+<rect x='488.65' y='59.04' width='57.11' height='66.22' style='stroke-width: 0.75;' />
+<circle cx='501.50' cy='96.46' r='2.70' style='stroke-width: 0.75;' />
+<circle cx='501.50' cy='110.86' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
+<text x='517.21' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time </text>
+<text x='517.21' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.175</text>
+<text x='512.30' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>day</text>
+<text x='512.30' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>night</text>
 <text transform='translate(334.78,309.86) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: #A020F0; fill-opacity: 0.70; font-family: "Arial";'>a-farnesene</text>
 <text transform='translate(319.70,320.70) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>b-myrcene</text>
 <text transform='translate(324.70,321.89) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>b-ocimene</text>
@@ -151,38 +153,38 @@
 <text transform='translate(316.04,319.18) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>Benzyl nitrile</text>
 <text transform='translate(316.52,318.18) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>3-methylbutanal oxime</text>
 <text transform='translate(316.27,319.41) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>3-Hexen-1-ol, (Z)-</text>
-<circle cx='282.71' cy='252.28' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='141.70' cy='378.52' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='337.21' cy='398.18' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='377.45' cy='300.16' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='324.77' cy='320.34' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='144.29' cy='326.44' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='347.05' cy='331.80' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='382.74' cy='370.03' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='326.82' cy='262.40' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='286.07' cy='235.13' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='389.98' cy='275.94' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='336.46' cy='283.50' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='243.10' cy='75.47' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='370.47' cy='275.38' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='339.46' cy='271.51' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='328.52' cy='283.67' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='370.70' cy='275.48' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='334.43' cy='319.96' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='326.75' cy='319.89' r='2.70' style='stroke-width: 0.75; stroke: #DF536B;' />
-<circle cx='374.87' cy='287.68' r='2.70' style='stroke-width: 0.75; stroke: #DF536B; fill: #DF536B;' />
-<circle cx='323.90' cy='291.71' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='268.94' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='345.34' cy='314.67' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='328.77' cy='385.48' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='199.96' cy='445.73' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='145.79' cy='384.39' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='378.81' cy='318.52' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='347.68' cy='294.58' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='347.20' cy='314.85' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='334.41' cy='329.84' r='2.70' style='stroke-width: 0.75; stroke: #2297E6;' />
-<circle cx='346.13' cy='297.98' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
-<circle cx='328.49' cy='453.81' r='2.70' style='stroke-width: 0.75; stroke: #2297E6; fill: #2297E6;' />
+<circle cx='282.71' cy='252.28' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='141.70' cy='378.52' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='337.21' cy='398.18' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='377.45' cy='300.16' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='324.77' cy='320.34' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='144.29' cy='326.44' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='347.05' cy='331.80' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='382.74' cy='370.03' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='326.82' cy='262.40' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='286.07' cy='235.13' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='389.98' cy='275.94' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='336.46' cy='283.50' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='243.10' cy='75.47' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='370.47' cy='275.38' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='339.46' cy='271.51' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='328.52' cy='283.67' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='370.70' cy='275.48' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='334.43' cy='319.96' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='326.75' cy='319.89' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
+<circle cx='374.87' cy='287.68' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C; fill: #E41A1C;' />
+<circle cx='323.90' cy='291.71' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='268.94' cy='486.13' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='345.34' cy='314.67' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='328.77' cy='385.48' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='199.96' cy='445.73' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='145.79' cy='384.39' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='378.81' cy='318.52' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='347.68' cy='294.58' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='347.20' cy='314.85' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='334.41' cy='329.84' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
+<circle cx='346.13' cy='297.98' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
+<circle cx='328.49' cy='453.81' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
 <text x='277.63' y='305.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>DNday</text>
 <text x='346.85' y='334.42' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>DNnight</text>
 <text x='302.16' y='356.24' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Tempcool</text>

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2022-10-27" />
+<meta name="date" content="2022-11-02" />
 
 <title>Ipomopsis temperature experiments: OTC performance</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 performance</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2022-10-27</h4>
+<h4 class="date">2022-11-02</h4>
 
 </div>
 
@@ -276,7 +276,9 @@ td, th { padding : 6px }
   mutate(file = paste0(file, &quot;.csv&quot;)) %&gt;% 
   write_csv(&quot;data/hobo_csvs.csv&quot;)
 
-hobometa &lt;- read_csv(&quot;./data/CWu OTC Hobos - metadata.csv&quot;) %&gt;% filter(replace_na(!str_detect(notes,&quot;drop&quot;), TRUE))
+hobometa &lt;- read_csv(&quot;./data/CWu OTC Hobos - metadata.csv&quot;) %&gt;%
+  filter(replace_na(!str_detect(notes,&quot;drop&quot;), TRUE)) %&gt;% 
+  mutate(temp=fct_relevel(fct_recode(temp,&quot;warmed&quot;=&quot;OTC&quot;),&quot;control&quot;))
 #devtools::install_version(&quot;units&quot;, version = &quot;0.6-7&quot;, repos = &quot;http://cran.us.r-project.org&quot;)
 #Sys.unsetenv(&quot;GITHUB_PAT&quot;)
 #devtools::install_github(&quot;RyanLab/microclimloggers&quot;) #needs ud_units from old units version
@@ -308,27 +310,29 @@ hobos &lt;- hobo_objects %&gt;% map_dfr(~.x$df_env, .id=&quot;file&quot;)%&gt;% 
 <p><img src="plots-otcs/heatmap-2.png" width="960" /></p>
 <pre class="r"><code>hobos.mean &lt;- hobos %&gt;% group_by(year, site, datetime, date, time, temp) %&gt;% 
   summarize(mean_temp_C = mean(temp_C, na.rm=T), mean_intensity_lux = mean(intensity_lux, na.rm=T))%&gt;%
-  pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %&gt;% drop_na(mean_temp_C_OTC) %&gt;% 
-  mutate(OTC_diff_C = mean_temp_C_OTC - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_OTC - mean_intensity_lux_control) 
+  pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %&gt;% drop_na(mean_temp_C_warmed) %&gt;% 
+  mutate(OTC_diff_C = mean_temp_C_warmed - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_warmed - mean_intensity_lux_control) %&gt;%
+  write_csv(&quot;./data/hobos_mean.csv&quot;)
 
-hobos.mean.summary &lt;- hobos.mean %&gt;% ungroup() %&gt;% group_by(year, site) %&gt;% summarize(across(contains(c(&quot;C&quot;,&quot;lux&quot;)), list(mean=mean, sd=sd)))
-kable(hobos.mean.summary)</code></pre>
-<table>
+hobos.mean %&gt;% ungroup() %&gt;% group_by(year, site) %&gt;% 
+  summarize(across(contains(c(&quot;C&quot;,&quot;lux&quot;)), list(mean=mean, sd=sd))) %&gt;% 
+  kable()</code></pre>
+<table style="width:100%;">
 <colgroup>
 <col width="1%" />
 <col width="3%" />
 <col width="8%" />
+<col width="7%" />
 <col width="8%" />
 <col width="7%" />
-<col width="6%" />
-<col width="11%" />
 <col width="10%" />
-<col width="9%" />
-<col width="9%" />
+<col width="10%" />
 <col width="5%" />
 <col width="4%" />
 <col width="6%" />
 <col width="5%" />
+<col width="10%" />
+<col width="9%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -336,50 +340,50 @@ kable(hobos.mean.summary)</code></pre>
 <th align="left">site</th>
 <th align="right">mean_temp_C_control_mean</th>
 <th align="right">mean_temp_C_control_sd</th>
-<th align="right">mean_temp_C_OTC_mean</th>
-<th align="right">mean_temp_C_OTC_sd</th>
+<th align="right">mean_temp_C_warmed_mean</th>
+<th align="right">mean_temp_C_warmed_sd</th>
 <th align="right">mean_intensity_lux_control_mean</th>
 <th align="right">mean_intensity_lux_control_sd</th>
-<th align="right">mean_intensity_lux_OTC_mean</th>
-<th align="right">mean_intensity_lux_OTC_sd</th>
 <th align="right">OTC_diff_C_mean</th>
 <th align="right">OTC_diff_C_sd</th>
 <th align="right">OTC_diff_lux_mean</th>
 <th align="right">OTC_diff_lux_sd</th>
+<th align="right">mean_intensity_lux_warmed_mean</th>
+<th align="right">mean_intensity_lux_warmed_sd</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">2018</td>
 <td align="left">bb</td>
-<td align="right">17.46328</td>
-<td align="right">12.029845</td>
-<td align="right">19.15394</td>
-<td align="right">13.46138</td>
-<td align="right">7936.945</td>
-<td align="right">12782.864</td>
-<td align="right">6653.101</td>
-<td align="right">10270.245</td>
-<td align="right">1.690659</td>
-<td align="right">1.553364</td>
-<td align="right">-1283.8441</td>
-<td align="right">4652.036</td>
+<td align="right">17.24866</td>
+<td align="right">12.063413</td>
+<td align="right">18.93961</td>
+<td align="right">13.48976</td>
+<td align="right">7928.146</td>
+<td align="right">12805.687</td>
+<td align="right">1.690944</td>
+<td align="right">1.550426</td>
+<td align="right">-1360.7731</td>
+<td align="right">4719.292</td>
+<td align="right">6567.373</td>
+<td align="right">10171.348</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="right">16.96144</td>
-<td align="right">11.226370</td>
-<td align="right">19.76628</td>
-<td align="right">14.62026</td>
-<td align="right">7379.631</td>
-<td align="right">11499.429</td>
-<td align="right">7608.538</td>
-<td align="right">11213.551</td>
-<td align="right">2.804837</td>
-<td align="right">3.550541</td>
-<td align="right">228.9073</td>
-<td align="right">2128.481</td>
+<td align="right">15.96277</td>
+<td align="right">11.434116</td>
+<td align="right">18.81069</td>
+<td align="right">14.90297</td>
+<td align="right">7385.635</td>
+<td align="right">11470.124</td>
+<td align="right">2.847922</td>
+<td align="right">3.659489</td>
+<td align="right">130.5749</td>
+<td align="right">2605.678</td>
+<td align="right">7516.210</td>
+<td align="right">11008.070</td>
 </tr>
 <tr class="odd">
 <td align="right">2019</td>
@@ -390,12 +394,12 @@ kable(hobos.mean.summary)</code></pre>
 <td align="right">14.54723</td>
 <td align="right">7913.722</td>
 <td align="right">11339.104</td>
-<td align="right">9049.147</td>
-<td align="right">12162.497</td>
 <td align="right">2.406017</td>
 <td align="right">3.019420</td>
 <td align="right">1135.4250</td>
 <td align="right">3061.335</td>
+<td align="right">9049.147</td>
+<td align="right">12162.497</td>
 </tr>
 <tr class="even">
 <td align="right">2019</td>
@@ -406,12 +410,12 @@ kable(hobos.mean.summary)</code></pre>
 <td align="right">13.54765</td>
 <td align="right">7451.669</td>
 <td align="right">10894.143</td>
-<td align="right">7153.628</td>
-<td align="right">10971.932</td>
 <td align="right">2.732357</td>
 <td align="right">3.062487</td>
 <td align="right">-298.0404</td>
 <td align="right">2232.327</td>
+<td align="right">7153.628</td>
+<td align="right">10971.932</td>
 </tr>
 <tr class="odd">
 <td align="right">2021</td>
@@ -422,12 +426,12 @@ kable(hobos.mean.summary)</code></pre>
 <td align="right">11.61215</td>
 <td align="right">5835.594</td>
 <td align="right">9571.010</td>
-<td align="right">3822.412</td>
-<td align="right">5967.848</td>
 <td align="right">1.940731</td>
 <td align="right">2.498417</td>
 <td align="right">-2013.1825</td>
 <td align="right">5668.294</td>
+<td align="right">3822.412</td>
+<td align="right">5967.848</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
@@ -438,12 +442,12 @@ kable(hobos.mean.summary)</code></pre>
 <td align="right">12.57918</td>
 <td align="right">8361.882</td>
 <td align="right">12139.925</td>
-<td align="right">7220.989</td>
-<td align="right">10507.084</td>
 <td align="right">1.687326</td>
 <td align="right">2.121104</td>
 <td align="right">-1140.8926</td>
 <td align="right">2431.502</td>
+<td align="right">7220.989</td>
+<td align="right">10507.084</td>
 </tr>
 <tr class="odd">
 <td align="right">2021</td>
@@ -454,16 +458,16 @@ kable(hobos.mean.summary)</code></pre>
 <td align="right">11.53999</td>
 <td align="right">3181.302</td>
 <td align="right">5349.557</td>
-<td align="right">2756.026</td>
-<td align="right">3960.406</td>
 <td align="right">1.699405</td>
 <td align="right">1.638513</td>
 <td align="right">-425.2761</td>
 <td align="right">2201.045</td>
+<td align="right">2756.026</td>
+<td align="right">3960.406</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_OTC, color=OTC_diff_C)) + 
+<pre class="r"><code>ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_warmed, color=OTC_diff_C)) + 
     facet_grid(rows=vars(site), cols=vars(year))+
   geom_point(size=0.5) + geom_abline(slope=1, intercept=0, color=&quot;white&quot;) + coord_fixed() +
   scale_color_viridis_c(option=&quot;magma&quot;) + geom_smooth(se=F, color=&quot;pink&quot;, span=0.2) + theme_dark() +
@@ -478,12 +482,12 @@ kable(hobos.mean.summary)</code></pre>
   scale_y_continuous(breaks=-2:11) + theme(legend.position = &quot;top&quot;, legend.key.width=unit(4,&quot;lines&quot;))+
   labs(title = &quot;Average Hourly Temp Comparison (Time of day)&quot;)</code></pre>
 <p><img src="plots-otcs/hobos_mean-2.png" width="960" /></p>
-<pre class="r"><code>hobos.mean %&gt;% pivot_longer(mean_temp_C_control:mean_temp_C_OTC, names_to=&quot;temp&quot;, values_to=&quot;temp_C&quot;) %&gt;% 
+<pre class="r"><code>hobos.mean %&gt;% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, names_to=&quot;temp&quot;, values_to=&quot;temp_C&quot;) %&gt;% 
   ggplot(aes(x=time, y=temp_C, linetype=temp, group=date)) + 
     facet_grid(rows=vars(site), cols=vars(year))+
   #geom_line(aes(group=paste(date, temp)), size=0.2, alpha=0.4)+
   geom_smooth(aes(group=temp), se=T, span=0.1, method=&quot;loess&quot;, size=1, color=&quot;black&quot;) + 
-  scale_linetype_manual(labels=c(&quot;control&quot;, &quot;OTC&quot;), values=c(2,1)) +
+  scale_linetype_manual(values=c(2,1)) +
   labs(y=&quot;Temperature (C)&quot;, x=&quot;Time of day&quot;, linetype=&quot;Temperature treatment&quot;) +
   theme(legend.key.width=unit(2,&quot;lines&quot;)) +
   scale_y_continuous(breaks=seq(5, 40, by=5), expand=expansion(mult=0.1)) +
@@ -506,19 +510,19 @@ hobos.minmax.date &lt;- hobos.minmax %&gt;% group_by(year, site, temp, date, nam
 ggplot(hobos.minmax, aes(x=yday(date), y=value, color=temp, linetype=name)) + geom_point() + 
       facet_grid(rows=vars(site), cols=vars(year))+
   geom_line(data=hobos.minmax.date)+
-  labs(y=&quot;Temperature (C)&quot;, x=&quot;Date&quot;, linetype=&quot;Statistic&quot;, color=&quot;Treatment&quot;) +
-  scale_color_hue(direction=-1) + scale_y_continuous(breaks=scales::breaks_pretty(10)) +
+  labs(y=&quot;Temperature (C)&quot;, x=&quot;Date&quot;, linetype=&quot;Statistic&quot;, color=&quot;Temperature&quot;) +
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + scale_y_continuous(breaks=scales::breaks_pretty(10)) +
   labs(title = &quot;Min and Max Daily Temp across Season&quot;)</code></pre>
 <p><img src="plots-otcs/hobos_minmax-1.png" width="960" /></p>
 <pre class="r"><code>hobos.max.long &lt;- hobos.minmax.date %&gt;% filter(name !=&quot;min_temp_C&quot;) %&gt;% pivot_wider() %&gt;% 
-  pivot_wider(names_from=temp, values_from=max_temp_C) %&gt;% mutate(OTC_diff_C = OTC-control)
+  pivot_wider(names_from=temp, values_from=max_temp_C) %&gt;% mutate(OTC_diff_C = warmed-control)
 ggplot(hobos.max.long, aes(x=control, y=OTC_diff_C)) + geom_point() + geom_smooth(span=0.6, se=F) + geom_hline(yintercept=0) +
   labs(title = &quot;Maximum daily temp&quot;)</code></pre>
 <p><img src="plots-otcs/hobos_minmax-2.png" width="960" /></p>
 <pre class="r"><code>mean(hobos.max.long$OTC_diff_C, na.rm=T)</code></pre>
-<pre><code>[1] 7.146241</code></pre>
+<pre><code>[1] 7.303121</code></pre>
 <pre class="r"><code>sd(hobos.max.long$OTC_diff_C, na.rm=T)</code></pre>
-<pre><code>[1] 2.407065</code></pre>
+<pre><code>[1] 2.528841</code></pre>
 <pre class="r"><code>hobos.minmax.tally &lt;- hobos.minmax %&gt;% count(year, site, plotid, temp)
 kable(hobos.minmax.tally)</code></pre>
 <table>
@@ -539,7 +543,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">F</td>
 <td align="right">29</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
@@ -547,7 +551,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">F</td>
 <td align="right">101</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
@@ -555,7 +559,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">H</td>
 <td align="right">103</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
@@ -563,7 +567,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">I</td>
 <td align="right">104</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
@@ -571,31 +575,31 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">J</td>
 <td align="right">105</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
 <td align="left">bb</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">G</td>
 <td align="right">102</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
 <td align="left">bb</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">H</td>
 <td align="right">27</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
 <td align="left">bb</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">J</td>
 <td align="right">19</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
@@ -603,7 +607,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">A</td>
 <td align="right">22</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
@@ -611,7 +615,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">B</td>
 <td align="right">11</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
@@ -619,7 +623,7 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">C</td>
 <td align="right">17</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
@@ -627,47 +631,47 @@ kable(hobos.minmax.tally)</code></pre>
 <td align="left">control</td>
 <td align="left">D</td>
 <td align="right">8</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">A</td>
 <td align="right">1</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">B</td>
 <td align="right">4</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">C</td>
 <td align="right">13</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="even">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">D</td>
 <td align="right">2</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">E</td>
 <td align="right">10</td>
-<td align="right">28</td>
+<td align="right">44</td>
 </tr>
 <tr class="even">
 <td align="right">2019</td>
@@ -712,7 +716,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2019</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">V</td>
 <td align="right">29</td>
 <td align="right">52</td>
@@ -720,7 +724,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">W</td>
 <td align="right">32</td>
 <td align="right">52</td>
@@ -728,7 +732,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2019</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">X</td>
 <td align="right">21</td>
 <td align="right">52</td>
@@ -736,7 +740,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">Z</td>
 <td align="right">22</td>
 <td align="right">52</td>
@@ -776,7 +780,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2019</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">A</td>
 <td align="right">17</td>
 <td align="right">46</td>
@@ -784,7 +788,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">B</td>
 <td align="right">30</td>
 <td align="right">46</td>
@@ -792,7 +796,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2019</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">D</td>
 <td align="right">10</td>
 <td align="right">46</td>
@@ -800,7 +804,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2019</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">E</td>
 <td align="right">2</td>
 <td align="right">46</td>
@@ -832,7 +836,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">K</td>
 <td align="right">10</td>
 <td align="right">64</td>
@@ -840,7 +844,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">L</td>
 <td align="right">24</td>
 <td align="right">64</td>
@@ -848,7 +852,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">M</td>
 <td align="right">4</td>
 <td align="right">64</td>
@@ -856,7 +860,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">N</td>
 <td align="right">20</td>
 <td align="right">64</td>
@@ -864,7 +868,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">P</td>
 <td align="right">28</td>
 <td align="right">64</td>
@@ -872,7 +876,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">Q</td>
 <td align="right">3</td>
 <td align="right">64</td>
@@ -880,7 +884,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">GNA</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">R</td>
 <td align="right">1</td>
 <td align="right">64</td>
@@ -920,7 +924,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">1B</td>
 <td align="right">21</td>
 <td align="right">70</td>
@@ -928,7 +932,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">1C</td>
 <td align="right">32</td>
 <td align="right">70</td>
@@ -936,7 +940,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">2B</td>
 <td align="right">13</td>
 <td align="right">70</td>
@@ -944,7 +948,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">3A</td>
 <td align="right">1</td>
 <td align="right">70</td>
@@ -952,7 +956,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">3B</td>
 <td align="right">19</td>
 <td align="right">70</td>
@@ -960,7 +964,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">3D</td>
 <td align="right">8</td>
 <td align="right">70</td>
@@ -968,7 +972,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">4B</td>
 <td align="right">22</td>
 <td align="right">70</td>
@@ -976,7 +980,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">4C</td>
 <td align="right">30</td>
 <td align="right">70</td>
@@ -984,7 +988,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">5B</td>
 <td align="right">12</td>
 <td align="right">70</td>
@@ -992,7 +996,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">5D</td>
 <td align="right">4</td>
 <td align="right">70</td>
@@ -1000,7 +1004,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">6A</td>
 <td align="right">10</td>
 <td align="right">70</td>
@@ -1008,7 +1012,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">Maxfield</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">6C</td>
 <td align="right">29</td>
 <td align="right">70</td>
@@ -1064,7 +1068,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">A</td>
 <td align="right">5</td>
 <td align="right">66</td>
@@ -1072,7 +1076,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">B</td>
 <td align="right">12</td>
 <td align="right">66</td>
@@ -1080,7 +1084,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">D</td>
 <td align="right">3</td>
 <td align="right">66</td>
@@ -1088,7 +1092,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">E</td>
 <td align="right">15</td>
 <td align="right">66</td>
@@ -1096,7 +1100,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">G</td>
 <td align="right">2</td>
 <td align="right">66</td>
@@ -1104,7 +1108,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="even">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">H</td>
 <td align="right">2</td>
 <td align="right">66</td>
@@ -1112,7 +1116,7 @@ kable(hobos.minmax.tally)</code></pre>
 <tr class="odd">
 <td align="right">2021</td>
 <td align="left">SC</td>
-<td align="left">OTC</td>
+<td align="left">warmed</td>
 <td align="left">I</td>
 <td align="right">14</td>
 <td align="right">66</td>

@@ -1,4 +1,4 @@
-year,site,datetime,date,time,mean_temp_C_control,mean_temp_C_OTC,mean_intensity_lux_control,mean_intensity_lux_OTC,OTC_diff_C,OTC_diff_lux
+year,site,datetime,date,time,mean_temp_C_control,mean_temp_C_warmed,mean_intensity_lux_control,mean_intensity_lux_warmed,OTC_diff_C,OTC_diff_lux
 2018,bb,2018-07-10T19:00:00Z,2018-07-11,1,5.5004,5.8933333333333335,0,0,0.3929333333333336,0
 2018,bb,2018-07-10T20:00:00Z,2018-07-11,2,4.9942,5.346,0,0,0.3517999999999999,0
 2018,bb,2018-07-10T21:00:00Z,2018-07-11,3,5.0268,5.260666666666666,0,0,0.23386666666666667,0
