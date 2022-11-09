@@ -65,8 +65,8 @@
 <rect x='59.04' y='436.34' width='78.43' height='66.22' style='stroke-width: 0.75;' />
 <rect x='69.84' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
 <rect x='69.84' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
-<text x='98.26' y='444.96' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
-<text x='98.26' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.732</text>
+<text x='98.26' y='444.96' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Treatment </text>
+<text x='98.26' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.724</text>
 <text x='89.28' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>control</text>
 <text x='89.28' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>warmed</text>
 <rect x='488.65' y='436.34' width='57.11' height='66.22' style='stroke-width: 0.75;' />

@@ -74,14 +74,14 @@
 <rect x='75.23' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
 <rect x='75.23' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
 <text x='96.97' y='444.96' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
-<text x='96.97' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.267</text>
+<text x='96.97' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.245</text>
 <text x='94.67' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
 <text x='94.67' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
 <rect x='484.10' y='436.34' width='61.66' height='66.22' style='stroke-width: 0.75;' />
 <rect x='494.90' y='470.16' width='8.64' height='7.20' style='stroke-width: 0.75;' />
 <rect x='494.90' y='484.56' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #000000;' />
 <text x='514.93' y='444.96' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time </text>
-<text x='514.93' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.419</text>
+<text x='514.93' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.418</text>
 <text x='514.34' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>day</text>
 <text x='514.34' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>night</text>
 <rect x='488.65' y='59.04' width='57.11' height='80.62' style='stroke-width: 0.75;' />
@@ -89,7 +89,7 @@
 <polygon points='498.46,113.56 503.86,113.56 503.86,108.16 498.46,108.16 ' style='stroke-width: 0.75; stroke: none; fill: #000000;' />
 <circle cx='501.16' cy='125.26' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
 <text x='517.21' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Year </text>
-<text x='517.21' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.469</text>
+<text x='517.21' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.474</text>
 <text x='511.96' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>2018</text>
 <text x='511.96' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>2019</text>
 <text x='511.96' y='129.63' style='font-size: 12.00px; font-family: "Arial";'>2021</text>
