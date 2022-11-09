@@ -485,66 +485,52 @@ points(nmds.vol, display="sites", col=svf$Year, pch=c(13,19)[svf$DN])
 ## CAP analysis of each OTC site and year
 ```{r otc}
 #inventory of samples
-svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site) %>% kable(caption="Sample size")
+svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site, is.na(mean_temp_C_treatment)) %>% pivot_wider(names_from=temp, values_from=n) %>%  kable(caption="Sample size")
 
-plot.otc <- function(svf.otc, plot.DN=F, plot.chems=T) {
-    vol.otc <- vol[svf.otc$sample,]
-    cap.otc <- capscale(sqrt(vol.otc) ~ temp, distance="bray", data=svf.otc)
-    if(plot.DN) cap.otc <- capscale(sqrt(vol.otc) ~ DN+temp, distance="bray", data=svf.otc)
-    summ.cap <- summary(cap.otc)
-    prop.expl <- summ.cap$cont$importance
-    ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
-    anova.cap <- anova(cap.otc, by="margin")
-    
-    plot(cap.otc, type="n", xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    with(svf.otc, title(paste("OTC warming:","I.",unique(PlantType), "at", unique(Site),"site,",unique(Year),
-                              do.call(paste0, list(unique(DN), collapse="/")))))
-    legend("topleft", title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), 
-           levels(svf.otc$temp), fill=tempcol)
-            if(plot.DN) legend("topright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), 
-                       levels(svf.otc$DN), pch=c(1,19))
-    points(cap.otc, display="sites", col=c(tempcol)[svf.otc$temp], pch=c(1,19)[svf.otc$DN]) 
-    text(cap.otc, display="cn")
-    if(plot.chems) {
-      if(plot.DN) text(cap.otc, display="species", cex=0.8, srt=45,
+plot.otc <- function(svf.otc, cap.terms=c("mean_temp_C_treatment", "temp"), plot.chems=T) {
+  vol.otc <- vol[svf.otc$sample,]
+  cap.formula <- reformulate(cap.terms, response = "sqrt(vol.otc)")
+  cap.otc <- capscale(cap.formula, distance="bray", data=svf.otc)
+  summ.cap <- summary(cap.otc)
+  prop.expl <- summ.cap$cont$importance
+  ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+  anova.cap <- anova(cap.otc, by="margin")
+  
+  plot(cap.otc, type="n", xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
+  with(svf.otc, 
+       title(paste("OTC warming:","I.",unique(PlantType), "at", paste(unique(Site), collapse=" & "),unique(Year),
+                            do.call(paste0, list(unique(DN), collapse="/")))))
+  if("temp" %in% cap.terms) legend("topleft", title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), 
+                                   levels(svf.otc$temp), fill=tempcol)
+  if("DN" %in% cap.terms) legend("topright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), 
+                                 levels(svf.otc$DN), pch=c(1,19))
+  temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+  if("mean_temp_C_treatment" %in% cap.terms) legend("bottomleft", 
+                                                    title=paste("Temp (C)","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]),
+                                                    paste(temprange, " C"), fill=rev(viridis(2)))
+  if("Site" %in% cap.terms) legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]),
+                                   unique(svf.otc$Site))
+  points(cap.otc, display="sites", col=c(tempcol)[svf.otc$temp], pch=c(1,19)[svf.otc$DN]) 
+  text(cap.otc, display="cn")
+  if(plot.chems) {
+    if(length(cap.terms)>1) text(cap.otc, display="species", cex=0.8, srt=45,
                      col=ifelse(sqrt(cap.otc$CCA$v[,1]^2 + cap.otc$CCA$v[,2]^2)>0.25, alpha("purple",1),alpha("purple",0)))
-      else text(cap.otc, display="species", cex=0.8, srt=45,
-                     col=ifelse(abs(cap.otc$CCA$v[,1])>0.1, alpha("purple",1),alpha("purple",0)))
-    }
-    return(cap.otc)
+    else text(cap.otc, display="species", cex=0.8, srt=45,
+              col=ifelse(abs(cap.otc$CCA$v[,1])>0.1, alpha("purple",1),alpha("purple",0)))
+  }
+  return(cap.otc)
 }
 
+plot.terms <-c("mean_temp_C_treatment", "temp")
 cap.otcbb18 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2018",Site=="bb",PlantType=="agg"))
 cap.otcGNA18 <- plot.otc(svf %>% filter(expt=="otc",Year=="2018",Site=="GNA",PlantType=="agg"))
-cap.otcGNA19 <- plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="GNA",PlantType=="agg"))
+cap.otc18 <- plot.otc(svf %>% filter(expt=="otc",Year=="2018",PlantType=="agg"), cap.terms=c(plot.terms, "Site"))
+cap.otcGNA19 <- plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="GNA",PlantType=="agg", !is.na(mean_temp_C_treatment)))
 cap.otcGNA21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="GNA",PlantType=="agg"))
-cap.otcGNA21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="Maxfield",PlantType=="agg"))
-cap.otcSC19 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="SC",PlantType=="ten"),plot.DN=T)
-cap.otcSC21 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="SC",PlantType=="ten"),plot.DN=T)
-#cap.otc.all <- list(bb18=cap.otcbb18, GNA18=cap.otcGNA18, GNA19=cap.otcGNA19, SC19=cap.otcSC19)
-```
-
-## CAP of all I. aggregata vs. OTCs
-```{r otc_comb}
-#Combined I. aggregata OTC CAP
-svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg")
-vol.otc <- vol[svf.otc$sample,]
-(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+temp, distance="bray", data=svf.otc))
-
-summ.cap <- summary(cap.otc.comb)
-prop.expl <- summ.cap$cont$importance
-ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
-yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
-(anova.cap <- anova(cap.otc.comb, by="margin"))
-plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])#xlim=range(cap.otc.comb$CCA$wa[,1])
-title("OTC warming: all I. agg")
-legend("bottomleft",  title=paste("Temperature","\nP =",anova.cap["temp","Pr(>F)"]), legend=levels(svf.otc$temp), fill=tempcol)
-legend("left",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=levels(svf.otc$Year), pch=yearpch)
-#legend("bottomleft",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site))
-text(cap.otc.comb, display="species", cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
-points(cap.otc.comb, display="sites", col=c(tempcol)[svf.otc$temp], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display="cn")
+cap.otcMax21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="Maxfield",PlantType=="agg"))
+cap.otc21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",PlantType=="agg"), cap.terms=c(plot.terms, "Site"))
+cap.otcSC19 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="SC",PlantType=="ten"),cap.terms=c(plot.terms, "DN"))
+cap.otcSC21 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="SC",PlantType=="ten"),cap.terms=c(plot.terms, "DN"))
 ```
 
 ## CAP of all I. aggregata vs. actual temp, site, year
@@ -558,40 +544,19 @@ summ.cap <- summary(cap.otc.comb)
 prop.expl <- summ.cap$cont$importance
 ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
 (anova.cap <- anova(cap.otc.comb, by="margin"))
+
+yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 par(bg="grey40")
 plot(cap.otc.comb, type="n",xlim=range(cap.otc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC actual temp: I. agg at GNA or bb sites, all years\nvol ~ Year+Site+temp+temp")
+title("OTC actual temp: I. agg at all sites, all years\nvol ~ Year+Site+temp_C+temp")
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
-legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site)[1:2])
+legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site))
 legend("left",  title=paste("OTC warming","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("pink",0.7),alpha("pink",0)))
-points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display="cn", col="white")
-```
-
-## CAP of all I. aggregata vs. actual temp, year
-```{r otc_comb_tempyr}
-#Combined I. aggregata OTC CAP
-svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg") %>% drop_na(mean_temp_C_treatment)
-vol.otc <- vol[svf.otc$sample,]
-(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+mean_temp_C_treatment, distance="bray", data=svf.otc))
-
-summ.cap <- summary(cap.otc.comb)
-prop.expl <- summ.cap$cont$importance
-ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
-(anova.cap <- anova(cap.otc.comb, by="margin"))
-par(bg="grey40")
-plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC actual temp: I. agg at GNA or bb sites, all years\n vol ~ temp")
-temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("bottomleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
-text(cap.otc.comb, display="species", cex=0.7, srt=45,
-                     col=ifelse(abs(cap.otc.comb$CCA$v[,1])>0.1, alpha("pink",0.7),alpha("pink",0)))
-points(cap.otc.comb, display="sites", col=inferno(32)[round(svf.otc$mean_temp_C_treatment)-7], pch=yearpch[svf.otc$Year])
+points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display="cn", col="white")
 ```
 
