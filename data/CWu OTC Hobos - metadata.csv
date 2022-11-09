@@ -3,7 +3,7 @@ file,year,site,n1,n2,n3,owner,id,plotid,temp,serial,plant_near,notes
 2018/bb/Hobo27-bbHinside-SN10793179.csv,2018,bb,Hobo27,bbHinside,SN10793179,UR,27,H,OTC,10793179,,
 2018/bb/Hobo29-bbFout-SN10793181.csv,2018,bb,Hobo29,bbFout,SN10793181,UR,29,F,control,10793181,,
 2018/bb/Hobo7-bbIinside-SN10542008.csv,2018,bb,Hobo7,bbIinside,SN10542008,UR,7,I,OTC,10542008,,"drop, last record 2018-07-13"
-2018/bb/HoboDC101-bbFout-SN1027086.csv,2018,bb,HoboDC101,bbFout,SN1027086,DC,101,F,control,1027086,,
+2018/bb/HoboDC101-bbFout-SN1027086.csv,2018,bb,HoboDC101,bbFout,SN1027086,DC,101,F,OTC,1027086,,"JP: changed from control to OTC based on data, dupe"
 2018/bb/HoboDC102-bbGinside-SN2006529.csv,2018,bb,HoboDC102,bbGinside,SN2006529,DC,102,G,OTC,2006529,,
 2018/bb/HoboDC103-bbHout-SN2006533.csv,2018,bb,HoboDC103,bbHout,SN2006533,DC,103,H,control,2006533,,
 2018/bb/HoboDC104-bbIout-SN1027087.csv,2018,bb,HoboDC104,bbIout,SN1027087,DC,104,I,control,1027087,,
@@ -47,7 +47,7 @@ file,year,site,n1,n2,n3,owner,id,plotid,temp,serial,plant_near,notes
 2021/GNA/RMBL20-chamberNin.csv,2021,GNA,RMBL20,chamberNin,,RMBL,20,N,OTC,,,
 2021/GNA/RMBL3-chamberQin.csv,2021,GNA,RMBL3,chamberQin,,RMBL,3,Q,OTC,,,
 2021/GNA/RMBL4-chamberMin.csv,2021,GNA,RMBL4,chamberMin,,RMBL,4,M,OTC,,,
-2021/GNA/RMBL6-chamblerPQout.csv,2021,GNA,RMBL6,chamblerPQout,,RMBL,6,PQ,control,,,
+2021/GNA/RMBL6-chamblerPQout.csv,2021,GNA,RMBL6,chamblerPQout,,RMBL,6,PQ,control,,,near both chambers P Q
 2021/GNA/RMBL9-chamberMout.csv,2021,GNA,RMBL9,chamberMout,,RMBL,9,M,control,,,
 2021/Maxfield/10793175-hobo30.csv,2021,Maxfield,10793175,hobo30,,UR,30,4C,OTC,10793175,932,
 2021/Maxfield/Hobo_27_-_SN_10793179.csv,2021,Maxfield,Hobo_27_,_SN_10793179,,UR,27,3B,control,10793179,626,
@@ -75,7 +75,7 @@ file,year,site,n1,n2,n3,owner,id,plotid,temp,serial,plant_near,notes
 2021/SC/RMBL5-chamberCout.csv,2021,SC,RMBL5,chamberCout,,RMBL,5,C,control,,,
 2021/SC/RMBL6-chamberHout.csv,2021,SC,RMBL6,chamberHout,,RMBL,6,H,control,,,
 2021/SC/RMBL7-chamberFGout.csv,2021,SC,RMBL7,chamberFGout,,RMBL,7,F,control,,,
-2021/SC/UR2-chamberGin.csv,2021,SC,UR2,chamberGin,,UR,2,G,OTC,10369061,,
-2021/SC/UR3-chamberDin.csv,2021,SC,UR3,chamberDin,,UR,3,D,OTC,10369065,,
-2021/SC/UR4-chamberAout.csv,2021,SC,UR4,chamberAout,,UR,4,A,control,10369048,,
+2021/SC/UR2-chamberGin.csv,2021,SC,UR2,chamberGin,,UR,2,G,OTC,,,
+2021/SC/UR3-chamberDin.csv,2021,SC,UR3,chamberDin,,UR,3,D,OTC,,,
+2021/SC/UR4-chamberAout.csv,2021,SC,UR4,chamberAout,,UR,4,A,control,,,
 2021/SC/UR5-chamberAin.csv,2021,SC,UR5,chamberAin,,UR,5,A,OTC,,,

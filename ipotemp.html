@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2022-11-03" />
+<meta name="date" content="2022-11-08" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2022-11-03</h4>
+<h4 class="date">2022-11-08</h4>
 
 </div>
 
@@ -477,7 +477,7 @@ meta &lt;- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id=&quot;ex
          Expt=expt) %&gt;% #TODO sort thru Expt==NA
   #Add mean temperature of OTCs or controls at time of sampling
   left_join(read_csv(&quot;data/hobos_mean.csv&quot;) %&gt;% select(-date) %&gt;% 
-              mutate(datetime = force_tz(datetime, &quot;America/Denver&quot;)), 
+              mutate(datetime = with_tz(datetime, &quot;America/Denver&quot;)), #stored in UTC!
             by = c(&quot;Site&quot;=&quot;site&quot;, &quot;Pump_datehour&quot;=&quot;datetime&quot;)) %&gt;% 
   mutate(mean_temp_C_treatment = if_else(temp==&quot;in&quot;, mean_temp_C_warmed, mean_temp_C_control))
 
@@ -1600,28 +1600,33 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
        x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/soil-2.svg" width="768" /></p>
 </div>
-<div id="otc-temperature-during-sampling" class="section level2">
-<h2>OTC temperature during sampling</h2>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
-  facet_wrap(vars(DN), scales=&quot;free_x&quot;)+
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_jitter(height=0, width=0.2)+
+<div id="otc-actual-temperature" class="section level2">
+<h2>OTC actual temperature</h2>
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+       aes(y=mean_temp_C_treatment, x=paste(Year, Site), color=temp)) +
+  facet_grid(cols=vars(DN), scales=&quot;free_x&quot;, space=&quot;free_x&quot;)+ geom_boxplot()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  ggtitle(&quot;Effects of OTCs on Temperature during Sampling&quot;)+
-  ylab(&quot;Temperature (C)&quot;) +
-  xlab(&quot;Year, temperature&quot;)</code></pre>
+  labs(y=&quot;Mean actual temperature (C)&quot;, x=(&quot;Year, site&quot;), color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/actualtemp-1.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, PlantType==&quot;agg&quot;), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
-  facet_wrap(vars(Year), scales=&quot;free_x&quot;, nrow=1)+
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_jitter(height=0, width=0.2)+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  ggtitle(&quot;Effects of OTCs on Temperature during Sampling: I agg.&quot;)+
-  ylab(&quot;Temperature (C)&quot;) +
-  xlab(&quot;Year, temperature&quot;)</code></pre>
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+       aes(y=mean_temp_C_warmed, x=mean_temp_C_control, color=DN))+
+  geom_abline(slope=1, intercept=0)+ geom_smooth(se=F)+
+  geom_text(aes(label=round(mean_temp_C_warmed-mean_temp_C_control)))+ theme_minimal() </code></pre>
 <p><img src="plots/actualtemp-2.svg" width="768" /></p>
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+       aes(y=mean_temp_C_warmed-mean_temp_C_control, x=hour(Pump), color=DN))+
+  geom_jitter(width=0.2,height=0)+geom_smooth(se=F)+ theme_minimal() </code></pre>
+<p><img src="plots/actualtemp-3.svg" width="768" /></p>
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+       aes(y=mean_temp_C_warmed-mean_temp_C_control, x=mean_temp_C_control, color=DN))+
+  geom_point()+geom_smooth(se=F)+ theme_minimal()</code></pre>
+<p><img src="plots/actualtemp-4.svg" width="768" /></p>
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+       aes(x=hour(Pump), y=mean_temp_C_control, color=DN))+
+  geom_point()+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
+  scale_x_continuous(n.breaks=20)</code></pre>
+<p><img src="plots/actualtemp-5.svg" width="768" /></p>
 </div>
 </div>
 <div id="filtering-criteria" class="section level1">
@@ -2064,19 +2069,19 @@ mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
 Total          44.0127     1.0000     
-Constrained     6.5590     0.1490    6
-Unconstrained  51.8583     1.1783   71
+Constrained     6.5599     0.1490    6
+Unconstrained  51.8573     1.1782   71
 Imaginary     -14.4046    -0.3273  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5   CAP6 
-2.8194 2.0030 1.0400 0.3512 0.2345 0.1109 
+2.8063 1.9535 0.9340 0.4630 0.2214 0.1817 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-7.541 4.898 4.171 3.536 2.676 2.254 2.132 1.929 
+7.471 4.918 4.151 3.480 2.682 2.302 2.132 1.904 
 (Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
@@ -2089,11 +2094,11 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    3.597 7.5961  0.001 ***
-Site                    2    1.460 3.0828  0.001 ***
-mean_temp_C_treatment   1    0.571 2.4097  0.001 ***
-temp                    1    0.377 1.5903  0.054 .  
-Residual              219   51.858                  
+Year                    2    3.451 7.2872  0.001 ***
+Site                    2    0.941 1.9862  0.002 ** 
+mean_temp_C_treatment   1    0.572 2.4138  0.002 ** 
+temp                    1    0.413 1.7435  0.030 *  
+Residual              219   51.857                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)
@@ -2122,19 +2127,19 @@ data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
 Total          44.0127     1.0000     
-Constrained     4.7280     0.1074    3
-Unconstrained  53.6892     1.2199   71
+Constrained     5.2135     0.1185    3
+Unconstrained  53.2037     1.2088   71
 Imaginary     -14.4046    -0.3273  154
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3 
-2.6772 1.6324 0.4184 
+2.6568 1.7911 0.7657 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-7.652 5.033 4.289 3.742 2.946 2.313 2.292 1.943 
+7.760 4.987 4.174 3.510 2.915 2.360 2.235 1.912 
 (Showing 8 of 71 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
@@ -2147,9 +2152,9 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    4.024 8.3193  0.001 ***
-mean_temp_C_treatment   1    0.563 2.3264  0.002 ** 
-Residual              222   53.689                  
+Year                    2    4.182 8.7258  0.001 ***
+mean_temp_C_treatment   1    1.048 4.3735  0.001 ***
+Residual              222   53.204                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>par(bg=&quot;grey40&quot;)

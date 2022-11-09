@@ -11,12 +11,12 @@ read_hobo_csv2 <- function (csv_file, units_out = c("as.is", "metric", "imperial
     stop("multiple serial numbers in file header")
   tz <- stringr::str_extract(header_bits[grep("Date Time", 
                                               header_bits)], "GMT[+-][0-9][0-9]")
+  olsonsign <- chartr("+-", "-+", substr(tz,4,4)) #POSIX Etc/GMT have the sign reversed, see ?timezones
   if (substr(tz, 5, 5) == 0) {
-    olsontz <- paste("Etc/", substr(tz, 1, 4), substr(tz, 
-                                                      6, 6), sep = "")
+    olsontz <- paste("Etc/", substr(tz, 1, 3), olsonsign, substr(tz, 6, 6), sep = "")
   }
   else {
-    olsontz <- paste("Etc/", tz, sep = "")
+    olsontz <- paste("Etc/", substr(tz, 1, 3), olsonsign, substr(tz, 5, 5), sep = "")
   }
   hobofile <- read.csv(csv_file, skip = 2, header = FALSE, 
                        stringsAsFactors = FALSE, na.strings = "")

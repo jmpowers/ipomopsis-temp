@@ -226,7 +226,7 @@ meta <- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id="expt") %>%
          Expt=expt) %>% #TODO sort thru Expt==NA
   #Add mean temperature of OTCs or controls at time of sampling
   left_join(read_csv("data/hobos_mean.csv") %>% select(-date) %>% 
-              mutate(datetime = force_tz(datetime, "America/Denver")), 
+              mutate(datetime = with_tz(datetime, "America/Denver")), #stored in UTC!
             by = c("Site"="site", "Pump_datehour"="datetime")) %>% 
   mutate(mean_temp_C_treatment = if_else(temp=="in", mean_temp_C_warmed, mean_temp_C_control))
 
@@ -283,27 +283,32 @@ ggplot(meta %>% filter(Expt=="otc", temp !="air"), aes(x=paste(Year, Site, Date)
        x="Year, site, date", color="Temperature")
 ```
 
-## OTC temperature during sampling
+## OTC actual temperature
 ```{r actualtemp}
-ggplot(meta %>% filter(Expt=="otc", temp !="air"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
-  facet_wrap(vars(DN), scales="free_x")+
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_jitter(height=0, width=0.2)+
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), 
+       aes(y=mean_temp_C_treatment, x=paste(Year, Site), color=temp)) +
+  facet_grid(cols=vars(DN), scales="free_x", space="free_x")+ geom_boxplot()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = "Set1", direction=-1)+
-  ggtitle("Effects of OTCs on Temperature during Sampling")+
-  ylab("Temperature (C)") +
-  xlab("Year, temperature")
+  labs(y="Mean actual temperature (C)", x=("Year, site"), color="Temperature")
 
-ggplot(meta %>% filter(Expt=="otc", temp !="air", PlantType=="agg"), aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
-  facet_wrap(vars(Year), scales="free_x", nrow=1)+
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_jitter(height=0, width=0.2)+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = "Set1", direction=-1)+
-  ggtitle("Effects of OTCs on Temperature during Sampling: I agg.")+
-  ylab("Temperature (C)") +
-  xlab("Year, temperature")
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), 
+       aes(y=mean_temp_C_warmed, x=mean_temp_C_control, color=DN))+
+  geom_abline(slope=1, intercept=0)+ geom_smooth(se=F)+
+  geom_text(aes(label=round(mean_temp_C_warmed-mean_temp_C_control)))+ theme_minimal() 
+
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), 
+       aes(y=mean_temp_C_warmed-mean_temp_C_control, x=hour(Pump), color=DN))+
+  geom_jitter(width=0.2,height=0)+geom_smooth(se=F)+ theme_minimal() 
+
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), 
+       aes(y=mean_temp_C_warmed-mean_temp_C_control, x=mean_temp_C_control, color=DN))+
+  geom_point()+geom_smooth(se=F)+ theme_minimal()
+
+ggplot(meta %>% filter(Expt=="otc", temp !="air"), 
+       aes(x=hour(Pump), y=mean_temp_C_control, color=DN))+
+  geom_point()+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method="lm")+ theme_minimal() +
+  scale_x_continuous(n.breaks=20)
 ```
 
 
