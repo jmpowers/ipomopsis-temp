@@ -409,7 +409,7 @@ sc21 &lt;- read_tsv(&quot;data/2021 Spring Creek Volatiles - 2021.tsv&quot;) %&g
    mutate(PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;ten&quot;))
 gna21 &lt;- read_tsv(&quot;data/2021 GNA Volatiles - 2021.tsv&quot;) %&gt;% 
   mutate(time=&quot;day&quot;, PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;agg&quot;))
-library(stringr)
+
 files21 &lt;- tibble(Filename = rownames(ipo.all)) %&gt;% 
   filter(str_detect(Filename, &quot;2021&quot;), 
          str_detect(Filename, &quot;SC_|GNA_&quot;)) %&gt;%
@@ -1960,26 +1960,114 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(13,19)[svf$DN])<
 plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></pre>
 </div>
 <div id="cap-of-i.-aggregata" class="section level2">
-<h2>CAP of I. aggregata</h2>
+<h2>CAP of <em>I. aggregata</em></h2>
 <div id="each-year-and-site" class="section level3">
 <h3>Each year and site</h3>
-<pre class="r"><code>cap.otcbb18 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2018&quot;,Site==&quot;bb&quot;,PlantType==&quot;agg&quot;))</code></pre>
-<p><img src="plots/otc_agg-1.svg" width="768" /></p>
-<pre class="r"><code>cap.otcGNA18 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2018&quot;,Site==&quot;GNA&quot;,PlantType==&quot;agg&quot;))</code></pre>
-<p><img src="plots/otc_agg-2.svg" width="768" /></p>
-<pre class="r"><code>cap.otcGNA19 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2019&quot;,Site==&quot;GNA&quot;,PlantType==&quot;agg&quot;, !is.na(mean_temp_C_treatment)))</code></pre>
-<p><img src="plots/otc_agg-3.svg" width="768" /></p>
-<pre class="r"><code>cap.otcGNA21 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;GNA&quot;,PlantType==&quot;agg&quot;))</code></pre>
-<p><img src="plots/otc_agg-4.svg" width="768" /></p>
-<pre class="r"><code>cap.otcMax21 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;Maxfield&quot;,PlantType==&quot;agg&quot;))</code></pre>
-<p><img src="plots/otc_agg-5.svg" width="768" /></p>
+<pre class="r"><code>cap.siteyr.agg &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;agg&quot;) %&gt;% 
+  drop_na(mean_temp_C_treatment) %&gt;% 
+  group_by(Site, Year) %&gt;% summarize(meta = list(cur_data_all()), .groups = &quot;drop&quot;) %&gt;% 
+  arrange(Site, Year) %&gt;% #nest that keeps groups
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc),
+         anova = map(cap, ~tidy(anova(.x, by=&quot;margin&quot;))))</code></pre>
+<p><img src="plots/otc_agg-1.svg" width="768" /><img src="plots/otc_agg-2.svg" width="768" /><img src="plots/otc_agg-3.svg" width="768" /><img src="plots/otc_agg-4.svg" width="768" /><img src="plots/otc_agg-5.svg" width="768" /></p>
+<pre class="r"><code>cap.siteyr.agg %&gt;% select(-c(meta,cap)) %&gt;% unnest(anova) %&gt;% 
+  filter(term!=&quot;Residual&quot;) %&gt;% select(-c(df, SumOfSqs,statistic)) %&gt;% 
+  pivot_wider(names_from=term, values_from=p.value) %&gt;% 
+  rename(N=samples, Temperature=mean_temp_C_treatment, Treatment=temp) %&gt;% 
+  kable(caption=&quot;I. aggregata site-year CAP p-values&quot;)</code></pre>
+<table>
+<caption>I. aggregata site-year CAP p-values</caption>
+<thead>
+<tr class="header">
+<th align="left">Site</th>
+<th align="left">Year</th>
+<th align="right">N</th>
+<th align="right">Temperature</th>
+<th align="right">Treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">bb</td>
+<td align="left">2018</td>
+<td align="right">26</td>
+<td align="right">0.458</td>
+<td align="right">0.210</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="left">2018</td>
+<td align="right">46</td>
+<td align="right">0.001</td>
+<td align="right">0.405</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="left">2019</td>
+<td align="right">15</td>
+<td align="right">0.403</td>
+<td align="right">0.308</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="left">2021</td>
+<td align="right">58</td>
+<td align="right">0.001</td>
+<td align="right">0.100</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">2021</td>
+<td align="right">81</td>
+<td align="right">0.001</td>
+<td align="right">0.002</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="each-year" class="section level3">
 <h3>Each year</h3>
-<pre class="r"><code>cap.otc18 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2018&quot;, DN==&quot;day&quot;,PlantType==&quot;agg&quot;), cap.terms=c(plot.terms, &quot;Site&quot;))</code></pre>
-<p><img src="plots/otc_comb_year-1.svg" width="768" /></p>
-<pre class="r"><code>cap.otc21 &lt;- plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;, DN==&quot;day&quot;,PlantType==&quot;agg&quot;), cap.terms=c(plot.terms, &quot;Site&quot;))</code></pre>
-<p><img src="plots/otc_comb_year-2.svg" width="768" /></p>
+<pre class="r"><code>cap.yr.agg &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;agg&quot;, year != &quot;2019&quot;) %&gt;% 
+  drop_na(mean_temp_C_treatment) %&gt;% 
+  group_by(Year) %&gt;% summarize(meta = list(cur_data_all()), .groups = &quot;drop&quot;) %&gt;% 
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc, cap.terms=c(plot.terms, &quot;Site&quot;)),
+         anova = map(cap, ~tidy(anova(.x, by=&quot;margin&quot;))))</code></pre>
+<p><img src="plots/otc_comb_year-1.svg" width="768" /><img src="plots/otc_comb_year-2.svg" width="768" /></p>
+<pre class="r"><code>cap.yr.agg %&gt;% select(-c(meta,cap)) %&gt;% unnest(anova) %&gt;% 
+  filter(term!=&quot;Residual&quot;) %&gt;% select(-c(df, SumOfSqs,statistic)) %&gt;% 
+  pivot_wider(names_from=term, values_from=p.value) %&gt;% 
+  rename(N=samples, Temperature=mean_temp_C_treatment, Treatment=temp) %&gt;% 
+  kable(caption=&quot;I. aggregata year CAP p-values&quot;)</code></pre>
+<table>
+<caption>I. aggregata year CAP p-values</caption>
+<thead>
+<tr class="header">
+<th align="left">Year</th>
+<th align="right">N</th>
+<th align="right">Temperature</th>
+<th align="right">Treatment</th>
+<th align="right">Site</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2018</td>
+<td align="right">72</td>
+<td align="right">0.001</td>
+<td align="right">0.448</td>
+<td align="right">0.101</td>
+</tr>
+<tr class="even">
+<td align="left">2021</td>
+<td align="right">139</td>
+<td align="right">0.131</td>
+<td align="right">0.048</td>
+<td align="right">0.061</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="all-years" class="section level3">
 <h3>All years</h3>
@@ -2042,14 +2130,49 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_comb_temp-1.svg" width="768" /></p>
 </div>
 </div>
-<div id="cap-of-all-i.-tenuituba" class="section level2">
-<h2>CAP of all I. tenuituba</h2>
+<div id="cap-of-i.-tenuituba" class="section level2">
+<h2>CAP of <em>I. tenuituba</em></h2>
 <div id="each-year-1" class="section level3">
 <h3>Each year</h3>
-<pre class="r"><code>cap.otcSC19 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2019&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;), cap.terms=c(&quot;DN&quot;,&quot;temp&quot;,&quot;DN:temp&quot;))</code></pre>
-<p><img src="plots/otc_ten-1.svg" width="768" /></p>
-<pre class="r"><code>cap.otcSC21 &lt;-  plot.otc(svf %&gt;% filter(expt==&quot;otc&quot;,Year==&quot;2021&quot;,Site==&quot;SC&quot;,PlantType==&quot;ten&quot;), cap.terms=c(&quot;DN&quot;,&quot;temp&quot;,&quot;DN:temp&quot;))</code></pre>
-<p><img src="plots/otc_ten-2.svg" width="768" /></p>
+<pre class="r"><code>cap.yr.ten &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;ten&quot;) %&gt;% 
+  group_by(Year) %&gt;% summarize(meta = list(cur_data_all()), .groups = &quot;drop&quot;) %&gt;% 
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc, cap.terms=c(&quot;DN&quot;,&quot;temp&quot;,&quot;DN:temp&quot;)),
+         anova = map(cap, ~tidy(anova(.x, by=&quot;term&quot;))))</code></pre>
+<p><img src="plots/otc_ten-1.svg" width="768" /><img src="plots/otc_ten-2.svg" width="768" /></p>
+<pre class="r"><code>cap.yr.ten %&gt;% select(-c(meta,cap)) %&gt;% unnest(anova) %&gt;% 
+  filter(term!=&quot;Residual&quot;) %&gt;% select(-c(df, SumOfSqs,statistic)) %&gt;% 
+  pivot_wider(names_from=term, values_from=p.value) %&gt;% 
+  rename(N=samples, Time=DN, Treatment=temp, &quot;Time:Treatment&quot;=&quot;DN:temp&quot;) %&gt;% 
+  kable(caption=&quot;I. tenuituba year CAP p-values&quot;)</code></pre>
+<table>
+<caption>I. tenuituba year CAP p-values</caption>
+<thead>
+<tr class="header">
+<th align="left">Year</th>
+<th align="right">N</th>
+<th align="right">Time</th>
+<th align="right">Treatment</th>
+<th align="right">Time:Treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2019</td>
+<td align="right">38</td>
+<td align="right">0.373</td>
+<td align="right">0.294</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">2021</td>
+<td align="right">140</td>
+<td align="right">0.001</td>
+<td align="right">0.318</td>
+<td align="right">0.596</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="both-years-day" class="section level3">
 <h3>Both years, day</h3>

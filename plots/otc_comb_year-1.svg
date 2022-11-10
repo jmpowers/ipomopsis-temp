@@ -70,7 +70,7 @@
 <rect x='69.84' y='92.86' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
 <rect x='69.84' y='107.26' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
 <text x='98.26' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Treatment </text>
-<text x='98.26' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.486</text>
+<text x='98.26' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.459</text>
 <text x='89.28' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>control</text>
 <text x='89.28' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>warmed</text>
 <rect x='59.04' y='436.34' width='75.86' height='66.22' style='stroke-width: 0.75;' />
@@ -82,7 +82,7 @@
 <text x='95.05' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>18  C</text>
 <rect x='488.65' y='436.34' width='57.11' height='66.22' style='stroke-width: 0.75;' />
 <text x='517.21' y='444.96' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Site </text>
-<text x='517.21' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.094</text>
+<text x='517.21' y='459.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.102</text>
 <text x='512.30' y='478.13' style='font-size: 12.00px; font-family: "Arial";'>bb</text>
 <text x='512.30' y='492.53' style='font-size: 12.00px; font-family: "Arial";'>GNA</text>
 <circle cx='219.88' cy='257.82' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />

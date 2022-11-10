@@ -22,7 +22,9 @@ td, th { padding : 6px }
 library(reshape2)
 library(tidyverse)
 library(lubridate)
+library(bouquet)
 library(vegan)
+library(broom)
 library(viridis)
 library(RColorBrewer)
 library(pheatmap)
@@ -158,7 +160,7 @@ sc21 <- read_tsv("data/2021 Spring Creek Volatiles - 2021.tsv") %>%
    mutate(PlantType=if_else(plant=="air", "air", "ten"))
 gna21 <- read_tsv("data/2021 GNA Volatiles - 2021.tsv") %>% 
   mutate(time="day", PlantType=if_else(plant=="air", "air", "agg"))
-library(stringr)
+
 files21 <- tibble(Filename = rownames(ipo.all)) %>% 
   filter(str_detect(Filename, "2021"), 
          str_detect(Filename, "SC_|GNA_")) %>%
@@ -532,23 +534,41 @@ plot.terms <-c("mean_temp_C_treatment", "temp")
 ```
 
 
-## CAP of I. aggregata
+## CAP of *I. aggregata*
 
 ### Each year and site
 
 ```{r otc_agg}
-cap.otcbb18 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2018",Site=="bb",PlantType=="agg"))
-cap.otcGNA18 <- plot.otc(svf %>% filter(expt=="otc",Year=="2018",Site=="GNA",PlantType=="agg"))
-cap.otcGNA19 <- plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="GNA",PlantType=="agg", !is.na(mean_temp_C_treatment)))
-cap.otcGNA21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="GNA",PlantType=="agg"))
-cap.otcMax21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="Maxfield",PlantType=="agg"))
+cap.siteyr.agg <- svf %>% filter(expt=="otc", PlantType=="agg") %>% 
+  drop_na(mean_temp_C_treatment) %>% 
+  group_by(Site, Year) %>% summarize(meta = list(cur_data_all()), .groups = "drop") %>% 
+  arrange(Site, Year) %>% #nest that keeps groups
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc),
+         anova = map(cap, ~tidy(anova(.x, by="margin"))))
+
+cap.siteyr.agg %>% select(-c(meta,cap)) %>% unnest(anova) %>% 
+  filter(term!="Residual") %>% select(-c(df, SumOfSqs,statistic)) %>% 
+  pivot_wider(names_from=term, values_from=p.value) %>% 
+  rename(N=samples, Temperature=mean_temp_C_treatment, Treatment=temp) %>% 
+  kable(caption="I. aggregata site-year CAP p-values")
 ```
 
 ### Each year
 
 ```{r otc_comb_year}
-cap.otc18 <- plot.otc(svf %>% filter(expt=="otc",Year=="2018", DN=="day",PlantType=="agg"), cap.terms=c(plot.terms, "Site"))
-cap.otc21 <- plot.otc(svf %>% filter(expt=="otc",Year=="2021", DN=="day",PlantType=="agg"), cap.terms=c(plot.terms, "Site"))
+cap.yr.agg <- svf %>% filter(expt=="otc", PlantType=="agg", year != "2019") %>% 
+  drop_na(mean_temp_C_treatment) %>% 
+  group_by(Year) %>% summarize(meta = list(cur_data_all()), .groups = "drop") %>% 
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc, cap.terms=c(plot.terms, "Site")),
+         anova = map(cap, ~tidy(anova(.x, by="margin"))))
+
+cap.yr.agg %>% select(-c(meta,cap)) %>% unnest(anova) %>% 
+  filter(term!="Residual") %>% select(-c(df, SumOfSqs,statistic)) %>% 
+  pivot_wider(names_from=term, values_from=p.value) %>% 
+  rename(N=samples, Temperature=mean_temp_C_treatment, Treatment=temp) %>% 
+  kable(caption="I. aggregata year CAP p-values")
 ```
 
 ### All years
@@ -575,12 +595,21 @@ points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2
 text(cap.otc.comb, display="cn")
 ```
 
-## CAP of all I. tenuituba
+## CAP of *I. tenuituba*
 
 ### Each year
 ```{r otc_ten}
-cap.otcSC19 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2019",Site=="SC",PlantType=="ten"), cap.terms=c("DN","temp","DN:temp"))
-cap.otcSC21 <-  plot.otc(svf %>% filter(expt=="otc",Year=="2021",Site=="SC",PlantType=="ten"), cap.terms=c("DN","temp","DN:temp"))
+cap.yr.ten <- svf %>% filter(expt=="otc", PlantType=="ten") %>% 
+  group_by(Year) %>% summarize(meta = list(cur_data_all()), .groups = "drop") %>% 
+  mutate(samples = map_int(meta, nrow),
+         cap = map(meta, plot.otc, cap.terms=c("DN","temp","DN:temp")),
+         anova = map(cap, ~tidy(anova(.x, by="term"))))
+
+cap.yr.ten %>% select(-c(meta,cap)) %>% unnest(anova) %>% 
+  filter(term!="Residual") %>% select(-c(df, SumOfSqs,statistic)) %>% 
+  pivot_wider(names_from=term, values_from=p.value) %>% 
+  rename(N=samples, Time=DN, Treatment=temp, "Time:Treatment"="DN:temp") %>% 
+  kable(caption="I. tenuituba year CAP p-values")
 ```
 
 ### Both years, day
