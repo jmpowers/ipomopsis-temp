@@ -1,0 +1,87 @@
+site,date,chamber,temp,VWC,period,notes
+SC,2021-06-29,A,warmed,3.9,1.176,rained previous day.
+SC,2021-06-29,A,control,4.2,1.181,rained previous day.
+SC,2021-06-29,B,warmed,4.3,1.183,rained previous day.
+SC,2021-06-29,B,control,5.2,1.200,rained previous day.
+SC,2021-06-29,C,warmed,8.5,1.258,rained previous day.
+SC,2021-06-29,C,control,8.0,1.249,rained previous day.
+SC,2021-06-29,D,warmed,10.9,1.296,rained previous day.
+SC,2021-06-29,D,control,8.8,1.262,rained previous day.
+SC,2021-06-29,E,warmed,11.4,1.304,rained previous day.
+SC,2021-06-29,E,control,10.6,1.294,rained previous day.
+SC,2021-06-29,F,warmed,7.1,1.233,rained previous day.
+SC,2021-06-29,F,control,11.5,1.309,rained previous day.
+SC,2021-06-29,G,warmed,6.9,1.231,rained previous day.
+SC,2021-06-29,G,control,5.1,1.197,rained previous day.
+SC,2021-06-29,H,warmed,4.3,1.182,rained previous day.
+SC,2021-06-29,H,control,5.3,1.202,rained previous day.
+SC,2021-06-29,I,warmed,7.5,1.239,rained previous day.
+SC,2021-06-29,I,control,6.4,1.221,rained previous day.
+SC,2019-07-18,A,control,4.1,1.179,11:02 AM
+SC,2019-07-18,A,warmed,3.9,1.149,11:02 AM
+SC,2019-07-18,B,control,2.8,1.154,
+SC,2019-07-18,B,warmed,2.9,1.156,
+SC,2019-07-18,C,control,3.5,1.169,
+SC,2019-07-18,C,warmed,4.7,1.190,
+SC,2019-07-18,D,control,3.1,1.159,
+SC,2019-07-18,D,warmed,3.1,1.158,
+SC,2019-07-18,E,control,2.8,1.135,10:49 AM
+SC,2019-07-18,E,warmed,3.4,1.166,10:49 AM
+SC,2019-07-23,A,warmed,2.7,1.152,10:23 AM
+SC,2019-07-23,A,control,2.8,1.155,
+SC,2019-07-23,B,warmed,3.0,1.158,
+SC,2019-07-23,B,control,2.9,1.157,
+SC,2019-07-23,C,warmed,2.7,1.153,
+SC,2019-07-23,C,control,2.6,1.149,
+SC,2019-07-23,D,warmed,2.7,1.152,
+SC,2019-07-23,D,control,2.7,1.152,
+SC,2019-07-23,E,warmed,2.5,1.146,
+SC,2019-07-23,E,control,2.6,1.149,10:36 AM
+GNA,2021-07-01,S,warmed,14.1,1.346,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,S,control,14.2,1.347,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,R,warmed,12.1,1.316,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,R,control,12.0,1.313,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,Q,warmed,7.4,1.238,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,Q,control,11.0,1.298,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,P,warmed,7.9,1.247,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,P,control,10.2,1.285,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,N,warmed,14.4,1.351,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,N,control,14.6,1.354,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,M,warmed,13.1,1.330,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,M,control,11.8,1.309,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,L,warmed,8.8,1.261,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,L,control,8.0,1.264,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,K,warmed,13.3,1.334,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,K,control,12.9,1.329,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,J,warmed,6.4,1.221,started sampling at 1:30pm; rained yesterday
+GNA,2021-07-01,J,control,10.0,1.282,started sampling at 1:30pm; rained yesterday
+GNA,2019-07-09,Z,control,7.1,1.214,2:50 PM
+GNA,2019-07-09,Z,warmed,7.1,1.213,
+GNA,2019-07-09,Y,control,8.3,1.234,
+GNA,2019-07-09,Y,warmed,7.9,1.226,
+GNA,2019-07-09,X,control,8.6,1.239,
+GNA,2019-07-09,X,warmed,6.6,1.205,2:54 PM
+GNA,2019-07-09,W,control,7.1,1.213,2:58 PM
+GNA,2019-07-09,W,warmed,9.7,1.258,
+GNA,2019-07-09,V,control,8.7,1.241,
+GNA,2019-07-09,V,warmed,8.1,1.231,3:01 PM
+GNA,2019-07-18,Z,control,6.2,1.217,3:28 PM
+GNA,2019-07-18,Z,warmed,5.5,1.205,3:28 PM
+GNA,2019-07-18,Y,control,5.9,1.212,3:30 PM
+GNA,2019-07-18,Y,warmed,5.3,1.202,3:31 PM
+GNA,2019-07-18,X,control,5.2,1.200,3:34 PM
+GNA,2019-07-18,X,warmed,4.3,1.183,3:35 PM
+GNA,2019-07-18,W,control,5.0,1.197,3:45 PM
+GNA,2019-07-18,W,warmed,4.0,1.178,3:44 PM
+GNA,2019-07-18,V,control,5.8,1.211,3:43 PM
+GNA,2019-07-18,V,warmed,6.8,1.227,3:42 PM
+GNA,2019-07-23,X,warmed,2.3,1.144,1:52 PM
+GNA,2019-07-23,X,control,4.2,1.149,
+GNA,2019-07-23,Y,warmed,3.1,1.159,
+GNA,2019-07-23,Y,control,4.1,1.179,
+GNA,2019-07-23,Z,warmed,3.3,1.164,
+GNA,2019-07-23,Z,control,4.2,1.186,
+GNA,2019-07-23,W,warmed,6.6,1.224,2:20 PM
+GNA,2019-07-23,W,control,5.9,1.203,
+GNA,2019-07-23,V,warmed,2.3,1.144,
+GNA,2019-07-23,V,control,2.9,1.137,
