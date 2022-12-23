@@ -152,8 +152,8 @@ legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, 
 ```{r metadata}
 files <- read_tsv("data/CWu_samples_text2.csv") %>% 
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
-perc <- read_tsv("data/Percivals2018_2019.csv")
-otc <- read_tsv("data/OTC2018_2019.csv")  %>%  
+perc <- read_csv("data/CWu Ipomopsis Scent Metadata - Percivals2018_2019.csv")
+otc <- read_csv("data/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv")  %>%  
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
 
 sc21 <- read_tsv("data/2021 Spring Creek Volatiles - 2021.tsv") %>% 
@@ -255,17 +255,17 @@ files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filena
 
 ## Times
 ```{r times}
-ggplot(meta, aes(x=paste(Expt, DN,Year), y=Bag, color=DN)) + 
+ggplot(meta, aes(x=paste(Expt, DN,Year), y=Pump, color=DN)) + 
   geom_boxplot() + geom_point()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90))+
   ggtitle("Sampling time of day")
 
-ggplot(meta, aes(x=paste(Expt, DN,Year), y=Total/60, color=DN)) + 
-  geom_boxplot() + geom_point()+
+ggplot(meta, aes(x=paste(Expt, Site, Year), y=Total/60, color=Tissue)) + 
+  geom_point(position=position_dodge(width=0.3))+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   ggtitle("Total sampling duration")+
   ylab("Equilibration plus pumping time (min)")
-#TODO fix timings
+
 ```
 
 ## OTC soil moisture
@@ -343,7 +343,8 @@ ipo.data.cut$Filename <- sv$Filename[match(ipo.data.cut$Filename, sv$Filename)]
 ipo.data.cut <- ipo.data.cut[ipo.data.cut$Name != "", ] #drop unidentified peaks
 ipo.data.cut$Name <- droplevels(ipo.data.cut$Name)
 longdata <- load_longdata(ipo.data.cut, sample="Filename", RT="Ret.Time", name="Name", area="Area", match = "SI", maxmatch=100)
-metadata <- sv %>% mutate(Tissue = fct_recode(Tissue, ambient="air", floral="flower", leaf="leaf")) %>% 
+metadata <- sv %>% as.data.frame() %>% #tibbles break bouquet's add_count_freqs
+  mutate(Tissue = fct_recode(Tissue, ambient="air", floral="flower", leaf="leaf")) %>% 
   load_metadata(date="Date", sample="Filename", group="PlantType", type="Tissue")
 vol.all <- make_sampletable(longdata, metadata)
 chems <- make_chemtable(longdata, metadata)
@@ -363,15 +364,19 @@ chems <- make_chemtable(longdata, metadata)
 chemsf <- chems %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
-  filter_freq(0.1, group = FALSE) %>% 
+  filter_freq(0.1, group = TRUE) %>% #now filter separately for each species
   filter_contaminant(cont.list = c("Cyclotetrasiloxane, octamethyl-",
   "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate")) %>% 
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   filter_ambient_ttest(vol.all, metadata, alpha = 0.05, adjust = "fdr") %>%
   combine_filters() 
-chemsf$filter_final <- with(chemsf, filter_RT == "OK" & filter_match =="OK" & filter_freq.floral == "OK" & filter_area == "OK" & 
-                              (filter_ambient_ratio == "OK" | (filter_ambient_ttest == "OK" & ambient_ratio >1)) & filter_contaminant == "OK")
+chemsf$filter_final <- with(chemsf, filter_RT == "OK" & filter_match =="OK" & 
+                              (filter_freq.agg == "OK" | filter_freq.ten =="OK") & 
+                              filter_area == "OK" & 
+                              (filter_ambient_ratio == "OK" | 
+                                 (filter_ambient_ttest == "OK" & filter_ambient_ratio == "OK")) &
+                              filter_contaminant == "OK")
 bouquet::plot_filters(chemsf, option="rarity")
 bouquet::plot_filters(chemsf, option="ambient")
 bouquet::plot_filters(chemsf, option="prop")
@@ -386,14 +391,18 @@ chems.leaf <- make_chemtable(longdata, meta.leaf)
 chemsf.leaf <- chems.leaf %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
-  filter_freq(0.2, group = FALSE) %>% 
+  filter_freq(0.1, group = TRUE) %>%  #now filter separately for each species
   filter_contaminant(cont.list = c("Caprolactam")) %>% 
   filter_area(min_maximum = 5e5) %>% 
   filter_ambient_ratio(vol.all, meta.leaf, ratio = 4) %>%
   filter_ambient_ttest(vol.all, meta.leaf, alpha = 0.05, adjust = "fdr") %>%
   combine_filters()
-chemsf.leaf$filter_final <- with(chemsf.leaf, filter_RT == "OK" & filter_match =="OK" & filter_freq.floral == "OK" & #floral are actually leafs
-                                   filter_area == "OK" & (filter_ambient_ratio == "OK" | (filter_ambient_ttest == "OK" & ambient_ratio >1)) & filter_contaminant == "OK")
+chemsf.leaf$filter_final <- with(chemsf.leaf, filter_RT == "OK" & filter_match =="OK" & 
+                              (filter_freq.agg == "OK" | filter_freq.ten =="OK") & 
+                              filter_area == "OK" & 
+                              (filter_ambient_ratio == "OK" | 
+                                 (filter_ambient_ttest == "OK" & filter_ambient_ratio == "OK")) &
+                              filter_contaminant == "OK")
 #TODO bouquet needs to do a one-sided t-test! some compounds lower in blanks got a pass with low p value!
 bouquet::plot_filters(chemsf.leaf, option="rarity")
 bouquet::plot_filters(chemsf.leaf, option="ambient")
@@ -408,7 +417,8 @@ chemsf <- chemsf %>% mutate(filter_ambient_leaf_ratio = chemsf.leaf$filter_ambie
 ggplot(chemsf, aes(x=mean.floral, y= chemsf.leaf$mean.floral, label=name, color=paste(filter_final,chemsf.leaf$filter_final, sep=", "),
                    alpha=filter_final|chemsf.leaf$filter_final))+ theme_minimal()+
   geom_abline(slope=1, intercept=1) + geom_text()+ scale_x_log10()+ scale_y_log10() +
-  labs(x="Mean area in flowers", y= "Mean area in leaves", alpha="Kept in either dataset", color="Kept in floral, leaf datasets")
+  scale_alpha_discrete(range=c(0,1), guide="none")+
+  labs(x="Mean area in flowers", y= "Mean area in leaves", color="Kept in floral, leaf datasets")
 ```
 
 ```{r pruning}
@@ -436,15 +446,15 @@ colnames(vol.all) <- chemsf3$name
 #vol <- prune_sampletable(vol.all, chemsf3, metadata)
 #TODO use chesf3 (manual list instead)
 vol <- prune_sampletable(vol.all, chemsf3, metadata)
-files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd")#no filtered volatiles
+files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", #no filtered volatiles
+                   "SC_91_210715_8202021_10.qgd") #Artemisia leaves
 svf <- metadata[metadata$type == "floral" & !(metadata$sample %in% files_exclude),]
 svf$Year <- factor(svf$Year)
 svf <- svf %>% mutate_if(is.factor, droplevels) %>% 
   mutate(Treat = paste(temp, Temp) %>% 
            fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
-vol <- vol / 0.75 / 1 #30 min of equilibration plus 15 minpumping, one flower 
-#TODO fix svf$Total data entry errors
+vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
 ```
 
 ```{r pruning_leaf}
@@ -455,9 +465,7 @@ svl <- svl %>% mutate_if(is.factor, droplevels) %>%
   mutate(Treat = paste(temp, Temp) %>% 
            fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
-svl$LeafDryWtGrams[c(8,3)] <- svl$LeafDryWtGrams[c(8,3)]/10
-vol.leaf <- vol.leaf / 0.75 / svl$LeafDryWtGrams #area per hour per dry gram
-#TODO fix svf$Total data entry errors for leaves
+vol.leaf <- vol.leaf / as.numeric(svl$Total, units="hours") / (svl$LeafDryWtGrams*1000) #area per hour per dry milligram
 ```
 
 
