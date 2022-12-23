@@ -127,7 +127,7 @@ n,Year,Date,DN,Temp,PlantType,Tissue,Sample,Sample2,nomatch,Bag,Pump,End ,Equil,
 53,2019,2019-07-25,night,warm,ten,flower,T144,T144,,22:34,23:07,23:22,0:33,0:15,1,0,DRC5,,Carrie,
 45,2019,2019-07-25,night,warm,ten,flower,T164,T164,,20:14,20:44,20:59,0:30,0:15,1,0,CW2,,Carrie,
 51,2019,2019-07-25,night,warm,ten,flower,T176,T176,,22:10,22:42,22:57,0:32,0:15,1,0,DRC5,,Carrie,
-38,2019,2019-07-29,day,cool,agg,leaf,A76-leaf,A76,,17:07,17:37,17:52,0:30,0:15,0,0,JMP7,,John?,0.1372
+38,2019,2019-07-29,day,cool,agg,leaf,A76-leaf,A76,,17:07,17:37,17:52,0:30,0:15,0,0,JMP7,JP: divided LeafDryWtGrams by 10,John?,0.01372
 34,2019,2019-07-29,day,cool,agg,leaf,A91-leaf,A91,,16:55,17:25,17:40,0:30,0:15,0,0,JMP7,,John?,0.02249
 36,2019,2019-07-29,day,cool,agg,leaf,A95-leaf,A95,,17:03,17:33,17:48,0:30,0:15,0,0,JMP7,,John?,0.00917
 26,2019,2019-07-29,day,warm,agg,flower,A80,A80,,11:27,11:57,12:12,0:30,0:15,1,0,DRC9,These last two are on the same datasheet at 7/25 ,John,
@@ -137,7 +137,7 @@ n,Year,Date,DN,Temp,PlantType,Tissue,Sample,Sample2,nomatch,Bag,Pump,End ,Equil,
 35,2019,2019-07-29,day,cool,ten,leaf,T173-leaf,T173,,17:01,17:31,17:46,0:30,0:15,0,0,JMP7,,John?,0.00704
 37,2019,2019-07-29,day,cool,ten,leaf,T188-leaf,T188,,17:05,17:35,17:50,0:30,0:15,0,0,JMP7,,John?,0.01297
 43,2019,2019-07-29,day,warm,ten,leaf,T140W-leaf,T140,,17:21,17:51,18:06,0:30,0:15,0,0,DRC9,,Lucas?,0.01109
-41,2019,2019-07-29,day,warm,ten,leaf,T141W-leaf,T141,,17:09,17:39,17:54,0:30,0:15,0,0,DRC10,,Lucas?,0.0769
+41,2019,2019-07-29,day,warm,ten,leaf,T141W-leaf,T141,,17:09,17:39,17:54,0:30,0:15,0,0,DRC10,JP: divided LeafDryWtGrams by 10,Lucas?,0.00769
 42,2019,2019-07-29,day,warm,agg,leaf,T38W-leaf,A38,,17:14,17:46,18:01,0:32,0:15,0,0,DRC8,"A38 is actual plant. Tag 38 is aggregata, so this should be A38W for analysis.  But sample is likely called T38W",Lucas?,0.01293
 66,2019,2019-07-29,night,cool,agg,flower,A15,A15,,21:29,22:06,22:22,0:37,0:16,1,0,unknown,,?,
 67,2019,2019-07-29,night,cool,agg,flower,A76,A76,,21:31,22:07,22:22,0:36,0:15,1,0,unknown,,?,
