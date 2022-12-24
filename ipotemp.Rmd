@@ -344,7 +344,8 @@ ipo.data.cut <- ipo.data.cut[ipo.data.cut$Name != "", ] #drop unidentified peaks
 ipo.data.cut$Name <- droplevels(ipo.data.cut$Name)
 longdata <- load_longdata(ipo.data.cut, sample="Filename", RT="Ret.Time", name="Name", area="Area", match = "SI", maxmatch=100)
 metadata <- sv %>% as.data.frame() %>% #tibbles break bouquet's add_count_freqs
-  mutate(Tissue = fct_recode(Tissue, ambient="air", floral="flower", leaf="leaf")) %>% 
+  mutate(Tissue = fct_recode(Tissue, ambient="air", floral="flower", leaf="leaf"),
+         PlantType = factor(if_else(Tissue=="leaf",paste0(PlantType,Tissue), as.character(PlantType)))) %>% 
   load_metadata(date="Date", sample="Filename", group="PlantType", type="Tissue")
 vol.all <- make_sampletable(longdata, metadata)
 chems <- make_chemtable(longdata, metadata)
@@ -365,8 +366,8 @@ chemsf <- chems %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
   filter_freq(0.1, group = TRUE) %>% #now filter separately for each species
-  filter_contaminant(cont.list = c("Cyclotetrasiloxane, octamethyl-",
-  "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate")) %>% 
+  filter_contaminant(cont.list = c("Hexyl chloroformate", "Disulfide, di-tert-dodecyl",
+                                   "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate")) %>% 
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   filter_ambient_ttest(vol.all, metadata, alpha = 0.05, adjust = "fdr") %>%
@@ -384,21 +385,21 @@ bouquet::plot_filters(chemsf, option="prop")
 
 ## Leaves
 
-```{r filtering_leaf}
+```{r filtering_leaf, fig.height=12, fig.width=12}
 ### Leaf filtering
-meta.leaf <- metadata %>% mutate(type = fct_recode(type, floral = "leaf", flower = "floral")) #trick bouquet to think the leaf samples are floral TODO: hacky!
+meta.leaf <- metadata %>% mutate(type = fct_recode(type, floral = "leaf", flower = "floral"))  #trick bouquet to think the leaf samples are floral TODO: hacky!
 chems.leaf <- make_chemtable(longdata, meta.leaf) 
 chemsf.leaf <- chems.leaf %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
-  filter_freq(0.1, group = TRUE) %>%  #now filter separately for each species
-  filter_contaminant(cont.list = c("Caprolactam")) %>% 
+  filter_freq(0.2, group = TRUE) %>%  #now filter separately for each species
+  filter_contaminant(cont.list = c("Hexyl chloroformate","Acetic acid, trifluoro-, undecyl ester")) %>% 
   filter_area(min_maximum = 5e5) %>% 
   filter_ambient_ratio(vol.all, meta.leaf, ratio = 4) %>%
   filter_ambient_ttest(vol.all, meta.leaf, alpha = 0.05, adjust = "fdr") %>%
   combine_filters()
 chemsf.leaf$filter_final <- with(chemsf.leaf, filter_RT == "OK" & filter_match =="OK" & 
-                              (filter_freq.agg == "OK" | filter_freq.ten =="OK") & 
+                              (filter_freq.aggleaf == "OK" | filter_freq.tenleaf =="OK") & 
                               filter_area == "OK" & 
                               (filter_ambient_ratio == "OK" | 
                                  (filter_ambient_ttest == "OK" & filter_ambient_ratio == "OK")) &
@@ -414,11 +415,12 @@ chemsf <- chemsf %>% mutate(filter_ambient_leaf_ratio = chemsf.leaf$filter_ambie
                             leaf_not_flower = filter_ambient_leaf_ratio=="OK" & filter_ambient_leaf_ttest=="OK" & 
                               !(filter_ambient_ratio=="OK" & filter_ambient_ttest=="OK"))
 
-ggplot(chemsf, aes(x=mean.floral, y= chemsf.leaf$mean.floral, label=name, color=paste(filter_final,chemsf.leaf$filter_final, sep=", "),
-                   alpha=filter_final|chemsf.leaf$filter_final))+ theme_minimal()+
-  geom_abline(slope=1, intercept=1) + geom_text()+ scale_x_log10()+ scale_y_log10() +
-  scale_alpha_discrete(range=c(0,1), guide="none")+
-  labs(x="Mean area in flowers", y= "Mean area in leaves", color="Kept in floral, leaf datasets")
+kept_either <- chemsf$filter_final | chemsf.leaf$filter_final
+ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,"mean.floral"], label=name, color=paste(filter_final,chemsf.leaf[kept_either,"filter_final"], sep=", ")))+ theme_minimal()+
+  geom_abline(slope=1, intercept=1) +   geom_point(aes(size=RT), alpha=0.3)+  geom_text()+ 
+  scale_x_log10()+ scale_y_log10() + coord_fixed()+
+  scale_color_manual(labels=c("leaf","floral","both"),values=c("darkgreen","red","blue"))+
+  labs(x="Mean area in flowers", y= "Mean area in leaves", color="Kept in dataset")
 ```
 
 ```{r pruning}
@@ -496,13 +498,13 @@ TEYcols <- brewer.pal(9, "Paired")#[c(1:4,8,5:6)]
 spcols <- c(agg="red", ten="violet")
 ordiplot(nmds.vol, type = "n")
 text(nmds.vol, display="species", cex=0.7, col="grey20")
-legend("topleft", levels(svf$DN), pch=c(13,19))
+legend("topleft", levels(svf$DN), pch=c(1,4))
 #legend("topright", levels(svf$PlantType), fill=spcols)
 legend("bottomright", levels(svf$Year), fill=1:3)
 #legend("bottomleft", levels(TEY), fill=TEYcols, cex=0.9)
-points(nmds.vol, display="sites", col=TEYcols[TEY], pch=c(13,19)[svf$DN])
-points(nmds.vol, display="sites", col=spcols[svf$PlantType], pch=c(13,19)[svf$DN])
-points(nmds.vol, display="sites", col=svf$Year, pch=c(13,19)[svf$DN])
+#points(nmds.vol, display="sites", col=TEYcols[TEY], pch=c(13,19)[svf$DN])
+#points(nmds.vol, display="sites", col=spcols[svf$PlantType], pch=c(13,19)[svf$DN])
+points(nmds.vol, display="sites", col=svf$Year, pch=c(1,4)[svf$DN])
 #points(nmds.vol, display="sites", col=viridis(100)[sqrt(rowSums(vol))/100], pch=19)
 ```
 
@@ -797,6 +799,21 @@ ph_leaf  <- pheatmap(as.matrix(t(vol.leaf))^(1/3),
    fontsize = 10, border_color = NA, legend=F, annotation_legend=T, cutree_rows=6
 )
 #dev.off()
+```
+
+## Leaf NMDS
+```{r nmds_filtered_leaf}
+set.seed(1)
+nmds.vol_leaf <- metaMDS(sqrt(vol.leaf), dist="bray", autotransform = FALSE, trace=F)
+
+TEY <- with(svl, factor(paste(PlantType,expt,Year)))
+TEYcols <- brewer.pal(9, "Paired")#[c(1:4,8,5:6)]
+spcols <- c(aggleaf="red", tenleaf="violet")
+ordiplot(nmds.vol_leaf, type = "n")
+legend("bottomleft", levels(TEY), fill=TEYcols, cex=0.9)
+points(nmds.vol_leaf, display="sites", col=TEYcols[TEY], pch=19)
+text(nmds.vol_leaf, display="species", cex=0.7, col="grey20")
+#points(nmds.vol_leaf, display="sites", col=viridis(100)[sqrt(rowSums(vol.leaf))/26], pch=19)
 ```
 
 ## CAP - OTCs
