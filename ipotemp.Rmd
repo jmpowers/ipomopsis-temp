@@ -55,7 +55,7 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 # ipo.data <- rbind(ipo.data, ipo.data.2021)
 #     
 # save(ipo.data, file="CWu_181921.Rdata")
-load("data/CWu_181921.Rdata")
+load("data/volatiles/CWu_181921.Rdata")
 
 ipo.all <- dcast(ipo.data, Filename~Name, sum, value.var="Area")
 rownames(ipo.all) <- ipo.all[,1]
@@ -63,9 +63,9 @@ ipo.all[,1] <- NULL
 
 ipo.cut <- ipo.all[,colSums(ipo.all)>4e6]
 
-write(rownames(ipo.all), "data/CWu_samples.txt")
+write(rownames(ipo.all), "data/volatiles/CWu_samples.txt")
 
-ipos <- read.csv("data/CWu_samples.csv", colClasses=list(RunDate="Date"))
+ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date"))
 
 
 # Maxfield
@@ -82,7 +82,7 @@ ipos <- read.csv("data/CWu_samples.csv", colClasses=list(RunDate="Date"))
 #GCMS_Maxfield_21 <- GCMS_output %>% bind_rows() %>% filter(Filename %in% GCMS_metadata$Filename)
 #save(GCMS_Maxfield_21, file="Maxfield_21.Rdata")
 
-load("data/Maxfield_21.Rdata") #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
+load("data/volatiles/Maxfield_21.Rdata") #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
 
 ipo.data <- bind_rows(ipo.data, GCMS_Maxfield_21)
 ```
@@ -150,15 +150,15 @@ legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, 
 
 # Read metadata
 ```{r metadata}
-files <- read_tsv("data/CWu_samples_text2.csv") %>% 
+files <- read_tsv("data/volatiles/CWu_samples_text2.csv") %>% 
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
-perc <- read_csv("data/CWu Ipomopsis Scent Metadata - Percivals2018_2019.csv")
-otc <- read_csv("data/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv")  %>%  
+perc <- read_csv("data/volatiles/CWu Ipomopsis Scent Metadata - Percivals2018_2019.csv")
+otc <- read_csv("data/volatiles/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv")  %>%  
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
 
-sc21 <- read_tsv("data/2021 Spring Creek Volatiles - 2021.tsv") %>% 
+sc21 <- read_tsv("data/volatiles/2021 Spring Creek Volatiles - 2021.tsv") %>% 
    mutate(PlantType=if_else(plant=="air", "air", "ten"))
-gna21 <- read_tsv("data/2021 GNA Volatiles - 2021.tsv") %>% 
+gna21 <- read_tsv("data/volatiles/2021 GNA Volatiles - 2021.tsv") %>% 
   mutate(time="day", PlantType=if_else(plant=="air", "air", "agg"))
 
 files21 <- tibble(Filename = rownames(ipo.all)) %>% 
@@ -167,7 +167,7 @@ files21 <- tibble(Filename = rownames(ipo.all)) %>%
   separate(Filename, into=c("site","vial","sampledate","rundate","GCn"), sep="_", remove=FALSE, convert=TRUE) %>% 
   mutate(GCn = str_remove(GCn, ".qgd"))
 #write_tsv(files21, "files21.tsv")  
-files21 <- read_tsv("data/files21.tsv")
+files21 <- read_tsv("data/volatiles/files21.tsv")
 
 perc2 <- left_join(perc,files, by=c("Date","DN","Tissue","Sample2"), suffix=c("",".f"))
 otc2 <- left_join(otc,files, by=c("Date","Site","temp","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
@@ -188,7 +188,7 @@ otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>%
 #otc21 %>% filter(is.na(FileName), is.na(lost))
 
 # Maxfield metadata
-maxfiles <- read_csv("data/filenames_metadata - filenames_metadata.csv") %>% 
+maxfiles <- read_csv("data/volatiles/filenames_metadata - filenames_metadata.csv") %>% 
   mutate(Is2021 = str_detect(Filename,"_210")) %>% 
   filter(Maxfield==1 & Year=="2021") %>% 
   separate(Filename2, into=c("plantid","vial","date","rundate","sequence","ext"),remove=F) %>% 
@@ -196,7 +196,7 @@ maxfiles <- read_csv("data/filenames_metadata - filenames_metadata.csv") %>%
   mutate(date = ymd(date), vial=as.character(vial),
          filament = ifelse(date>ymd("2021-07-21"),"after","before"))
 
-GCMS_metadata1 <- read_csv("data/2021 Maxfield Volatiles - 2021.csv") %>% mutate(plotid=paste0(plot, subplot)) %>% 
+GCMS_metadata1 <- read_csv("data/volatiles/2021 Maxfield Volatiles - 2021.csv") %>% mutate(plotid=paste0(plot, subplot)) %>% 
   left_join(read_csv("data/2021 Maxfield Rosettes - 2021OTCs.csv") %>% mutate(plant=as.character(plant)),
             by=c("plotid","plant","plantid"))
 
@@ -232,7 +232,7 @@ meta <- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id="expt") %>%
             by = c("Site"="site", "Pump_datehour"="datetime")) %>% 
   mutate(mean_temp_C_treatment = if_else(temp=="warmed", mean_temp_C_warmed, mean_temp_C_control))
 
-meta %>% write.csv("data/CWu_meta21.csv")
+meta %>% write.csv("data/volatiles/CWu_meta21.csv")
 
 meta %>% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %>% kable(caption="Sample size")
 
@@ -427,7 +427,7 @@ ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,"mean
 ### Manual filtering
 #write.csv(chemsf, "chemsf_ipo.csv")
 #annotated this in a google sheet
-chemsf2 <- read.csv("data/Ipo volatile compounds - chemsf_ipo.csv.csv")
+chemsf2 <- read.csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv.csv")
 keep <- as.character(chemsf2[chemsf2$verdict %in% c("fvoc","keep","merge","keep-leaf"),"name"])
 #keep_leaf <- as.character(chemsf2[chemsf2$verdict =="keep_leaf","name"]) # > 4 | chemsf3$name %in% keep_leaf)
 
