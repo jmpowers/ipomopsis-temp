@@ -32,15 +32,15 @@ library(dendsort)
 library(knitr)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
                       fig.path = "plots/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=8, fig.width=8)
-
-#setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu")
-#source("read_shimadzu.R")
 ```
 
-```{r read_scents}
+```{r read_shimadzu, eval=F}
+# CWu GC data
+# setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu")
+# source("read_shimadzu.R")
 # setwd("/media/C/GCMSsolution/Data/heather Ipo/")
 # data18 <- read.shimadzu("./Temperature expt CWu 2018/CWu2018.txt")
-# data19 <- read.shimadzu("./Temperature expt CWu 2019/CWu2019..txt")
+# data19 <- read.shimadzu("./Temperature expt CWu 2019/CWu2019.txt")
 # ipo.data <- rbind(data18, data19)
 # 
 # files.2021 <- c("Ihyb_VF_210718.txt", "Ihyb_VF_210719.txt", "Samples_210720.txt", 
@@ -48,28 +48,12 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 # "Maxfield_SC_210803.txt",    "SC_GNA_210804.txt",  "Lupinus20_SC_Lagg21_210814.txt" ,"SC_210817.txt", "SC_210818.txt",     
 # "SC_210818b.txt",     "SC_210818b001.txt",  "SC_210820b.txt",     "SC_Lagg_210821.txt"  )
 # 
-# library(tidyverse)
 # setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/RMBL Batches")
 # ipo.data.2021 <- map_dfr(files.2021, read.shimadzu)
-# 
 # ipo.data <- rbind(ipo.data, ipo.data.2021)
-#     
 # save(ipo.data, file="CWu_181921.Rdata")
-load("data/volatiles/CWu_181921.Rdata")
 
-ipo.all <- dcast(ipo.data, Filename~Name, sum, value.var="Area")
-rownames(ipo.all) <- ipo.all[,1]
-ipo.all[,1] <- NULL
-
-ipo.cut <- ipo.all[,colSums(ipo.all)>4e6]
-
-write(rownames(ipo.all), "data/volatiles/CWu_samples.txt")
-
-ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date"))
-
-
-# Maxfield
-
+# Maxfield GC data
 # setwd("~/Downloads/MaxfieldVols21/batches")
 # source("../read_shimadzu.R")
 # datafiles <- list.files(pattern=".txt") # TODO had to copy over newer Maxfield_210802.txt and add Maxfield_SC_210802b.txt
@@ -81,15 +65,38 @@ ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date
 #... load in GCMS_metadata 
 #GCMS_Maxfield_21 <- GCMS_output %>% bind_rows() %>% filter(Filename %in% GCMS_metadata$Filename)
 #save(GCMS_Maxfield_21, file="Maxfield_21.Rdata")
+```
 
+```{r read_scents}
 load("data/volatiles/Maxfield_21.Rdata") #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
-
+load("data/volatiles/CWu_181921.Rdata")
+#write(rownames(ipo.all), "data/volatiles/CWu_samples.txt")
+ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date"))
 ipo.data <- bind_rows(ipo.data, GCMS_Maxfield_21)
+
+# load short names and standard regessions
+ipochems <- read_csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv") %>% 
+  select(name, shortname, standard, verdict) %>%  filter(verdict != "") %>% 
+  mutate(standard = fct_recode(standard, "Methyl_salicylate"="Benzaldehyde"), # benzaldehyde regressions not reliable
+         class = fct_recode(standard, Aliphatic="Hexenol", Benzenoid="Methyl_salicylate", Benzenoid="Indole", 
+                            Sesquiterpene="Caryophyllene", Monoterpene="alpha_Pinene", Monoterpene="Linalool")) %>%  
+  left_join(read_csv("data/volatiles/regressions_181921_filtered_slopes.csv") %>% 
+              pivot_wider(id_cols=standard, names_from="year", names_prefix="area_per_ng", values_from=area_per_ng)) 
+class_pal <- set_names(c("#BC0060","#027B8C","#E56E00","#86D400"), levels(ipochems$class))
+
+#shorten chemical names and merge compounds with multiple names
+shortnames <- ipochems %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
+#shortnames[shortnames %in% shortnames[duplicated(shortnames)]]
+ipo.data$Name <- recode(ipo.data$Name, !!!shortnames)
+
+ipo.all <- dcast(ipo.data, Filename~Name, sum, value.var="Area")
+rownames(ipo.all) <- ipo.all[,1]
+ipo.all[,1] <- NULL
 ```
 
 # Overview - no metadata
 ## Inventory
-```{r inventory}
+```{r inventory, eval=FALSE}
 #TODO merge F, G, H, I, J into GNA for 2018
 with(ipos, table(Year, Type))
 with(ipos, table(Type, DNLeaf))
@@ -97,6 +104,7 @@ with(ipos, table(Type, DNLeaf))
 
 ## NMDS
 ```{r nmds, eval=FALSE}
+ipo.cut <- ipo.all[,colSums(ipo.all)>1e9]
 set.seed(1)
 nmds.ipo <- metaMDS(decostand(ipo.cut, "hellinger"), dist="bray", autotransform = FALSE, try=5, trymax=5)
 
@@ -350,17 +358,6 @@ metadata <- sv %>% as.data.frame() %>% #tibbles break bouquet's add_count_freqs
 vol.all <- make_sampletable(longdata, metadata)
 chems <- make_chemtable(longdata, metadata)
 
-
-#TODO update this code to convert to nanograms
-# classes <- read_csv("Ipo volatile compounds - max21_chemtable.csv")
-# table(classes$class)
-# stds <- read_csv("shimadzu_standards.xlsx - conversions_2021.csv")
-# longdata.ng <- longdata %>% left_join(select(GCMS_metadata, sample=Filename, filament)) %>% 
-#   left_join(select(classes, class, name), by="name") %>% 
-#   left_join(stds) %>% 
-#   mutate(area = area / area_per_ng) #area is no longer area!!! it's nanograms
-# sampletable.ng = make_sampletable(longdata.ng, metadata)[,names(sampletable)]
-
 ### Flower filtering
 chemsf <- chems %>%
   filter_RT(2, 17) %>% 
@@ -424,30 +421,7 @@ ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,"mean
 ```
 
 ```{r pruning}
-### Manual filtering
-#write.csv(chemsf, "chemsf_ipo.csv")
-#annotated this in a google sheet
-chemsf2 <- read.csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv.csv")
-keep <- as.character(chemsf2[chemsf2$verdict %in% c("fvoc","keep","merge","keep-leaf"),"name"])
-#keep_leaf <- as.character(chemsf2[chemsf2$verdict =="keep_leaf","name"]) # > 4 | chemsf3$name %in% keep_leaf)
-
-#shorten names
-shortnames <- chemsf2 %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
-chemsf3 <- chemsf %>% 
-  filter_contaminant(cont.list=as.character(chemsf2[chemsf2$verdict %in% c("ambi","bis14","cont","rare"),"name"])) %>% 
-  mutate(filter_final_leaf = filter_contaminant == "OK" & chemsf.leaf$filter_final, #& chemsf2$shortname!=""#four big alkanes
-         name = recode(name, !!!shortnames))
-#chemsf3$filter_final <- with(chemsf3, filters_passed > 4 & filter_contaminant == "OK" & name %in% keep)#keeps with passed<=4 still excluded
-colnames(vol.all) <- chemsf3$name
-
-#TODO merge the duplicate name2s - the following doesn't work
-#longdata3 <- longdata %>% inner_join(chemsf3 %>% select(c("name", "name2")), by = "name") %>% 
-  #mutate(name = factor(name2))
-#vol.all3 <- make_sampletable(longdata3) 
-
-#vol <- prune_sampletable(vol.all, chemsf3, metadata)
-#TODO use chesf3 (manual list instead)
-vol <- prune_sampletable(vol.all, chemsf3, metadata)
+vol <- prune_sampletable(vol.all, chemsf_short, metadata)
 files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", #no filtered volatiles
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
 svf <- metadata[metadata$type == "floral" & !(metadata$sample %in% files_exclude),]
@@ -457,10 +431,17 @@ svf <- svf %>% mutate_if(is.factor, droplevels) %>%
            fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
+
+
+# TODO update this code to convert to nanograms
+# for(yr in unique(volsmeta$sequence.year)) {
+#   thisyr <- volsmeta$sequence.year==yr
+#   vols.good[thisyr,] <- sweep(vols.good[thisyr,], 2, pull(ipochems, paste0("area_per_ng",yr)), FUN = '/')# convert areas to nanograms 
+# }
 ```
 
 ```{r pruning_leaf}
-vol.leaf <- prune_sampletable(vol.all, chemsf3 %>% mutate(filter_final=filter_final_leaf), meta.leaf)
+vol.leaf <- prune_sampletable(vol.all, chemsf_short %>% mutate(filter_final=filter_final_leaf), meta.leaf)
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", "T164_leaf_190731_882019_18.qgd","OTC_Z2_leaf_190805_8102019_23.qgd")#fist two lack leaf mass, secodn two have no filtered volatiles
 svl <- metadata[metadata$type == "leaf" & !(metadata$sample %in% files_exclude_leaf),]
 svl <- svl %>% mutate_if(is.factor, droplevels) %>% 
@@ -742,7 +723,7 @@ svf.perc.ten <- plot.perc.comb(svf %>% filter(expt=="perc", PlantType=="ten"))
 
 ## Treatment effects
 ```{r barplots, fig.width=15, fig.height=11}
-vols.plot <- chemsf3 %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character
+vols.plot <- chemsf_short %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character
 #vols.plot[vols.plot=="b-caryophyllene"] <- "b-caryophyllene.1"#c("b-ocimene","a-pinene","a-farnesene","b-caryophyllene.1","petasitene","b-myrcene","longifolene","tridec-1-ene  ","benzophenone")
 vol.long <- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key="chem",value="area", 2:(length(vols.plot)+2), factor_key=T)
 vol.plot <- left_join(vol.long, svf)
