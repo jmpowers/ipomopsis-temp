@@ -70,7 +70,7 @@ file,year,site,n1,n2,n3,owner,id,plotid,temp,serial,plant_near,notes
 2021/SC/Hobo2-ChamberHin.csv,2021,SC,Hobo2,ChamberHin,,UR,2,H,OTC,10369061,,
 2021/SC/RMBL11-chamberIout.csv,2021,SC,RMBL11,chamberIout,,RMBL,11,I,control,,,
 2021/SC/RMBL12-chamberBin.csv,2021,SC,RMBL12,chamberBin,,RMBL,12,B,OTC,,,
-2021/SC/RMBL15-chamberEin.csv,2021,SC,RMBL15,chamberEin,,RMBL,15,E,OTC,,,
+2021/SC/RMBL15-chamberEin.csv,2021,SC,RMBL15,chamberEin,,RMBL,15,E,control,,,"JP: changed from OTC to control based on data"
 2021/SC/RMBL2-chamberBout.csv,2021,SC,RMBL2,chamberBout,,RMBL,2,B,control,,,
 2021/SC/RMBL5-chamberCout.csv,2021,SC,RMBL5,chamberCout,,RMBL,5,C,control,,,
 2021/SC/RMBL6-chamberHout.csv,2021,SC,RMBL6,chamberHout,,RMBL,6,H,control,,,
