@@ -421,34 +421,42 @@ ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,"mean
 ```
 
 ```{r pruning}
-vol <- prune_sampletable(vol.all, chemsf_short, metadata)
+vol <- prune_sampletable(vol.all, chemsf, metadata)
+vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
+
 files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", #no filtered volatiles
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
+files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", #lack leaf mass
+                        "T164_leaf_190731_882019_18.qgd","OTC_Z2_leaf_190805_8102019_23.qgd") #no filtered volatiles
+
 svf <- metadata[metadata$type == "floral" & !(metadata$sample %in% files_exclude),]
+svl <- metadata[metadata$type == "leaf" & !(metadata$sample %in% files_exclude_leaf),]
+
 svf$Year <- factor(svf$Year)
 svf <- svf %>% mutate_if(is.factor, droplevels) %>% 
   mutate(Treat = paste(temp, Temp) %>% 
            fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
-vol <- vol[!(rownames(vol) %in% files_exclude) ,]
-vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
-
-
-# TODO update this code to convert to nanograms
-# for(yr in unique(volsmeta$sequence.year)) {
-#   thisyr <- volsmeta$sequence.year==yr
-#   vols.good[thisyr,] <- sweep(vols.good[thisyr,], 2, pull(ipochems, paste0("area_per_ng",yr)), FUN = '/')# convert areas to nanograms 
-# }
-```
-
-```{r pruning_leaf}
-vol.leaf <- prune_sampletable(vol.all, chemsf_short %>% mutate(filter_final=filter_final_leaf), meta.leaf)
-files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", "T164_leaf_190731_882019_18.qgd","OTC_Z2_leaf_190805_8102019_23.qgd")#fist two lack leaf mass, secodn two have no filtered volatiles
-svl <- metadata[metadata$type == "leaf" & !(metadata$sample %in% files_exclude_leaf),]
 svl <- svl %>% mutate_if(is.factor, droplevels) %>% 
   mutate(Treat = paste(temp, Temp) %>% 
            fct_collapse(control=c("control NA","NA cool"),warmed=c("NA warm","warmed NA")))
+
+vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
-vol.leaf <- vol.leaf / as.numeric(svl$Total, units="hours") / (svl$LeafDryWtGrams*1000) #area per hour per dry milligram
+
+vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
+vol.leaf <- vol.leaf / as.numeric(svl$Total, units="hours") / svl$LeafDryWtGrams #area per hour per dry gram leaf
+```
+
+
+```{r convert_areas}
+# convert peak areas to nanograms using standards run in each year
+ipochemsf <- ipochems[match(colnames(vol), ipochems$shortname),]
+for(yr in levels(svf$Year)) {
+  thisyr <- svf$Year==yr
+  vol[thisyr,] <- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0("area_per_ng",yr)), FUN = '/')
+}
+ipochemsl <- ipochems[match(colnames(vol.leaf), ipochems$shortname),]
+vol.leaf <- sweep(vol.leaf, 2, ipochemsl$area_per_ng2019, FUN = '/')
 ```
 
 
@@ -723,7 +731,7 @@ svf.perc.ten <- plot.perc.comb(svf %>% filter(expt=="perc", PlantType=="ten"))
 
 ## Treatment effects
 ```{r barplots, fig.width=15, fig.height=11}
-vols.plot <- chemsf_short %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character
+vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character
 #vols.plot[vols.plot=="b-caryophyllene"] <- "b-caryophyllene.1"#c("b-ocimene","a-pinene","a-farnesene","b-caryophyllene.1","petasitene","b-myrcene","longifolene","tridec-1-ene  ","benzophenone")
 vol.long <- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key="chem",value="area", 2:(length(vols.plot)+2), factor_key=T)
 vol.plot <- left_join(vol.long, svf)
@@ -735,7 +743,7 @@ ggplot(drop_na(vol.plot, PlantType, expt),#TODO track down NAs
        aes(x=paste(PlantType,ifelse(is.na(Site), "", Site),expt),y=area,  fill=DN, color=paste(Year, Treat))) +
   geom_boxplot(size=0.7, outlier.size=0.7, position=position_dodge2(preserve="single")) + 
   facet_wrap(vars(chem), scales="free") + 
-  scale_y_sqrt("Peak area per flower per hour") + 
+  scale_y_sqrt("ng per flower per hour") + 
   scale_color_brewer("Year, treatment", palette = "Paired")+
   scale_x_discrete("Species, site, experiment")+
   #scale_color_manual("Species, Treatment", values=specDNcols) + 
@@ -749,7 +757,7 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc"),#TODO track do
        aes(x=mean_temp_C_treatment, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
   geom_point() + geom_smooth(se=F, method="lm")+
   facet_wrap(vars(chem), scales="free_y") + 
-  scale_y_sqrt("Peak area per flower per hour") + 
+  scale_y_sqrt("ng per flower per hour") + 
   scale_x_continuous("Mean temperature in controls or OTCs (C)")+
   scale_color_brewer("Species, site, year", palette = "Dark2", direction=-1)+#scale_color_manual("Species", values=spcols) + 
   scale_shape_manual("Time of day",values=c(1,19)) + 
@@ -761,7 +769,7 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc"),#TODO track do
 
 ## Inventory
 
-Dropped 2 samples from 2018 without leaf mass. Volatiles units are peak area per hour per gram dry leaf.
+Dropped 2 samples from 2018 without leaf mass. Volatiles units are ng per hour per gram dry leaf.
 
 ```{r inventory_leaf}
 svl %>% count(PlantType, Treat, expt) %>% kable(caption="Sample size")
