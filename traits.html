@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-04" />
+<meta name="date" content="2023-01-05" />
 
 <title>Ipomopsis temperature experiments: Floral traits</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 traits</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-04</h4>
+<h4 class="date">2023-01-05</h4>
 
 </div>
 
@@ -325,7 +325,12 @@ phen.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quo
   left_join(census.maxf) %&gt;% 
   mutate_if(is.character, as.factor) 
 
-phen &lt;- phen.raw %&gt;% 
+#some plants were measured late, merge with the earlier date
+phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom_tile()</code></pre>
+<p><img src="plots-traits/read_data-1.svg" width="480" /></p>
+<pre class="r"><code>phen &lt;- phen.raw %&gt;% mutate(date=ymd(recode(as.character(date),
+                                             &quot;2021-07-02&quot;=&quot;2021-06-30&quot;, &quot;2021-07-26&quot;=&quot;2021-07-20&quot;)),
+                            julian=yday(date)) %&gt;% 
   complete(nesting(plantid, plotid, plot, subplot, snow, temp),nesting(julian, date), fill=list(open=0,buds=0)) %&gt;% #add zeros to weeks the plant was not counted
   mutate(flowering = open + buds &gt; 0,
          has_egg = eggs &gt; 0, 
@@ -448,27 +453,32 @@ traitnames.units &lt;- set_names(c(
 <tr class="odd">
 <td align="left">Maxfield</td>
 <td align="right">1</td>
-<td align="right">10</td>
+<td align="right">14</td>
 </tr>
 <tr class="even">
 <td align="left">Maxfield</td>
 <td align="right">2</td>
-<td align="right">5</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">Maxfield</td>
 <td align="right">3</td>
-<td align="right">25</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
 <td align="left">Maxfield</td>
 <td align="right">4</td>
-<td align="right">19</td>
+<td align="right">27</td>
 </tr>
 <tr class="odd">
 <td align="left">Maxfield</td>
 <td align="right">5</td>
-<td align="right">12</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">6</td>
+<td align="right">11</td>
 </tr>
 </tbody>
 </table>
@@ -889,30 +899,30 @@ ggplot(aes(x=temp, y=value, color=temp)) +
 <tbody>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">39.74838</td>
-<td align="right">39.74838</td>
+<td align="right">30.31597</td>
+<td align="right">30.31597</td>
 <td align="right">1</td>
-<td align="right">46.448979</td>
-<td align="right">0.3579552</td>
-<td align="right">0.5525505</td>
+<td align="right">46.303967</td>
+<td align="right">0.2782277</td>
+<td align="right">0.6003837</td>
 </tr>
 <tr class="even">
 <td align="left">snow</td>
-<td align="right">32.20310</td>
-<td align="right">32.20310</td>
+<td align="right">45.34598</td>
+<td align="right">45.34598</td>
 <td align="right">1</td>
-<td align="right">5.469413</td>
-<td align="right">0.2900060</td>
-<td align="right">0.6114093</td>
+<td align="right">5.678776</td>
+<td align="right">0.4161670</td>
+<td align="right">0.5440193</td>
 </tr>
 <tr class="odd">
 <td align="left">temp:snow</td>
-<td align="right">12.44011</td>
-<td align="right">12.44011</td>
+<td align="right">21.15732</td>
+<td align="right">21.15732</td>
 <td align="right">1</td>
-<td align="right">46.448979</td>
-<td align="right">0.1120298</td>
-<td align="right">0.7393518</td>
+<td align="right">46.303967</td>
+<td align="right">0.1941733</td>
+<td align="right">0.6615161</td>
 </tr>
 </tbody>
 </table>
@@ -1139,16 +1149,16 @@ ggplot(aes(x=temp, y=value, color=temp)) +
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">35.29394</td>
-<td align="right">35.29394</td>
-<td align="right">0.3192179</td>
-<td align="right">0.5742202</td>
+<td align="right">25.6804</td>
+<td align="right">25.6804</td>
+<td align="right">0.2329113</td>
+<td align="right">0.6311593</td>
 </tr>
 <tr class="even">
 <td align="left">Residuals</td>
 <td align="right">59</td>
-<td align="right">6523.26344</td>
-<td align="right">110.56379</td>
+<td align="right">6505.2376</td>
+<td align="right">110.2583</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -1263,7 +1273,7 @@ Number of permutations: 999
 
 Model: capscale(formula = t(flrspec.nm.zero.bin[, -1]) ~ temp, data = flrcol, scale = TRUE)
          Df SumOfSqs      F Pr(&gt;F)
-temp      1   0.0674 1.0572  0.314
+temp      1   0.0674 1.0572  0.332
 Residual 64   4.0795              </code></pre>
 </div>
 <div id="spectrum-vs.-temp" class="section level2">
@@ -1330,32 +1340,140 @@ Residual 64   4.0795              </code></pre>
   scale_x_continuous(breaks=seq(120,240, by=20))+ 
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) +theme_minimal() </code></pre>
 <p><img src="plots-traits/phenology_temp-1.svg" width="480" /></p>
-<pre class="r"><code>phen %&gt;% drop_na(snow,temp) %&gt;% group_by(temp, julian) %&gt;% summarize_at(c(&quot;open&quot;,&quot;buds&quot;), mean, na.rm=T) %&gt;% 
-  ggplot(aes(x=julian, y=open, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
-  labs(y=&quot;Mean total flowers&quot;, 
+<pre class="r"><code>phen %&gt;% drop_na(snow,temp) %&gt;% group_by(temp, julian) %&gt;% drop_na(open, buds) %&gt;% 
+  summarize(openbuds.se = sd(open+buds)/sqrt(length(open+buds)), openbuds=mean(open+buds)) %&gt;% 
+  ggplot(aes(x=julian, y=openbuds, color=temp))+ geom_point() + 
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=openbuds-openbuds.se, ymax=openbuds+openbuds.se))+
+  labs(y=&quot;Mean total open flowers + elongated buds&quot;, 
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
 <p><img src="plots-traits/phenology_temp-2.svg" width="480" /></p>
+<pre class="r"><code>lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=phen.raw) %&gt;% anova %&gt;% kable(caption=&quot;mean open and buds&quot;)</code></pre>
+<table>
+<caption>mean open and buds</caption>
+<colgroup>
+<col width="23%" />
+<col width="14%" />
+<col width="14%" />
+<col width="7%" />
+<col width="12%" />
+<col width="14%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">factor(date)</td>
+<td align="right">2848.83020</td>
+<td align="right">406.975742</td>
+<td align="right">7</td>
+<td align="right">224.28238</td>
+<td align="right">12.9854702</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">temp</td>
+<td align="right">43.85506</td>
+<td align="right">43.855061</td>
+<td align="right">1</td>
+<td align="right">73.28379</td>
+<td align="right">1.3992937</td>
+<td align="right">0.2406653</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(date):temp</td>
+<td align="right">56.98891</td>
+<td align="right">8.141273</td>
+<td align="right">7</td>
+<td align="right">224.28238</td>
+<td align="right">0.2597655</td>
+<td align="right">0.9685928</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>phen %&gt;% drop_na(temp)%&gt;% group_by(temp, julian) %&gt;% summarize_at(&quot;flowering&quot;, mean, na.rm=T) %&gt;% 
   ggplot(aes(x=julian, y=flowering, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
+  geom_path(aes(group=temp)) + 
   labs(y=&quot;Proportion flowering&quot;, 
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_y_continuous(labels = scales::percent)+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
 <p><img src="plots-traits/phenology_temp-3.svg" width="480" /></p>
-<pre class="r"><code>phen %&gt;% drop_na(temp)%&gt;% group_by(temp, julian) %&gt;% summarize_at(&quot;eggs&quot;, mean, na.rm=T) %&gt;% 
+<pre class="r"><code>phen %&gt;% drop_na(temp) %&gt;% group_by(temp, julian) %&gt;% drop_na(eggs) %&gt;% 
+  summarize(eggs.se = sd(eggs)/sqrt(length(eggs)), eggs=mean(eggs)) %&gt;% 
   ggplot(aes(x=julian, y=eggs, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=eggs-eggs.se, ymax=eggs+eggs.se))+
   labs(y=&quot;Mean total eggs&quot;, 
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() </code></pre>
 <p><img src="plots-traits/phenology_temp-4.svg" width="480" /></p>
-<pre class="r"><code>phen%&gt;% drop_na(temp) %&gt;% group_by(year, temp, julian) %&gt;% summarize_at(&quot;has_egg&quot;, mean, na.rm=T) %&gt;% 
+<pre class="r"><code>lmer(eggs ~ factor(date) * temp + (1|plantid), data=phen.raw) %&gt;% anova %&gt;% kable(caption=&quot;mean eggs&quot;)</code></pre>
+<table style="width:100%;">
+<caption>mean eggs</caption>
+<colgroup>
+<col width="24%" />
+<col width="14%" />
+<col width="13%" />
+<col width="8%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">factor(date)</td>
+<td align="right">427.829051</td>
+<td align="right">61.118436</td>
+<td align="right">7</td>
+<td align="right">227.55950</td>
+<td align="right">21.799580</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">temp</td>
+<td align="right">9.945029</td>
+<td align="right">9.945029</td>
+<td align="right">1</td>
+<td align="right">75.14566</td>
+<td align="right">3.547169</td>
+<td align="right">0.0635165</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(date):temp</td>
+<td align="right">48.299698</td>
+<td align="right">6.899957</td>
+<td align="right">7</td>
+<td align="right">227.55950</td>
+<td align="right">2.461060</td>
+<td align="right">0.0188211</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>phen %&gt;% drop_na(temp) %&gt;% group_by(year, temp, julian) %&gt;% summarize_at(&quot;has_egg&quot;, mean, na.rm=T) %&gt;% 
   ggplot(aes(x=julian, y=has_egg, color=temp))+ geom_point() + 
   geom_path(aes(group=temp)) +
   labs(y=&quot;Proportion of plants with eggs&quot;, 

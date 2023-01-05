@@ -85,7 +85,11 @@ phen.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>%
   left_join(census.maxf) %>% 
   mutate_if(is.character, as.factor) 
 
-phen <- phen.raw %>% 
+#some plants were measured late, merge with the earlier date
+phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile()
+phen <- phen.raw %>% mutate(date=ymd(recode(as.character(date),
+                                             "2021-07-02"="2021-06-30", "2021-07-26"="2021-07-20")),
+                            julian=yday(date)) %>% 
   complete(nesting(plantid, plotid, plot, subplot, snow, temp),nesting(julian, date), fill=list(open=0,buds=0)) %>% #add zeros to weeks the plant was not counted
   mutate(flowering = open + buds > 0,
          has_egg = eggs > 0, 
@@ -351,32 +355,36 @@ ggplot(phen %>% drop_na(height_cm, temp), aes(x=julian, y=height_cm, color=temp)
   scale_x_continuous(breaks=seq(120,240, by=20))+ 
   scale_color_brewer(palette="Set1", direction=-1) +theme_minimal() 
 
-phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% summarize_at(c("open","buds"), mean, na.rm=T) %>% 
-  ggplot(aes(x=julian, y=open, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
-  labs(y="Mean total flowers", 
+phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% drop_na(open, buds) %>% 
+  summarize(openbuds.se = sd(open+buds)/sqrt(length(open+buds)), openbuds=mean(open+buds)) %>% 
+  ggplot(aes(x=julian, y=openbuds, color=temp))+ geom_point() + 
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=openbuds-openbuds.se, ymax=openbuds+openbuds.se))+
+  labs(y="Mean total open flowers + elongated buds", 
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
+lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=phen.raw) %>% anova %>% kable(caption="mean open and buds")
 
 phen %>% drop_na(temp)%>% group_by(temp, julian) %>% summarize_at("flowering", mean, na.rm=T) %>% 
   ggplot(aes(x=julian, y=flowering, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
+  geom_path(aes(group=temp)) + 
   labs(y="Proportion flowering", 
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_y_continuous(labels = scales::percent)+
   scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
 
-phen %>% drop_na(temp)%>% group_by(temp, julian) %>% summarize_at("eggs", mean, na.rm=T) %>% 
+phen %>% drop_na(temp) %>% group_by(temp, julian) %>% drop_na(eggs) %>% 
+  summarize(eggs.se = sd(eggs)/sqrt(length(eggs)), eggs=mean(eggs)) %>% 
   ggplot(aes(x=julian, y=eggs, color=temp))+ geom_point() + 
-  geom_path(aes(group=temp)) +
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=eggs-eggs.se, ymax=eggs+eggs.se))+
   labs(y="Mean total eggs", 
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() 
+lmer(eggs ~ factor(date) * temp + (1|plantid), data=phen.raw) %>% anova %>% kable(caption="mean eggs")
 
-phen%>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_egg", mean, na.rm=T) %>% 
+phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_egg", mean, na.rm=T) %>% 
   ggplot(aes(x=julian, y=has_egg, color=temp))+ geom_point() + 
   geom_path(aes(group=temp)) +
   labs(y="Proportion of plants with eggs", 
