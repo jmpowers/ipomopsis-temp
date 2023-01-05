@@ -2269,6 +2269,63 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_comb_temp_tenN-1.svg" width="768" /></p>
 </div>
 </div>
+<div id="both-species-day" class="section level2">
+<h2>Both species, day</h2>
+<pre class="r"><code>svf.otc &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, DN==&quot;day&quot;) %&gt;% drop_na(mean_temp_C_treatment)
+vol.otc &lt;- vol[svf.otc$sample,]
+(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
+<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + Site +
+mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
+
+               Inertia Proportion Rank
+Total          71.1122     1.0000     
+Constrained    10.7909     0.1517    7
+Unconstrained  84.9879     1.1951   92
+Imaginary     -24.6666    -0.3469  224
+Inertia is squared Bray distance 
+Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
+
+Eigenvalues for constrained axes:
+ CAP1  CAP2  CAP3  CAP4  CAP5  CAP6  CAP7 
+5.630 1.812 1.356 1.137 0.439 0.229 0.188 
+
+Eigenvalues for unconstrained axes:
+  MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
+12.253  7.910  5.930  4.499  4.390  4.065  3.094  2.946 
+(Showing 8 of 92 unconstrained eigenvalues)</code></pre>
+<pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
+<pre><code>Permutation test for capscale under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
+                       Df SumOfSqs       F Pr(&gt;F)    
+Year                    2    6.385 11.6824  0.001 ***
+Site                    3    3.072  3.7476  0.001 ***
+mean_temp_C_treatment   1    0.864  3.1609  0.001 ***
+temp                    1    0.470  1.7192  0.035 *  
+Residual              311   84.988                   
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
+prop.expl &lt;- summ.cap$cont$importance
+ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
+
+yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
+plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
+title(&quot;OTC warming: I. agg &amp; ten at all sites, all years, day&quot;)
+temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
+legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
+legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
+legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
+text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+<p><img src="plots/otc_both_species-1.svg" width="768" /></p>
+</div>
 </div>
 <div id="percivals-warm-vs.-cool" class="section level1">
 <h1>Percivals warm vs. cool</h1>

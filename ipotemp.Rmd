@@ -665,6 +665,31 @@ points(cap.otc.comb, display="sites", col=tempcol[svf.otc$temp], pch=yearpch[svf
 text(cap.otc.comb, display="cn")
 ```
 
+## Both species, day
+```{r otc_both_species}
+svf.otc <- svf %>% filter(expt=="otc", DN=="day") %>% drop_na(mean_temp_C_treatment)
+vol.otc <- vol[svf.otc$sample,]
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, distance="bray", data=svf.otc))
+(anova.cap <- anova(cap.otc.comb, by="term"))
+summ.cap <- summary(cap.otc.comb)
+prop.expl <- summ.cap$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+
+yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
+plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
+title("OTC warming: I. agg & ten at all sites, all years, day")
+temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
+legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
+legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site))
+legend("bottomleft",  title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
+text(cap.otc.comb, display="species", cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
+points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
+text(cap.otc.comb, display="cn")
+```
+
+
 # Percivals warm vs. cool
 
 ## CAP analysis of each Percival dataset
