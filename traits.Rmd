@@ -91,7 +91,16 @@ phen <- phen.raw %>%
          has_egg = eggs > 0, 
          site="Maxfield", species="agg")
 
-speclabs <- c(agg="I. aggregata", ten="I. tenuituba")
+spnames <- c(agg="I. aggregata", ten="I. tenuituba")
+sitenames <- c(GNA="Gothic Natural Area",Maxfield="Maxfield Meadow",SC="Spring Creek")
+
+alltraits <- c("corolla_length", "corolla_width", "nectar_volume", "nectar_conc", "nectar_sugar", 
+               "height_cm", "redness", "prop_infested", "prop_aborted")
+traitnames.units <- set_names(c(
+  "Corolla length (mm)", "Corolla width (mm)",
+  "Nectar production (\U00B5L/day)", "Nectar conc. (% by mass)", "Nectar sucrose (mg/day)",
+  "Inflorescence height (cm)", "Redness index", 
+  "Prop. nonaborted fruits infested","Prop. fruits aborted"), alltraits)
 ```
 
 # Sample sizes
@@ -122,19 +131,22 @@ morph.mean <- morph %>% drop_na(corolla_length) %>%
 nectar.mean <- nectar %>% drop_na(nectar_volume) %>% 
   group_by(species, site, temp, snow, plotid, plantid) %>%
   summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
-phen.mean <- phen %>% drop_na(height_cm, temp) %>% 
+phen.max <- phen %>% drop_na(height_cm, temp) %>% 
   group_by(species, site, temp, snow, plotid, plantid) %>% 
-  summarize(height_cm=mean(height_cm, na.rm=T))
+  summarize(height_cm=max(height_cm, na.rm=T)) #use the maximum plant height instead of the mean across the year (deer browsing)
 flrcol.mean <- flrcol %>% drop_na(redness, temp) %>% 
   group_by(species, site, temp, snow, plotid, plantid) %>% 
   summarize(redness=mean(redness, na.rm=T))
+
+all.mean <- morph.mean %>% rename(n.morph=n) %>% 
+  full_join(rename(nectar.mean, n.nectar=n)) %>% full_join(phen.max) %>% full_join(flrcol.mean)
 ```
 
 
 # Trait correlations
 ```{r corr}
 ggplot(morph, aes(shape=site, y=corolla_width, x=corolla_length, color=temp)) + 
-  facet_wrap(vars(species), labeller = as_labeller(speclabs)) +
+  facet_wrap(vars(species), labeller = as_labeller(spnames)) +
   geom_point() + geom_smooth(aes(group=species), color="black") + 
   labs(x="Corolla length", y="Corolla width", shape="Site", color="Temperature") + 
   scale_color_brewer(palette="Set1", direction=-1) + theme_bw() + 
@@ -147,37 +159,29 @@ ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=temp)) +
 ```
 
 # Trait plasticity
-```{r plasticity}
-ggplot(morph.mean, aes(x=paste(species, site), y=corolla_length, color=temp)) + 
+```{r plasticity, fig.width=7.5}
+morph.mean %>% pivot_longer(c(corolla_length, corolla_width)) %>% 
+ggplot(aes(x=paste(spnames[species], sitenames[site], sep="\n"), y=value, color=temp)) + 
+  facet_wrap(vars(name), scales="free_y", labeller = as_labeller(traitnames.units))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1)) +
-  labs(x="Species, site", y="Corolla length", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-ggplot(morph.mean, aes(x=paste(species, site), y=corolla_width, color=temp)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x="", y="", color="Temperature") + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  theme(legend.position = "top", axis.title.x=element_blank(), panel.grid.major.x = element_blank())
+
+all.mean %>% pivot_longer(any_of(alltraits)) %>% 
+  filter(site=="Maxfield", !name %in% c("corolla_length", "corolla_width", "nectar_sugar")) %>% 
+  drop_na(value) %>% 
+ggplot(aes(x=temp, y=value, color=temp)) + 
+  facet_wrap(vars(name), scales="free_y", labeller = as_labeller(traitnames.units), nrow=1)+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x="Species, site", y="Corolla width", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_volume, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x="Species, site", y="Nectar volume (uL)", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_conc, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x="Species, site", y="Nectar concentration (%)", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-ggplot(phen.mean, aes(x=paste(species, site), y=height_cm, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x="Species, site", y="Plant height (cm)", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-ggplot(flrcol, aes(x=paste(species, site), y=redness, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x="Species, site", y="Redness index", color="Temperature") + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x="", y="", color="Temperature") + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
+        panel.grid.major.x = element_blank())
 ```
 
 # Effect of snowmelt
@@ -191,7 +195,7 @@ lmer(nectar_volume ~temp*snow+(1|plotid)+(1|plantid),data=nectar) %>% anova %>%
   kable(caption="nectar_volume")
 lmer(nectar_conc   ~temp*snow+(1|plotid)+(1|plantid),data=nectar) %>% anova %>% 
   kable(caption="nectar_conc")
-lmer(height_cm   ~temp*snow+(1|plotid)+(1|plantid),data=phen) %>% anova %>% 
+lmer(height_cm   ~temp*snow+(1|plotid),data=phen.max) %>% anova %>% 
   kable(caption="height_cm")
 lmer(redness     ~temp*snow+(1|plotid)+(1|plantid), data=flrcol) %>% anova %>% 
   kable(caption="redness")
@@ -204,7 +208,7 @@ lmer(corolla_length~temp*species+(1|plantid),data=morph) %>% anova %>% kable(cap
 lmer(corolla_width ~temp*species+(1|plantid),data=morph) %>% anova %>% kable(caption="corolla_width")
 lmer(nectar_volume ~temp+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_volume")
 lmer(nectar_conc   ~temp+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_conc")
-lmer(height_cm     ~temp+(1|plantid),data=phen)          %>% anova %>% kable(caption="height_cm")
+lm(height_cm     ~temp, data=phen.max)      %>% anova %>% kable(caption="height_cm")
 lmer(redness       ~temp+(1|plantid), data=flrcol)       %>% anova %>% kable(caption="redness")
 ```
 

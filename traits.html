@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2022-11-02" />
+<meta name="date" content="2023-01-04" />
 
 <title>Ipomopsis temperature experiments: Floral traits</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 traits</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2022-11-02</h4>
+<h4 class="date">2023-01-04</h4>
 
 </div>
 
@@ -271,7 +271,7 @@ Campbell</h4>
 img{ max-width:200%; height: auto; }
 td, th { padding : 6px }
 </style>
-<pre class="r"><code>census.maxf &lt;- read_csv(&quot;data/traits/2021 Maxfield Rosettes - 2021OTCs.csv&quot;) %&gt;% 
+<pre class="r"><code>census.maxf &lt;- read_csv(&quot;data/2021 Maxfield Rosettes - 2021OTCs.csv&quot;) %&gt;% 
   mutate(across(c(plant, plot), as.character),
          temp=fct_relevel(fct_recode(temp,&quot;warmed&quot;=&quot;OTC&quot;),&quot;control&quot;))
 
@@ -331,7 +331,16 @@ phen &lt;- phen.raw %&gt;%
          has_egg = eggs &gt; 0, 
          site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
 
-speclabs &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)</code></pre>
+spnames &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)
+sitenames &lt;- c(GNA=&quot;Gothic Natural Area&quot;,Maxfield=&quot;Maxfield Meadow&quot;,SC=&quot;Spring Creek&quot;)
+
+alltraits &lt;- c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, &quot;nectar_volume&quot;, &quot;nectar_conc&quot;, &quot;nectar_sugar&quot;, 
+               &quot;height_cm&quot;, &quot;redness&quot;, &quot;prop_infested&quot;, &quot;prop_aborted&quot;)
+traitnames.units &lt;- set_names(c(
+  &quot;Corolla length (mm)&quot;, &quot;Corolla width (mm)&quot;,
+  &quot;Nectar production (\U00B5L/day)&quot;, &quot;Nectar conc. (% by mass)&quot;, &quot;Nectar sucrose (mg/day)&quot;,
+  &quot;Inflorescence height (cm)&quot;, &quot;Redness index&quot;, 
+  &quot;Prop. nonaborted fruits infested&quot;,&quot;Prop. fruits aborted&quot;), alltraits)</code></pre>
 <div id="sample-sizes" class="section level1">
 <h1>Sample sizes</h1>
 <div id="measurements-per-plant" class="section level2">
@@ -609,18 +618,21 @@ morph.mean &lt;- morph %&gt;% drop_na(corolla_length) %&gt;%
 nectar.mean &lt;- nectar %&gt;% drop_na(nectar_volume) %&gt;% 
   group_by(species, site, temp, snow, plotid, plantid) %&gt;%
   summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
-phen.mean &lt;- phen %&gt;% drop_na(height_cm, temp) %&gt;% 
+phen.max &lt;- phen %&gt;% drop_na(height_cm, temp) %&gt;% 
   group_by(species, site, temp, snow, plotid, plantid) %&gt;% 
-  summarize(height_cm=mean(height_cm, na.rm=T))
+  summarize(height_cm=max(height_cm, na.rm=T)) #use the maximum plant height instead of the mean across the year (deer browsing)
 flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;% 
   group_by(species, site, temp, snow, plotid, plantid) %&gt;% 
-  summarize(redness=mean(redness, na.rm=T))</code></pre>
+  summarize(redness=mean(redness, na.rm=T))
+
+all.mean &lt;- morph.mean %&gt;% rename(n.morph=n) %&gt;% 
+  full_join(rename(nectar.mean, n.nectar=n)) %&gt;% full_join(phen.max) %&gt;% full_join(flrcol.mean)</code></pre>
 </div>
 </div>
 <div id="trait-correlations" class="section level1">
 <h1>Trait correlations</h1>
 <pre class="r"><code>ggplot(morph, aes(shape=site, y=corolla_width, x=corolla_length, color=temp)) + 
-  facet_wrap(vars(species), labeller = as_labeller(speclabs)) +
+  facet_wrap(vars(species), labeller = as_labeller(spnames)) +
   geom_point() + geom_smooth(aes(group=species), color=&quot;black&quot;) + 
   labs(x=&quot;Corolla length&quot;, y=&quot;Corolla width&quot;, shape=&quot;Site&quot;, color=&quot;Temperature&quot;) + 
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_bw() + 
@@ -635,42 +647,29 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
 </div>
 <div id="trait-plasticity" class="section level1">
 <h1>Trait plasticity</h1>
-<pre class="r"><code>ggplot(morph.mean, aes(x=paste(species, site), y=corolla_length, color=temp)) + 
+<pre class="r"><code>morph.mean %&gt;% pivot_longer(c(corolla_length, corolla_width)) %&gt;% 
+ggplot(aes(x=paste(spnames[species], sitenames[site], sep=&quot;\n&quot;), y=value, color=temp)) + 
+  facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller = as_labeller(traitnames.units))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1)) +
-  labs(x=&quot;Species, site&quot;, y=&quot;Corolla length&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-1.svg" width="480" /></p>
-<pre class="r"><code>ggplot(morph.mean, aes(x=paste(species, site), y=corolla_width, color=temp)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), panel.grid.major.x = element_blank())</code></pre>
+<p><img src="plots-traits/plasticity-1.svg" width="720" /></p>
+<pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(alltraits)) %&gt;% 
+  filter(site==&quot;Maxfield&quot;, !name %in% c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, &quot;nectar_sugar&quot;)) %&gt;% 
+  drop_na(value) %&gt;% 
+ggplot(aes(x=temp, y=value, color=temp)) + 
+  facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller = as_labeller(traitnames.units), nrow=1)+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x=&quot;Species, site&quot;, y=&quot;Corolla width&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-2.svg" width="480" /></p>
-<pre class="r"><code>ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_volume, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x=&quot;Species, site&quot;, y=&quot;Nectar volume (uL)&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-3.svg" width="480" /></p>
-<pre class="r"><code>ggplot(nectar.mean, aes(x=paste(species, site), y=nectar_conc, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x=&quot;Species, site&quot;, y=&quot;Nectar concentration (%)&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-4.svg" width="480" /></p>
-<pre class="r"><code>ggplot(phen.mean, aes(x=paste(species, site), y=height_cm, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x=&quot;Species, site&quot;, y=&quot;Plant height (cm)&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-5.svg" width="480" /></p>
-<pre class="r"><code>ggplot(flrcol, aes(x=paste(species, site), y=redness, color=temp)) + 
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1))+
-  labs(x=&quot;Species, site&quot;, y=&quot;Redness index&quot;, color=&quot;Temperature&quot;) + 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
-<p><img src="plots-traits/plasticity-6.svg" width="480" /></p>
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
+        panel.grid.major.x = element_blank())</code></pre>
+<p><img src="plots-traits/plasticity-2.svg" width="720" /></p>
 </div>
 <div id="effect-of-snowmelt" class="section level1">
 <h1>Effect of snowmelt</h1>
@@ -872,19 +871,10 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>lmer(height_cm   ~temp*snow+(1|plotid)+(1|plantid),data=phen) %&gt;% anova %&gt;% 
+<pre class="r"><code>lmer(height_cm   ~temp*snow+(1|plotid),data=phen.max) %&gt;% anova %&gt;% 
   kable(caption=&quot;height_cm&quot;)</code></pre>
 <table>
 <caption>height_cm</caption>
-<colgroup>
-<col width="15%" />
-<col width="15%" />
-<col width="15%" />
-<col width="9%" />
-<col width="13%" />
-<col width="15%" />
-<col width="15%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -899,30 +889,30 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
 <tbody>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">3.9670994</td>
-<td align="right">3.9670994</td>
+<td align="right">39.74838</td>
+<td align="right">39.74838</td>
 <td align="right">1</td>
-<td align="right">57.13399</td>
-<td align="right">0.3584534</td>
-<td align="right">0.5517329</td>
+<td align="right">46.448979</td>
+<td align="right">0.3579552</td>
+<td align="right">0.5525505</td>
 </tr>
 <tr class="even">
 <td align="left">snow</td>
-<td align="right">3.8147682</td>
-<td align="right">3.8147682</td>
+<td align="right">32.20310</td>
+<td align="right">32.20310</td>
 <td align="right">1</td>
-<td align="right">57.13399</td>
-<td align="right">0.3446893</td>
-<td align="right">0.5594479</td>
+<td align="right">5.469413</td>
+<td align="right">0.2900060</td>
+<td align="right">0.6114093</td>
 </tr>
 <tr class="odd">
 <td align="left">temp:snow</td>
-<td align="right">0.5020839</td>
-<td align="right">0.5020839</td>
+<td align="right">12.44011</td>
+<td align="right">12.44011</td>
 <td align="right">1</td>
-<td align="right">57.13399</td>
-<td align="right">0.0453666</td>
-<td align="right">0.8320896</td>
+<td align="right">46.448979</td>
+<td align="right">0.1120298</td>
+<td align="right">0.7393518</td>
 </tr>
 </tbody>
 </table>
@@ -1132,16 +1122,15 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>lmer(height_cm     ~temp+(1|plantid),data=phen)          %&gt;% anova %&gt;% kable(caption=&quot;height_cm&quot;)</code></pre>
+<pre class="r"><code>lm(height_cm     ~temp, data=phen.max)      %&gt;% anova %&gt;% kable(caption=&quot;height_cm&quot;)</code></pre>
 <table>
 <caption>height_cm</caption>
 <thead>
 <tr class="header">
 <th align="left"></th>
+<th align="right">Df</th>
 <th align="right">Sum Sq</th>
 <th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
 <th align="right">F value</th>
 <th align="right">Pr(&gt;F)</th>
 </tr>
@@ -1149,12 +1138,19 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
 <tbody>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">3.426821</td>
-<td align="right">3.426821</td>
 <td align="right">1</td>
-<td align="right">59.11337</td>
-<td align="right">0.3096294</td>
-<td align="right">0.5800082</td>
+<td align="right">35.29394</td>
+<td align="right">35.29394</td>
+<td align="right">0.3192179</td>
+<td align="right">0.5742202</td>
+</tr>
+<tr class="even">
+<td align="left">Residuals</td>
+<td align="right">59</td>
+<td align="right">6523.26344</td>
+<td align="right">110.56379</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 </tr>
 </tbody>
 </table>
@@ -1267,7 +1263,7 @@ Number of permutations: 999
 
 Model: capscale(formula = t(flrspec.nm.zero.bin[, -1]) ~ temp, data = flrcol, scale = TRUE)
          Df SumOfSqs      F Pr(&gt;F)
-temp      1   0.0674 1.0572  0.315
+temp      1   0.0674 1.0572  0.314
 Residual 64   4.0795              </code></pre>
 </div>
 <div id="spectrum-vs.-temp" class="section level2">
