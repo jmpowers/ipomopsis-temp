@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-04" />
+<meta name="date" content="2023-01-10" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-04</h4>
+<h4 class="date">2023-01-10</h4>
 
 </div>
 
@@ -1790,7 +1790,8 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
 <h1>OTCs vs. Ambient</h1>
 <div id="inventory-1" class="section level2">
 <h2>Inventory</h2>
-<pre class="r"><code>svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, Site, is.na(mean_temp_C_treatment)) %&gt;% pivot_wider(names_from=temp, values_from=n) %&gt;%  kable(caption=&quot;Sample size&quot;)</code></pre>
+<pre class="r"><code>svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, Site, is.na(mean_temp_C_treatment)) %&gt;% 
+  pivot_wider(names_from=temp, values_from=n) %&gt;%  kable(caption=&quot;Sample size&quot;)</code></pre>
 <table>
 <caption>Sample size</caption>
 <colgroup>
@@ -1906,6 +1907,152 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>#TODO CWu&#39;s Sample2 isn&#39;t always just the plant number, need to create a new plantid column
+svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, Site, coalesce(plantid, Sample2)) %&gt;% 
+  count(PlantType, DN, Year, Site, n)  %&gt;%  kable(caption=&quot;Sample size per plant&quot;)</code></pre>
+<table>
+<caption>Sample size per plant</caption>
+<thead>
+<tr class="header">
+<th align="left">PlantType</th>
+<th align="left">DN</th>
+<th align="left">Year</th>
+<th align="left">Site</th>
+<th align="right">n</th>
+<th align="right">nn</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2018</td>
+<td align="left">bb</td>
+<td align="right">1</td>
+<td align="right">26</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2018</td>
+<td align="left">GNA</td>
+<td align="right">1</td>
+<td align="right">42</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2018</td>
+<td align="left">GNA</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2019</td>
+<td align="left">GNA</td>
+<td align="right">1</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2019</td>
+<td align="left">GNA</td>
+<td align="right">2</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">GNA</td>
+<td align="right">26</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">GNA</td>
+<td align="right">32</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">27</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">24</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2019</td>
+<td align="left">SC</td>
+<td align="right">1</td>
+<td align="right">21</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">30</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">42</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2019</td>
+<td align="left">SC</td>
+<td align="right">1</td>
+<td align="right">17</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">28</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">39</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>plot.otc &lt;- function(svf.otc, cap.terms=c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;), plot.chems=T) {
   vol.otc &lt;- vol[svf.otc$sample,]
   cap.formula &lt;- reformulate(cap.terms, response = &quot;sqrt(vol.otc)&quot;)
@@ -1919,7 +2066,7 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
   plot(cap.otc, type=&quot;n&quot;, xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
   with(svf.otc, 
        title(main=paste(&quot;OTC warming:&quot;,&quot;I.&quot;,unique(PlantType), &quot;at&quot;, paste(unique(Site), collapse=&quot; &amp; &quot;),unique(Year),
-                            do.call(paste0, list(unique(DN), collapse=&quot;/&quot;)))))
+                            do.call(paste0, list(unique(DN), collapse=&quot;/&quot;)), &quot;n =&quot;,nrow(svf.otc))))
   if(&quot;temp&quot; %in% cap.terms) legend(&quot;topleft&quot;, title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), 
                                    levels(svf.otc$temp), fill=tempcol)
   if(&quot;DN&quot; %in% cap.terms) legend(&quot;topright&quot;, title=paste(&quot;Time&quot;,&quot;\nP =&quot;,anova.cap[&quot;DN&quot;,&quot;Pr(&gt;F)&quot;]), 
@@ -2102,7 +2249,7 @@ ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.exp
 
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
-title(&quot;OTC warming: I. agg at all sites, all years&quot;)
+title(paste(&quot;OTC warming: I. agg at all sites, all years&quot;, &quot;n =&quot;, nrow(svf.otc)))
 temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
@@ -2169,19 +2316,19 @@ temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
 Total         18.04587    1.00000     
-Constrained    1.56878    0.08693    4
-Unconstrained 20.54747    1.13862   40
+Constrained    1.56719    0.08684    4
+Unconstrained 20.54906    1.13871   40
 Imaginary     -4.07037   -0.22556   50
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4 
-0.7510 0.4988 0.1677 0.1512 
+0.7511 0.4997 0.1677 0.1487 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-3.772 3.000 1.681 1.541 1.170 1.076 0.998 0.862 
+3.772 3.000 1.682 1.542 1.169 1.075 0.999 0.862 
 (Showing 8 of 40 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
@@ -2191,11 +2338,11 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year * mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                            Df SumOfSqs      F Pr(&gt;F)   
-Year                        1   0.6216 2.6621  0.006 **
-mean_temp_C_treatment       1   0.2316 0.9917  0.441   
-temp                        1   0.1637 0.7009  0.784   
-Year:mean_temp_C_treatment  1   0.5520 2.3640  0.005 **
-Residual                   88  20.5475                 
+Year                        1   0.6216 2.6619  0.006 **
+mean_temp_C_treatment       1   0.2223 0.9522  0.488   
+temp                        1   0.1635 0.7002  0.781   
+Year:mean_temp_C_treatment  1   0.5598 2.3972  0.005 **
+Residual                   88  20.5491                 
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -2204,7 +2351,7 @@ ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.exp
 
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
-title(&quot;OTC warming: I. ten, 2019/2021 day&quot;)
+title(paste(&quot;OTC warming: I. ten, 2019/2021 day&quot;,&quot;n =&quot;, nrow(svf.otc)))
 temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
@@ -2259,7 +2406,7 @@ ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.exp
 
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
-title(&quot;OTC warming: I. ten, 2019/2021 night&quot;)
+title(paste(&quot;OTC warming: I. ten, 2019/2021 night&quot;,&quot;n =&quot;, nrow(svf.otc)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
 legend(&quot;left&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp), fill=tempcol)
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
@@ -2279,19 +2426,19 @@ mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
 Total          71.1122     1.0000     
-Constrained    10.7909     0.1517    7
-Unconstrained  84.9879     1.1951   92
+Constrained    10.7823     0.1516    7
+Unconstrained  84.9965     1.1952   92
 Imaginary     -24.6666    -0.3469  224
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
  CAP1  CAP2  CAP3  CAP4  CAP5  CAP6  CAP7 
-5.630 1.812 1.356 1.137 0.439 0.229 0.188 
+5.634 1.809 1.350 1.131 0.441 0.229 0.188 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-12.253  7.910  5.930  4.499  4.390  4.065  3.094  2.946 
+12.249  7.912  5.930  4.498  4.401  4.067  3.094  2.945 
 (Showing 8 of 92 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
@@ -2301,11 +2448,11 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs       F Pr(&gt;F)    
-Year                    2    6.385 11.6824  0.001 ***
-Site                    3    3.072  3.7476  0.001 ***
-mean_temp_C_treatment   1    0.864  3.1609  0.001 ***
-temp                    1    0.470  1.7192  0.035 *  
-Residual              311   84.988                   
+Year                    2    6.385 11.6812  0.001 ***
+Site                    3    3.072  3.7472  0.001 ***
+mean_temp_C_treatment   1    0.851  3.1134  0.001 ***
+temp                    1    0.474  1.7348  0.029 *  
+Residual              311   84.997                   
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -2314,7 +2461,7 @@ ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.exp
 
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
-title(&quot;OTC warming: I. agg &amp; ten at all sites, all years, day&quot;)
+title(paste(&quot;OTC warming: I. agg &amp; ten at all sites, all years, day&quot;,&quot;n =&quot;, nrow(svf.otc)))
 temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
@@ -2468,7 +2615,7 @@ svf %&gt;% filter(expt==&quot;perc&quot;) %&gt;%  count(PlantType, DN, Temp,Year
     anova.cap &lt;- anova(cap.perc, by=&quot;margin&quot;)
     
     plot(cap.perc, type=&quot;n&quot;, xlim=range(cap.perc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    with(svf.perc, title(paste0(&quot;Percivals: I. &quot;, unique(PlantType),&quot; in &quot;, unique(Year))))
+    with(svf.perc, title(paste0(&quot;Percivals: I. &quot;, unique(PlantType),&quot; in &quot;, unique(Year), &quot;n =&quot;, nrow(svf.perc))))
     #, &quot; (&quot;,round(100*summ.cap$constr.chi / summ.cap$tot.chi),&quot;% explained)&quot;)
     legend(&quot;topleft&quot;, title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;Temp&quot;,&quot;Pr(&gt;F)&quot;]), 
            levels(svf.perc$Temp), fill=Tempcol)
@@ -2503,7 +2650,7 @@ class="section level2">
     anova.cap &lt;- anova(cap.perc.comb, by=&quot;margin&quot;)
     
     plot(cap.perc.comb, type=&quot;n&quot;, xlim=range(cap.perc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    title(paste(&quot;Percivals: I.&quot;,unique(svf.perc$PlantType), &quot;2018/2019&quot;))
+    title(paste(&quot;Percivals: I.&quot;,unique(svf.perc$PlantType), &quot;2018/2019&quot;,&quot;n =&quot;, nrow(svf.perc)))
     legend(&quot;bottomleft&quot;, title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;Temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$Temp), fill=Tempcol)
   legend(&quot;bottomright&quot;, title=paste(&quot;Time&quot;,&quot;\nP =&quot;,anova.cap[&quot;DN&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$DN), fil=c(0,1))
   legend(&quot;topright&quot;, title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$Year), pch=c(19,15))
@@ -2677,7 +2824,7 @@ Residual  33   5.8596
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>plot(cap.leaf, type=&quot;n&quot;, xlim=range(cap.leaf$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste(&quot;OTCs: I. agg and I. ten leaves 2019&quot;))
+title(paste(&quot;OTCs: I. agg and I. ten leaves 2019&quot;,&quot;n =&quot;, nrow(svl.otc)))
 legend(&quot;bottomleft&quot;, title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svl.otc$temp), fill=tempcol)
 legend(&quot;bottomright&quot;, title=paste(&quot;Species&quot;,&quot;\nP =&quot;,anova.cap[&quot;PlantType&quot;,&quot;Pr(&gt;F)&quot;]), levels(svl.otc$PlantType), pch=c(19,15))
 points(cap.leaf, display=&quot;sites&quot;, col=tempcol[svl.otc$temp], pch=c(19,15)[svl.otc$PlantType]) 

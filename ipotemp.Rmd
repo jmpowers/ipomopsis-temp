@@ -501,7 +501,12 @@ points(nmds.vol, display="sites", col=svf$Year, pch=c(1,4)[svf$DN])
 
 ## Inventory
 ```{r otc}
-svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site, is.na(mean_temp_C_treatment)) %>% pivot_wider(names_from=temp, values_from=n) %>%  kable(caption="Sample size")
+svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site, is.na(mean_temp_C_treatment)) %>% 
+  pivot_wider(names_from=temp, values_from=n) %>%  kable(caption="Sample size")
+
+#TODO CWu's Sample2 isn't always just the plant number, need to create a new plantid column
+svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site, coalesce(plantid, Sample2)) %>% 
+  count(PlantType, DN, Year, Site, n)  %>%  kable(caption="Sample size per plant")
 
 plot.otc <- function(svf.otc, cap.terms=c("mean_temp_C_treatment", "temp"), plot.chems=T) {
   vol.otc <- vol[svf.otc$sample,]
@@ -516,7 +521,7 @@ plot.otc <- function(svf.otc, cap.terms=c("mean_temp_C_treatment", "temp"), plot
   plot(cap.otc, type="n", xlim=range(cap.otc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
   with(svf.otc, 
        title(main=paste("OTC warming:","I.",unique(PlantType), "at", paste(unique(Site), collapse=" & "),unique(Year),
-                            do.call(paste0, list(unique(DN), collapse="/")))))
+                            do.call(paste0, list(unique(DN), collapse="/")), "n =",nrow(svf.otc))))
   if("temp" %in% cap.terms) legend("topleft", title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), 
                                    levels(svf.otc$temp), fill=tempcol)
   if("DN" %in% cap.terms) legend("topright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), 
@@ -592,7 +597,7 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 
 yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC warming: I. agg at all sites, all years")
+title(paste("OTC warming: I. agg at all sites, all years", "n =", nrow(svf.otc)))
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
@@ -633,7 +638,7 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 
 yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC warming: I. ten, 2019/2021 day")
+title(paste("OTC warming: I. ten, 2019/2021 day","n =", nrow(svf.otc)))
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
@@ -656,7 +661,7 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 
 yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC warming: I. ten, 2019/2021 night")
+title(paste("OTC warming: I. ten, 2019/2021 night","n =", nrow(svf.otc)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
 legend("left",  title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp), fill=tempcol)
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
@@ -677,7 +682,7 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 
 yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title("OTC warming: I. agg & ten at all sites, all years, day")
+title(paste("OTC warming: I. agg & ten at all sites, all years, day","n =", nrow(svf.otc)))
 temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
 legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
@@ -706,7 +711,7 @@ plot.perc <- function(svf.perc, plot.chems=T) {
     anova.cap <- anova(cap.perc, by="margin")
     
     plot(cap.perc, type="n", xlim=range(cap.perc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    with(svf.perc, title(paste0("Percivals: I. ", unique(PlantType)," in ", unique(Year))))
+    with(svf.perc, title(paste0("Percivals: I. ", unique(PlantType)," in ", unique(Year), "n =", nrow(svf.perc))))
     #, " (",round(100*summ.cap$constr.chi / summ.cap$tot.chi),"% explained)")
     legend("topleft", title=paste("Temperature","\nP =",anova.cap["Temp","Pr(>F)"]), 
            levels(svf.perc$Temp), fill=Tempcol)
@@ -738,7 +743,7 @@ plot.perc.comb <- function(svf.perc, plot.chems=F) {
     anova.cap <- anova(cap.perc.comb, by="margin")
     
     plot(cap.perc.comb, type="n", xlim=range(cap.perc.comb$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    title(paste("Percivals: I.",unique(svf.perc$PlantType), "2018/2019"))
+    title(paste("Percivals: I.",unique(svf.perc$PlantType), "2018/2019","n =", nrow(svf.perc)))
     legend("bottomleft", title=paste("Temperature","\nP =",anova.cap["Temp","Pr(>F)"]), levels(svf.perc$Temp), fill=Tempcol)
   legend("bottomright", title=paste("Time","\nP =",anova.cap["DN","Pr(>F)"]), levels(svf.perc$DN), fil=c(0,1))
   legend("topright", title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.perc$Year), pch=c(19,15))
@@ -840,7 +845,7 @@ ax.labs <- paste0("CAP", 1:2, " (",round(100*prop.expl),"% explained)")
 (anova.cap <- anova(cap.leaf, by="margin"))
 
 plot(cap.leaf, type="n", xlim=range(cap.leaf$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("OTCs: I. agg and I. ten leaves 2019"))
+title(paste("OTCs: I. agg and I. ten leaves 2019","n =", nrow(svl.otc)))
 legend("bottomleft", title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svl.otc$temp), fill=tempcol)
 legend("bottomright", title=paste("Species","\nP =",anova.cap["PlantType","Pr(>F)"]), levels(svl.otc$PlantType), pch=c(19,15))
 points(cap.leaf, display="sites", col=tempcol[svl.otc$temp], pch=c(19,15)[svl.otc$PlantType]) 
