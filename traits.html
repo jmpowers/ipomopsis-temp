@@ -336,16 +336,69 @@ phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom
          has_egg = eggs &gt; 0, 
          site=&quot;Maxfield&quot;, species=&quot;agg&quot;)
 
+counts_19_20 &lt;- c(&quot;seeds&quot;,&quot;fruits&quot;,&quot;fruits_split&quot;,&quot;aborts&quot;,&quot;fruits_fly_no_seeds&quot;,&quot;fruits_fly_with_seeds&quot;,&quot;seeds_fly&quot;,&quot;fruits_caterpillar&quot;,&quot;fruits_early_uncountable&quot;,&quot;flowers_buds&quot;,&quot;flowers_buds_collected_early&quot;,&quot;flowers_buds_collected_last&quot;)
+sds21.date &lt;- read_csv(&quot;data/traits/2021 Maxfield Seeds - 2021.csv&quot;, skip=1) %&gt;% 
+  mutate(plot = as.character(plot), 
+         plotid = paste0(plot, subplot),
+         plantid = paste0(plotid, plant),
+         plant = as.character(plant),
+         julian = factor(yday(date)),
+         year = &quot;2021&quot;) %&gt;% 
+  mutate(flowers_buds_collected_last = ifelse(yday(date) &gt;= 235, flowers_buds, 0), #8/23
+         flowers_buds_collected_early = ifelse(yday(date) &lt; 235, flowers_buds, 0)) %&gt;% 
+  mutate(across(all_of(counts_19_20), replace_na, 0)) %&gt;% 
+  left_join(census.maxf) %&gt;% drop_na(temp) %&gt;% #8 plants with no census record (also not in traits)
+  mutate_if(is.character, as.factor) 
+
+sds21 &lt;- sds21.date %&gt;% 
+  group_by(across(c(&quot;plant&quot;, &quot;plantid&quot;, colnames(census.maxf)))) %&gt;% 
+  summarize(across(all_of(counts_19_20), sum, na.rm=T), dates=n(), .groups=&quot;drop&quot;)
+
+sds21.date.zeroed &lt;- sds21.date %&gt;% 
+  filter(date %in% (sds21.date %&gt;% drop_na(date) %&gt;% count(date) %&gt;% filter(n&gt;2) %&gt;% pull(date))) %&gt;% 
+  complete(nesting(plantid, plotid, plot, subplot, snow, temp), nesting(julian, date), fill=list(seeds=0, fruits=0, fruits_split=0, fruits_fly_no_seeds=0, fruits_fly_with_seeds=0, seeds_fly=0, fruits_caterpillar=0)) %&gt;% 
+  mutate(julian=as.integer(as.character(julian)),
+         seeds_per_fruit = seeds/fruits,
+         fruits_with_seeds = fruits + fruits_split + fruits_fly_with_seeds,
+         fruits_nonaborted = fruits_with_seeds + fruits_fly_no_seeds + fruits_caterpillar + fruits_split,
+         prop_infested  = (fruits_fly_no_seeds + fruits_fly_with_seeds + fruits_caterpillar) / fruits_nonaborted,
+         fruiting = fruits_nonaborted &gt; 0)
+
+sds &lt;- sds21 %&gt;% 
+  mutate(plantid = paste0(plotid,plant),
+         species=&quot;agg&quot;, site=&quot;Maxfield&quot;,
+    #flowers_volatiles = replace_na(flowers_volatiles, 0), #TODO get volatiles for 2018 &amp; 2019
+    #flowers_destroyed = flowers_morphology_nectar + flowers_volatiles, #TODO + flowers_color
+    seeds_per_fruit = seeds / fruits,
+    fruits_aborted  = aborts + flowers_buds_collected_last,
+    seeds_est   = seeds + seeds_fly + (flowers_buds_collected_early + #flowers_destroyed + 
+                                       fruits_early_uncountable) * (seeds/(fruits + fruits_aborted + fruits_fly_with_seeds + fruits_fly_no_seeds + fruits_caterpillar)) + fruits_split * seeds_per_fruit, 
+    fruits_with_seeds   = fruits + fruits_split + fruits_fly_with_seeds, 
+    fruits_nonaborted   = fruits_with_seeds + fruits_fly_no_seeds + fruits_caterpillar + fruits_split,
+    flowers_est = fruits_nonaborted + aborts + flowers_buds, #+ flowers_destroyed,# aborts used to be fruits_aborted, which includes flowers_buds_collected_last, but these are already in flowers_buds
+    prop_infested   = (fruits_fly_no_seeds + fruits_fly_with_seeds + fruits_caterpillar) / fruits_nonaborted,
+    prop_aborted    = fruits_aborted / (fruits_nonaborted + fruits_aborted),
+    prop_nonaborted = fruits_nonaborted / (fruits_nonaborted + fruits_aborted),
+    seeds_per_flower = seeds_est / flowers_est) %&gt;% 
+  filter(flowers_est &gt; 0)#one plant &quot;gone&quot;
+
 spnames &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)
 sitenames &lt;- c(GNA=&quot;Gothic Natural Area&quot;,Maxfield=&quot;Maxfield Meadow&quot;,SC=&quot;Spring Creek&quot;)
 
-alltraits &lt;- c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, &quot;nectar_volume&quot;, &quot;nectar_conc&quot;, &quot;nectar_sugar&quot;, 
-               &quot;height_cm&quot;, &quot;redness&quot;, &quot;prop_infested&quot;, &quot;prop_aborted&quot;)
+
+traits &lt;- c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, 
+            &quot;nectar_volume&quot;, &quot;nectar_conc&quot;,
+            &quot;height_cm&quot;,&quot;redness&quot;,
+            &quot;open&quot;,&quot;seeds_per_fruit&quot;, &quot;seeds_est&quot;, &quot;fruits_nonaborted&quot;,  &quot;flowers_est&quot;, 
+            &quot;prop_infested&quot;, &quot;prop_aborted&quot;, &quot;seeds_per_flower&quot;) 
+floraltraits &lt;- traits[1:6]
+seedtraits &lt;- traits[7:14] 
 traitnames.units &lt;- set_names(c(
   &quot;Corolla length (mm)&quot;, &quot;Corolla width (mm)&quot;,
-  &quot;Nectar production (\U00B5L/day)&quot;, &quot;Nectar conc. (% by mass)&quot;, &quot;Nectar sucrose (mg/day)&quot;,
+  &quot;Nectar production (\U00B5L/day)&quot;, &quot;Nectar conc. (% by mass)&quot;,
   &quot;Inflorescence height (cm)&quot;, &quot;Redness index&quot;, 
-  &quot;Prop. nonaborted fruits infested&quot;,&quot;Prop. fruits aborted&quot;), alltraits)</code></pre>
+  &quot;Open flowers&quot;, &quot;Seeds per fruit&quot;, &quot;Estimated total seeds&quot;, &quot;Nonaborted fruits&quot;, &quot;Flower number&quot;, 
+  &quot;Prop. nonaborted fruits infested&quot;,&quot;Prop. fruits aborted&quot;,&quot;Estimated seeds per flower&quot;), traits)</code></pre>
 <div id="sample-sizes" class="section level1">
 <h1>Sample sizes</h1>
 <div id="measurements-per-plant" class="section level2">
@@ -636,7 +689,7 @@ flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;%
   summarize(redness=mean(redness, na.rm=T))
 
 all.mean &lt;- morph.mean %&gt;% rename(n.morph=n) %&gt;% 
-  full_join(rename(nectar.mean, n.nectar=n)) %&gt;% full_join(phen.max) %&gt;% full_join(flrcol.mean)</code></pre>
+  full_join(rename(nectar.mean, n.nectar=n)) %&gt;% full_join(phen.max) %&gt;% full_join(flrcol.mean) %&gt;% full_join(sds)</code></pre>
 </div>
 </div>
 <div id="trait-correlations" class="section level1">
@@ -671,14 +724,14 @@ ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[si
   theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())</code></pre>
 <p><img src="plots-traits/plasticity_multisite-1.svg" width="480" /></p>
-<pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(alltraits)) %&gt;% 
-  filter(site==&quot;Maxfield&quot;, !name %in% c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, &quot;nectar_sugar&quot;)) %&gt;% 
+<pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(floraltraits[-c(1:2)])) %&gt;% 
+  filter(site==&quot;Maxfield&quot;) %&gt;% 
   drop_na(value) %&gt;% 
 ggplot(aes(x=temp, y=value, color=temp)) + 
   facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller = as_labeller(traitnames.units), nrow=1)+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
-  geom_signif(comparisons = list(c(1,2)), 
+  geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
               map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
   labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;) + 
   scale_y_continuous(limits=c(0,NA))+
@@ -686,6 +739,21 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())</code></pre>
 <p><img src="plots-traits/plasticity-1.svg" width="720" /></p>
+<pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(seedtraits)) %&gt;% 
+  filter(site==&quot;Maxfield&quot;) %&gt;% 
+  drop_na(value) %&gt;% 
+ggplot(aes(x=temp, y=value, color=temp)) + 
+  facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller = as_labeller(traitnames.units), nrow=2)+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
+              map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
+        panel.grid.major.x = element_blank())</code></pre>
+<p><img src="plots-traits/plasticity-2.svg" width="720" /></p>
 </div>
 <div id="effect-of-snowmelt" class="section level1">
 <h1>Effect of snowmelt</h1>
@@ -1279,7 +1347,7 @@ Number of permutations: 999
 
 Model: capscale(formula = t(flrspec.nm.zero.bin[, -1]) ~ temp, data = flrcol, scale = TRUE)
          Df SumOfSqs      F Pr(&gt;F)
-temp      1   0.0674 1.0572  0.332
+temp      1   0.0674 1.0572  0.324
 Residual 64   4.0795              </code></pre>
 </div>
 <div id="spectrum-vs.-temp" class="section level2">
@@ -1489,6 +1557,23 @@ Residual 64   4.0795              </code></pre>
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() </code></pre>
 <p><img src="plots-traits/phenology_temp-5.svg" width="480" /></p>
 </div>
+</div>
+<div id="selection" class="section level1">
+<h1>Selection</h1>
+<pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;seeds_est&quot;))) %&gt;% 
+  pivot_longer(any_of(floraltraits), names_to=&quot;trait&quot;) %&gt;% 
+  ggplot(aes(x=value, y=seeds_est, color=temp)) + geom_point() + geom_smooth(method=&quot;loess&quot;,se=F, span=1.3) + 
+  facet_wrap(vars(trait), scales=&quot;free_x&quot;, labeller=as_labeller(traitnames.units)) + 
+  labs(x=&quot;Trait&quot;, y=&quot;Seed production&quot;, color=&quot;Temperature&quot;)+
+  theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/selection-1.svg" width="768" /></p>
+<pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;prop_infested&quot;))) %&gt;% 
+  pivot_longer(any_of(floraltraits), names_to=&quot;trait&quot;) %&gt;% 
+  ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() + geom_smooth(method=&quot;loess&quot;,se=F, span=1.3) + 
+  facet_wrap(vars(trait), scales=&quot;free_x&quot;, labeller=as_labeller(traitnames.units)) + 
+  labs(x=&quot;Trait&quot;, y=traitnames.units[&quot;prop_infested&quot;], color=&quot;Temperature&quot;)+
+  theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/selection-2.svg" width="768" /></p>
 </div>
 
 
