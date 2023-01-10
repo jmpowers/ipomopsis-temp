@@ -163,23 +163,14 @@ ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=temp)) +
 ```
 
 # Trait plasticity
-```{r plasticity, fig.width=7.5}
+```{r plasticity_multisite, fig.height=7.5}
+library(ggsignif)
 morph.mean %>% pivot_longer(c(corolla_length, corolla_width)) %>% 
-ggplot(aes(x=paste(spnames[species], sitenames[site], sep="\n"), y=value, color=temp)) + 
-  facet_wrap(vars(name), scales="free_y", labeller = as_labeller(traitnames.units))+
+ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep="\n")
+  facet_grid(name~site, scales="free_y", labeller = as_labeller(c(traitnames.units, sitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
-  labs(x="", y="", color="Temperature") + 
-  scale_y_continuous(limits=c(0,NA))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
-  theme(legend.position = "top", axis.title.x=element_blank(), panel.grid.major.x = element_blank())
-
-all.mean %>% pivot_longer(any_of(alltraits)) %>% 
-  filter(site=="Maxfield", !name %in% c("corolla_length", "corolla_width", "nectar_sugar")) %>% 
-  drop_na(value) %>% 
-ggplot(aes(x=temp, y=value, color=temp)) + 
-  facet_wrap(vars(name), scales="free_y", labeller = as_labeller(traitnames.units), nrow=1)+
-  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_signif(comparisons = list(c(1,2)), 
+              map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
   labs(x="", y="", color="Temperature") + 
   scale_y_continuous(limits=c(0,NA))+
@@ -187,6 +178,24 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())
 ```
+
+```{r plasticity, fig.width=7.5}
+all.mean %>% pivot_longer(any_of(alltraits)) %>% 
+  filter(site=="Maxfield", !name %in% c("corolla_length", "corolla_width", "nectar_sugar")) %>% 
+  drop_na(value) %>% 
+ggplot(aes(x=temp, y=value, color=temp)) + 
+  facet_wrap(vars(name), scales="free_y", labeller = as_labeller(traitnames.units), nrow=1)+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  geom_signif(comparisons = list(c(1,2)), 
+              map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
+  labs(x="", y="", color="Temperature") + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
 
 # Effect of snowmelt
 
