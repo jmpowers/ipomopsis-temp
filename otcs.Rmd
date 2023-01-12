@@ -59,7 +59,8 @@ hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa)
   left_join(read_csv("./data/CWu OTC Hobos - duration.csv")) %>%
   filter(Timestamp > OTC_start, Timestamp < OTC_end) %>% 
   rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %>% 
-  mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60)
+  mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60) %>% 
+  filter(site != "bb")
 ```
 
 # Raw data
@@ -76,7 +77,7 @@ ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=in
 ```
 
 ```{r lineplot}
-hobos %>% filter(year=="2018", site=="bb", date>=ymd("2018-07-16"), date <=ymd("2018-07-20")) %>% drop_na(temp_C) %>% 
+hobos %>% filter(year=="2018", site=="GNA", date>=ymd("2018-07-16"), date <=ymd("2018-07-20")) %>% drop_na(temp_C) %>% 
   ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) + geom_path() +
   scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()+
   labs(x="Date", y="Temperature (C)", color="Temperature")
