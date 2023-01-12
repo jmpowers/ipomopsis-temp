@@ -24,7 +24,10 @@ library(lubridate)
 library(knitr)
 library(lme4)
 library(lmerTest)
+library(emmeans)
+library(broom)
 library(viridis)
+library(ggsignif)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
                       fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), 
                       fig.height=5, fig.width=5)
@@ -158,6 +161,13 @@ traitnames.units <- set_names(c(
   "Inflorescence height (cm)", "Redness index", 
   "Open flowers", "Seeds per fruit", "Estimated total seeds", "Nonaborted fruits", "Flower number", 
   "Prop. nonaborted fruits infested","Prop. fruits aborted","Estimated seeds per flower"), traits)
+
+traitnames <- set_names(c(
+  "Corolla length", "Corolla width",
+  "Nectar production", "Nectar conc.",
+  "Inflorescence height", "Redness index", 
+  "Open flowers", "Seeds per fruit", "Estimated total seeds", "Nonaborted fruits", "Flower number", 
+  "Prop. nonaborted fruits infested","Prop. fruits aborted","Estimated seeds per flower"), traits)
 ```
 
 # Sample sizes
@@ -197,6 +207,7 @@ flrcol.mean <- flrcol %>% drop_na(redness, temp) %>%
 
 all.mean <- morph.mean %>% rename(n.morph=n) %>% 
   full_join(rename(nectar.mean, n.nectar=n)) %>% full_join(phen.max) %>% full_join(flrcol.mean) %>% full_join(sds)
+traits.sd <- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %>% set_names(traits)
 ```
 
 
@@ -217,12 +228,11 @@ ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=temp)) +
 
 # Trait plasticity
 ```{r plasticity_multisite, fig.height=7.5}
-library(ggsignif)
 morph.mean %>% pivot_longer(c(corolla_length, corolla_width)) %>% 
 ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep="\n")
   facet_grid(name~site, scales="free_y", labeller = as_labeller(c(traitnames.units, sitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_signif(comparisons = list(c(1,2)), 
+  geom_signif(comparisons = list(c(1,2)), test="t.test",
               map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
   labs(x="", y="", color="Temperature") + 
@@ -473,19 +483,55 @@ phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_eg
 
 # Selection
 
-```{r selection, fig.width=8}
+##  Seed production
+
+```{r selection, fig.width=7, fig.height=7}
 all.mean %>% select(all_of(c(floraltraits, "seeds_est"))) %>% 
   pivot_longer(any_of(floraltraits), names_to="trait") %>% 
-  ggplot(aes(x=value, y=seeds_est, color=temp)) + geom_point() + geom_smooth(method="loess",se=F, span=1.3) + 
+  ggplot(aes(x=value, y=seeds_est, color=temp)) + geom_point() + geom_smooth(method="lm",se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
   facet_wrap(vars(trait), scales="free_x", labeller=as_labeller(traitnames.units)) + 
-  labs(x="Trait", y="Seed production", color="Temperature")+
+  labs(x="Trait", y=traitnames["seeds_est"], color="Temperature")+
   theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top")
 
+#get the the standardized selection differential S' (change in relative fitness / standardized trait value)
+mt.mod.seeds <- map(set_names(floraltraits), 
+                    ~ lm(seeds_rel ~ trait.z * temp, 
+                         data=all.mean %>% as.data.frame() %>% mutate(trait.z = all.mean[[.x]] / traits.sd[[.x]]) %>% 
+                           group_by(temp) %>% mutate(seeds_rel = seeds_est/mean(seeds_est, na.rm=T)))) # mean seeds in each temp
+mt.mod.seeds.coefs <- map_dfr(mt.mod.seeds, tidy, .id="trait")
+mt.mod.seeds.tests <- map(mt.mod.seeds, car::Anova, type=3) %>% map_dfr(tidy, .id="trait")
+mt.mod.seeds.emm <- map_dfr(mt.mod.seeds, ~summary(emtrends(.x, ~temp, var="trait.z")), .id="trait")
+mt.mod.seeds.tests %>% filter(!term %in% c("(Intercept)","Residuals")) %>% kable(caption="Seeds selection vs. temperature", digits=3)
+ggplot(mt.mod.seeds.emm, aes(x=trait, color=temp, y=trait.z.trend, ymin=trait.z.trend-SE, ymax=trait.z.trend+SE)) + 
+  geom_hline(yintercept=0)+ geom_pointrange(position=position_dodge(width=0.3)) + 
+   theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top") + 
+  labs(x="", y="Standardized selection differential, total seeds", color="Temperature") +
+  scale_x_discrete(labels=traitnames)
+```
+
+
+## Fly damage
+
+```{r selection_fly , fig.width=7, fig.height=7}
 all.mean %>% select(all_of(c(floraltraits, "prop_infested"))) %>% 
   pivot_longer(any_of(floraltraits), names_to="trait") %>% 
-  ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() + geom_smooth(method="loess",se=F, span=1.3) + 
+  ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() + geom_smooth(method="glm",se=F, method.args = list(family="binomial")) + 
   facet_wrap(vars(trait), scales="free_x", labeller=as_labeller(traitnames.units)) + 
-  labs(x="Trait", y=traitnames.units["prop_infested"], color="Temperature")+
+  labs(x="Trait", y=traitnames["prop_infested"], color="Temperature")+
   theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top")
+
+mt.mod.infested <- map(set_names(floraltraits), 
+                    ~ lm(infested_rel ~ trait.z * temp, 
+                         data=all.mean %>% as.data.frame() %>% mutate(trait.z = all.mean[[.x]] / traits.sd[[.x]]) %>% 
+                           group_by(temp) %>% mutate(infested_rel = prop_infested/mean(prop_infested, na.rm=T)))) # mean infested in each temp
+mt.mod.infested.coefs <- map_dfr(mt.mod.infested, tidy, .id="trait")
+mt.mod.infested.tests <- map(mt.mod.infested, car::Anova, type=3) %>% map_dfr(tidy, .id="trait")
+mt.mod.infested.emm <- map_dfr(mt.mod.infested, ~summary(emtrends(.x, ~temp, var="trait.z")), .id="trait")
+mt.mod.infested.tests %>% filter(!term %in% c("(Intercept)","Residuals")) %>% kable(caption="Fly selection vs. temperature", digits=3)
+ggplot(mt.mod.infested.emm, aes(x=trait, color=temp, y=trait.z.trend, ymin=trait.z.trend-SE, ymax=trait.z.trend+SE)) + 
+  geom_hline(yintercept=0)+ geom_pointrange(position=position_dodge(width=0.3)) + 
+   theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top") + 
+  labs(x="", y="Standardized selection differential, proportion infested", color="Temperature") +
+  scale_x_discrete(labels=traitnames)
 ```
 
