@@ -63,21 +63,21 @@
 <line x1='309.46' y1='502.56' x2='309.46' y2='59.04' style='stroke-width: 0.75; stroke-dasharray: 1.00,3.00;' />
 </g>
 <g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
-<text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>Percivals: I. ten in 2019n =19</text>
+<text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>Percivals: I. ten in 2019 n = 19</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
 <rect x='59.04' y='59.04' width='75.86' height='66.22' style='stroke-width: 0.75;' />
 <rect x='75.23' y='92.86' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
 <rect x='75.23' y='107.26' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
 <text x='96.97' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
-<text x='96.97' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.299</text>
+<text x='96.97' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.308</text>
 <text x='94.67' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
 <text x='94.67' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
 <rect x='488.65' y='59.04' width='57.11' height='66.22' style='stroke-width: 0.75;' />
 <circle cx='501.50' cy='96.46' r='2.70' style='stroke-width: 0.75;' />
 <circle cx='501.50' cy='110.86' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
 <text x='517.21' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Time </text>
-<text x='517.21' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.945</text>
+<text x='517.21' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.941</text>
 <text x='512.30' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>day</text>
 <text x='512.30' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>night</text>
 <text transform='translate(313.99,306.69) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>a-farnesene</text>
@@ -114,6 +114,22 @@
 <text transform='translate(311.10,306.75) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>2-methylundecane</text>
 <text transform='translate(310.08,305.42) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>2-phenylacetonitrile</text>
 <text transform='translate(311.10,306.75) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>3-methylbutanal oxime</text>
+<line x1='416.74' y1='284.38' x2='370.43' y2='201.75' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='416.74' y1='284.38' x2='463.05' y2='367.01' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='164.41' y1='266.47' x2='219.05' y2='149.98' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='164.41' y1='266.47' x2='109.78' y2='382.96' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='279.82' y1='232.13' x2='303.14' y2='175.52' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='279.82' y1='232.13' x2='256.50' y2='288.74' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='262.48' y1='236.92' x2='230.24' y2='231.87' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='262.48' y1='236.92' x2='294.73' y2='241.97' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='393.79' y1='284.37' x2='412.51' y2='296.50' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='393.79' y1='284.37' x2='375.08' y2='272.23' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='417.60' y1='272.47' x2='366.03' y2='208.58' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='417.60' y1='272.47' x2='469.17' y2='336.37' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='304.84' y1='411.07' x2='426.27' y2='461.22' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='304.84' y1='411.07' x2='183.41' y2='360.93' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='312.27' y1='280.80' x2='429.09' y2='75.47' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='312.27' y1='280.80' x2='195.45' y2='486.13' style='stroke-width: 0.75; stroke: #CCCCCC;' />
 <circle cx='370.43' cy='201.75' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
 <circle cx='463.05' cy='367.01' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
 <circle cx='219.05' cy='149.98' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />

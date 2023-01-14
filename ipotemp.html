@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-10" />
+<meta name="date" content="2023-01-13" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-10</h4>
+<h4 class="date">2023-01-13</h4>
 
 </div>
 
@@ -414,7 +414,8 @@ otc21 &lt;- bind_rows(SC=sc21, GNA=gna21, .id=&quot;site&quot;) %&gt;%
   filter(!Filename %in% drop2021 | is.na(Filename)) %&gt;% 
   mutate(sampledate = as.character(sampledate),
          Year = 2021, Tissue = if_else(plant == &quot;air&quot;, &quot;air&quot;, &quot;flower&quot;), Expt=&quot;otc&quot;,
-         location = recode(location,&quot;inside&quot;=&quot;warmed&quot;,&quot;outside&quot;=&quot;control&quot;)) %&gt;% 
+         location = recode(location,&quot;inside&quot;=&quot;warmed&quot;,&quot;outside&quot;=&quot;control&quot;),
+         PlantID = paste0(chamber, plant)) %&gt;% 
   rename(Site=site, Collector=observer, Date=date, DN=time, temp=location, Bag=bag, Pump=pump, End=end, Equil=equil, Duration=pumping,
          NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate_text=sampledate,
          RunDate_text=rundate,GCOrder=GCn)
@@ -447,7 +448,7 @@ max21 &lt;- max21.oldformat %&gt;% #put in line with CWu metadata
   rename(Date=date, RunDate_text=rundate,
          Comments=notes, Collector=observer, Bag=bag, Pump=pump,End=end, 
          NumFlrs=flowers, NumBuds=buds, PumpID=pump_id, SoilVWC=VWC,
-         PlantType=type) %&gt;% 
+         PlantType=type, PlantID=plantid) %&gt;% 
   mutate(vial=as.integer(recode(vial, &quot;A&quot;=&quot;1001&quot;, &quot;B&quot;=&quot;1002&quot;)),
          RunDate_text = as.integer(RunDate_text),
          PlantType=recode(PlantType, &quot;ambient&quot;=&quot;air&quot;, &quot;floral&quot;=&quot;agg&quot;),
@@ -1238,6 +1239,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <col width="4%" />
 <col width="4%" />
 <col width="4%" />
+<col width="4%" />
 <col width="5%" />
 <col width="4%" />
 <col width="4%" />
@@ -1246,7 +1248,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <col width="3%" />
 <col width="4%" />
 <col width="5%" />
-<col width="4%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1261,6 +1262,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <th align="left">temp</th>
 <th align="left">Sample</th>
 <th align="left">Sample2</th>
+<th align="left">PlantID</th>
 <th align="left">nomatch</th>
 <th align="left">Bag</th>
 <th align="left">Pump</th>
@@ -1273,7 +1275,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <th align="left">PumpID</th>
 <th align="right">SoilVWC</th>
 <th align="right">SoilDepth</th>
-<th align="left">Comments</th>
 </tr>
 </thead>
 <tbody>
@@ -1289,6 +1290,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">warmed</td>
 <td align="left">KM10-B1</td>
 <td align="left">KM10B1</td>
+<td align="left">KM10B1</td>
 <td align="left">0</td>
 <td align="left">10:13:00</td>
 <td align="left">10:43:00</td>
@@ -1301,7 +1303,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">DRC5</td>
 <td align="right">3.7</td>
 <td align="right">1.171</td>
-<td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
@@ -1315,6 +1316,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">warmed</td>
 <td align="left">OTC-W1</td>
 <td align="left">W1</td>
+<td align="left">W1</td>
 <td align="left">0</td>
 <td align="left">11:53:00</td>
 <td align="left">12:26:00</td>
@@ -1327,7 +1329,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">CW2</td>
 <td align="right">8.6</td>
 <td align="right">1.258</td>
-<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
@@ -1341,6 +1342,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">warmed</td>
 <td align="left">OTC-A2-leaf</td>
 <td align="left">A2</td>
+<td align="left">A2</td>
 <td align="left">0</td>
 <td align="left">12:50:00</td>
 <td align="left">13:20:00</td>
@@ -1353,7 +1355,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">.</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
@@ -1367,6 +1368,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">warmed</td>
 <td align="left">OTC-C3-leaf</td>
 <td align="left">C3</td>
+<td align="left">C3</td>
 <td align="left">0</td>
 <td align="left">13:08:00</td>
 <td align="left">13:41:00</td>
@@ -1379,7 +1381,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">CW2</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
@@ -1393,6 +1394,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">warmed</td>
 <td align="left">OTC-E1-leaf</td>
 <td align="left">E1</td>
+<td align="left">E1</td>
 <td align="left">0</td>
 <td align="left">09:42:00</td>
 <td align="left">10:12:00</td>
@@ -1405,7 +1407,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">CW2</td>
 <td align="right">6.1</td>
 <td align="right">1.191</td>
-<td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
@@ -1419,6 +1420,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">control</td>
 <td align="left">SC9</td>
 <td align="left">9</td>
+<td align="left">9</td>
 <td align="left">0</td>
 <td align="left">20:21:00</td>
 <td align="left">20:51:00</td>
@@ -1431,7 +1433,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">CW2</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">perc</td>
@@ -1445,6 +1446,7 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">NA</td>
 <td align="left">A79</td>
 <td align="left">A79</td>
+<td align="left">NA</td>
 <td align="left">nm</td>
 <td align="left">21:02:00</td>
 <td align="left">21:35:00</td>
@@ -1457,7 +1459,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">CW2</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="left">NA</td>
 </tr>
 </tbody>
 </table>
@@ -1570,14 +1571,14 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 </div>
 <div id="otc-soil-moisture" class="section level2">
 <h2>OTC soil moisture</h2>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), aes(x=paste(Year, Site, Date), y=SoilVWC, color=temp)) +
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), aes(x=paste(Year, Site, Date), y=SoilVWC, color=temp)) +
   geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   labs(title=&quot;Effects of OTCs on Soil Moisture at Plant&quot;,y=&quot;Soil Volumetric Water Content (%)&quot;,
        x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/soil-1.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;) %&gt;% 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;,Site != &quot;bb&quot;) %&gt;% 
          group_by(Year, Site, Date, temp) %&gt;% summarize(SoilVWC=mean(SoilVWC, na.rm=T)) %&gt;% 
          pivot_wider(names_from=temp, values_from=SoilVWC), 
        aes(x=control, y=warmed, color=Site, shape=factor(Year))) +
@@ -1597,7 +1598,7 @@ ggplot(sm.general, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
 </div>
 <div id="otc-actual-temperature" class="section level2">
 <h2>OTC actual temperature</h2>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_treatment, x=paste(Year, Site, temp), color=temp)) +
   facet_grid(cols=vars(DN), scales=&quot;free_x&quot;, space=&quot;free_x&quot;)+ 
   geom_boxplot(outlier.shape=NA)+ geom_point(alpha=0.2)+ 
@@ -1606,23 +1607,23 @@ ggplot(sm.general, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   labs(y=&quot;Mean hourly temperature (C)&quot;, x=(&quot;Year, site&quot;), color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/actualtemp-1.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed, x=mean_temp_C_control, color=DN))+
   geom_abline(slope=1, intercept=0)+ geom_smooth(se=F)+
   geom_text(aes(label=round(mean_temp_C_warmed-mean_temp_C_control)), alpha=0.2)+ theme_minimal() +
   labs(x= &quot;Mean temperature, controls (C)&quot;, y=&quot;Mean temperature, warmed (C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-2.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed-mean_temp_C_control, x=hour(Pump), color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
     labs(x= &quot;Time of day&quot;, y=&quot;Temperature difference (C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-3.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed-mean_temp_C_control, x=mean_temp_C_control, color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
       labs(x= &quot;Mean temperature, controls (C)&quot;, y=&quot;Temperature difference (C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-4.svg" width="768" /></p>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;), 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(x=hour(Pump), y=mean_temp_C_control, color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
   scale_x_continuous(n.breaks=20) +
@@ -1717,7 +1718,9 @@ ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,&quot
 <pre class="r"><code>vol &lt;- prune_sampletable(vol.all, chemsf, metadata)
 vol.leaf &lt;- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
 
-files_exclude &lt;- c(&quot;T196DAug16_09012018.qgd&quot;, &quot;A188DAug16_09012018.qgd&quot;, &quot;OTC_Z3_190805_8102019_24.qgd&quot;, &quot;T139_day_190725_862019_06.qgd&quot;, &quot;GNA_17_210716_7202021_18.qgd&quot;,&quot;Maxfield_27_210723_822021_03.qgd&quot;, #no filtered volatiles
+colnames(vol)[!colnames(vol) %in% shortnames]</code></pre>
+<pre><code>character(0)</code></pre>
+<pre class="r"><code>files_exclude &lt;- c(&quot;T196DAug16_09012018.qgd&quot;, &quot;A188DAug16_09012018.qgd&quot;, &quot;OTC_Z3_190805_8102019_24.qgd&quot;, &quot;T139_day_190725_862019_06.qgd&quot;, &quot;GNA_17_210716_7202021_18.qgd&quot;,&quot;Maxfield_27_210723_822021_03.qgd&quot;, #no filtered volatiles
                    &quot;SC_91_210715_8202021_10.qgd&quot;) #Artemisia leaves
 files_exclude_leaf &lt;- c(&quot;CWH1LeafJuly27_09022018.qgd&quot;,&quot;NatArea69leafrenamedJuly25_08312018.qgd&quot;, #lack leaf mass
                         &quot;T164_leaf_190731_882019_18.qgd&quot;,&quot;OTC_Z2_leaf_190805_8102019_23.qgd&quot;) #no filtered volatiles
@@ -1759,7 +1762,7 @@ ph  &lt;- pheatmap(as.matrix(t(vol))^(1/3),
          clustering_distance_cols=vegdist(vol, method = &quot;bray&quot;),
          clustering_callback = function(hc, ...){dendsort(hc, type=&quot;average&quot;)},
          scale=&quot;none&quot;, color=inferno(512),
-         annotation_col = data.frame(svf %&gt;% select(&quot;Year&quot;, &quot;PlantType&quot;, &quot;expt&quot;, &quot;Treat&quot;,&quot;DN&quot;), row.names=rownames(vol)), 
+         annotation_col = data.frame(svf %&gt;% select(&quot;Year&quot;, &quot;PlantType&quot;, &quot;expt&quot;, &quot;Treat&quot;,&quot;DN&quot;,&quot;Site&quot;), row.names=rownames(vol)), 
    fontsize = 10, border_color = NA, legend=F, annotation_legend=T, cutree_rows=6
 )</code></pre>
 <p><img src="plots/heatmap-1.png" width="1152" /></p>
@@ -1820,7 +1823,7 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
 <td align="left">day</td>
 <td align="left">2018</td>
 <td align="left">bb</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 <td align="right">13</td>
 <td align="right">13</td>
 </tr>
@@ -1907,9 +1910,8 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>#TODO CWu&#39;s Sample2 isn&#39;t always just the plant number, need to create a new plantid column
-svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, Site, coalesce(plantid, Sample2)) %&gt;% 
-  count(PlantType, DN, Year, Site, n)  %&gt;%  kable(caption=&quot;Sample size per plant&quot;)</code></pre>
+<pre class="r"><code>samplesperplant &lt;- svf %&gt;% filter(Expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp, Year, Site, PlantID)
+samplesperplant %&gt;% count(PlantType, DN, Year, Site, n) %&gt;% kable(caption=&quot;Sample size per plant&quot;)</code></pre>
 <table>
 <caption>Sample size per plant</caption>
 <thead>
@@ -1968,18 +1970,26 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="left">day</td>
 <td align="left">2021</td>
 <td align="left">GNA</td>
-<td align="right">26</td>
 <td align="right">1</td>
+<td align="right">16</td>
 </tr>
 <tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">2021</td>
 <td align="left">GNA</td>
-<td align="right">32</td>
-<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">18</td>
 </tr>
 <tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">GNA</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">2021</td>
@@ -1987,7 +1997,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="right">1</td>
 <td align="right">27</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">2021</td>
@@ -1995,7 +2005,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="right">2</td>
 <td align="right">24</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">2021</td>
@@ -2003,7 +2013,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="right">3</td>
 <td align="right">2</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">2019</td>
@@ -2011,21 +2021,29 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="right">1</td>
 <td align="right">21</td>
 </tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
 <tr class="even">
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">2021</td>
 <td align="left">SC</td>
-<td align="right">30</td>
-<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">28</td>
 </tr>
 <tr class="odd">
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">2021</td>
 <td align="left">SC</td>
-<td align="right">42</td>
-<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">ten</td>
@@ -2040,19 +2058,29 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
 <td align="left">night</td>
 <td align="left">2021</td>
 <td align="left">SC</td>
-<td align="right">28</td>
 <td align="right">1</td>
+<td align="right">19</td>
 </tr>
 <tr class="even">
 <td align="left">ten</td>
 <td align="left">night</td>
 <td align="left">2021</td>
 <td align="left">SC</td>
-<td align="right">39</td>
-<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">3</td>
+<td align="right">4</td>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>samplesperplant %&gt;% ggplot(aes(x=n)) + facet_grid(Site ~ Year) + geom_histogram(binwidth=1)</code></pre>
+<p><img src="plots/otc-1.svg" width="768" /></p>
 <pre class="r"><code>plot.otc &lt;- function(svf.otc, cap.terms=c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;), plot.chems=T) {
   vol.otc &lt;- vol[svf.otc$sample,]
   cap.formula &lt;- reformulate(cap.terms, response = &quot;sqrt(vol.otc)&quot;)
@@ -2078,6 +2106,7 @@ svf %&gt;% filter(expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp,Year, 
                                                     paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
   if(&quot;Site&quot; %in% cap.terms) legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]),
                                    unique(svf.otc$Site))
+  ordispider(cap.otc, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
   points(cap.otc, display=&quot;sites&quot;, col=c(tempcol)[svf.otc$temp], pch=c(1,19)[svf.otc$DN]) 
   text(cap.otc, display=&quot;cn&quot;)
   if(plot.chems) {
@@ -2102,7 +2131,7 @@ plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></p
   mutate(samples = map_int(meta, nrow),
          cap = map(meta, plot.otc),
          anova = map(cap, ~tidy(anova(.x, by=&quot;margin&quot;))))</code></pre>
-<p><img src="plots/otc_agg-1.svg" width="768" /><img src="plots/otc_agg-2.svg" width="768" /><img src="plots/otc_agg-3.svg" width="768" /><img src="plots/otc_agg-4.svg" width="768" /><img src="plots/otc_agg-5.svg" width="768" /></p>
+<p><img src="plots/otc_agg-1.svg" width="768" /><img src="plots/otc_agg-2.svg" width="768" /><img src="plots/otc_agg-3.svg" width="768" /><img src="plots/otc_agg-4.svg" width="768" /></p>
 <pre class="r"><code>cap.siteyr.agg %&gt;% select(-c(meta,cap)) %&gt;% unnest(anova) %&gt;% 
   filter(term!=&quot;Residual&quot;) %&gt;% select(-c(df, SumOfSqs,statistic)) %&gt;% 
   pivot_wider(names_from=term, values_from=p.value) %&gt;% 
@@ -2121,52 +2150,45 @@ plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></p
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">bb</td>
-<td align="left">2018</td>
-<td align="right">26</td>
-<td align="right">0.299</td>
-<td align="right">0.095</td>
-</tr>
-<tr class="even">
 <td align="left">GNA</td>
 <td align="left">2018</td>
 <td align="right">46</td>
 <td align="right">0.001</td>
-<td align="right">0.297</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="left">2019</td>
-<td align="right">15</td>
-<td align="right">0.344</td>
-<td align="right">0.405</td>
+<td align="right">0.275</td>
 </tr>
 <tr class="even">
 <td align="left">GNA</td>
-<td align="left">2021</td>
-<td align="right">58</td>
-<td align="right">0.051</td>
-<td align="right">0.116</td>
+<td align="left">2019</td>
+<td align="right">15</td>
+<td align="right">0.339</td>
+<td align="right">0.410</td>
 </tr>
 <tr class="odd">
+<td align="left">GNA</td>
+<td align="left">2021</td>
+<td align="right">58</td>
+<td align="right">0.062</td>
+<td align="right">0.126</td>
+</tr>
+<tr class="even">
 <td align="left">Maxfield</td>
 <td align="left">2021</td>
 <td align="right">81</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
+<td align="right">0.001</td>
+<td align="right">0.003</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="each-year" class="section level3">
-<h3>Each year</h3>
-<pre class="r"><code>cap.yr.agg &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;agg&quot;, year != &quot;2019&quot;) %&gt;% 
+<div id="both-sites" class="section level3">
+<h3>2021 both sites</h3>
+<pre class="r"><code>cap.yr.agg &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;agg&quot;, year == &quot;2021&quot;) %&gt;% 
   drop_na(mean_temp_C_treatment) %&gt;% 
   group_by(Year) %&gt;% summarize(meta = list(cur_data_all()), .groups = &quot;drop&quot;) %&gt;% 
   mutate(samples = map_int(meta, nrow),
          cap = map(meta, plot.otc, cap.terms=c(plot.terms, &quot;Site&quot;)),
          anova = map(cap, ~tidy(anova(.x, by=&quot;margin&quot;))))</code></pre>
-<p><img src="plots/otc_comb_year-1.svg" width="768" /><img src="plots/otc_comb_year-2.svg" width="768" /></p>
+<p><img src="plots/otc_comb_year-1.svg" width="768" /></p>
 <pre class="r"><code>cap.yr.agg %&gt;% select(-c(meta,cap)) %&gt;% unnest(anova) %&gt;% 
   filter(term!=&quot;Residual&quot;) %&gt;% select(-c(df, SumOfSqs,statistic)) %&gt;% 
   pivot_wider(names_from=term, values_from=p.value) %&gt;% 
@@ -2185,18 +2207,11 @@ plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></p
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">2018</td>
-<td align="right">72</td>
-<td align="right">0.001</td>
-<td align="right">0.494</td>
-<td align="right">0.184</td>
-</tr>
-<tr class="even">
 <td align="left">2021</td>
 <td align="right">139</td>
-<td align="right">0.157</td>
-<td align="right">0.019</td>
-<td align="right">0.091</td>
+<td align="right">0.141</td>
+<td align="right">0.021</td>
+<td align="right">0.071</td>
 </tr>
 </tbody>
 </table>
@@ -2211,21 +2226,21 @@ mean_temp_C_treatment + Year * mean_temp_C_treatment + temp, data =
 svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          50.3741     1.0000     
-Constrained     9.2333     0.1833   10
-Unconstrained  56.6983     1.1255   73
-Imaginary     -15.5575    -0.3088  152
+Total          44.4385     1.0000     
+Constrained     7.7755     0.1750    8
+Unconstrained  49.6430     1.1171   68
+Imaginary     -12.9800    -0.2921  131
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
- CAP1  CAP2  CAP3  CAP4  CAP5  CAP6  CAP7  CAP8  CAP9 CAP10 
-4.938 1.553 0.900 0.484 0.428 0.259 0.219 0.172 0.167 0.112 
+ CAP1  CAP2  CAP3  CAP4  CAP5  CAP6  CAP7  CAP8 
+4.138 1.434 0.852 0.420 0.360 0.224 0.176 0.171 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-8.371 5.079 4.520 3.686 2.883 2.748 2.329 2.169 
-(Showing 8 of 73 unconstrained eigenvalues)</code></pre>
+7.619 4.755 4.091 3.433 2.575 2.335 2.092 1.944 
+(Showing 8 of 68 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
 Terms added sequentially (first to last)
@@ -2233,14 +2248,14 @@ Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + Site * mean_temp_C_treatment + Year * mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
-                            Df SumOfSqs       F Pr(&gt;F)    
-Year                         2    5.310 10.0673  0.001 ***
-Site                         2    1.240  2.3503  0.002 ** 
-mean_temp_C_treatment        1    0.888  3.3667  0.001 ***
-temp                         1    0.502  1.9031  0.019 *  
-Site:mean_temp_C_treatment   2    0.701  1.3284  0.089 .  
-Year:mean_temp_C_treatment   2    0.594  1.1254  0.290    
-Residual                   215   56.698                   
+                            Df SumOfSqs      F Pr(&gt;F)    
+Year                         2    4.582 8.8151  0.001 ***
+Site                         1    0.907 3.4913  0.001 ***
+mean_temp_C_treatment        1    0.719 2.7662  0.001 ***
+temp                         1    0.501 1.9272  0.022 *  
+Site:mean_temp_C_treatment   1    0.482 1.8545  0.028 *  
+Year:mean_temp_C_treatment   2    0.584 1.1233  0.270    
+Residual                   191   49.643                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -2257,6 +2272,7 @@ legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,
 legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_comb_temp-1.svg" width="768" /></p>
@@ -2264,7 +2280,7 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 </div>
 <div id="cap-of-i.-tenuituba" class="section level2">
 <h2>CAP of <em>I. tenuituba</em></h2>
-<div id="each-year-1" class="section level3">
+<div id="each-year" class="section level3">
 <h3>Each year</h3>
 <pre class="r"><code>cap.yr.ten &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, PlantType==&quot;ten&quot;) %&gt;% 
   group_by(Year) %&gt;% summarize(meta = list(cur_data_all()), .groups = &quot;drop&quot;) %&gt;% 
@@ -2292,16 +2308,16 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <tr class="odd">
 <td align="left">2019</td>
 <td align="right">38</td>
-<td align="right">0.298</td>
-<td align="right">0.530</td>
+<td align="right">0.315</td>
+<td align="right">0.548</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="even">
 <td align="left">2021</td>
 <td align="right">139</td>
 <td align="right">0.001</td>
-<td align="right">0.468</td>
-<td align="right">0.841</td>
+<td align="right">0.433</td>
+<td align="right">0.858</td>
 </tr>
 </tbody>
 </table>
@@ -2338,10 +2354,10 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year * mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                            Df SumOfSqs      F Pr(&gt;F)   
-Year                        1   0.6216 2.6619  0.006 **
-mean_temp_C_treatment       1   0.2223 0.9522  0.488   
-temp                        1   0.1635 0.7002  0.781   
-Year:mean_temp_C_treatment  1   0.5598 2.3972  0.005 **
+Year                        1   0.6216 2.6619  0.005 **
+mean_temp_C_treatment       1   0.2223 0.9522  0.491   
+temp                        1   0.1635 0.7002  0.769   
+Year:mean_temp_C_treatment  1   0.5598 2.3972  0.006 **
 Residual                   88  20.5491                 
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
@@ -2358,6 +2374,7 @@ legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,ano
 legend(&quot;left&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_comb_temp_tenD-1.svg" width="768" /></p>
@@ -2395,8 +2412,8 @@ Number of permutations: 999
 Model: capscale(formula = sqrt(vol.otc) ~ Year * temp, data = svf.otc, distance = &quot;bray&quot;)
           Df SumOfSqs      F Pr(&gt;F)    
 Year       1   0.9144 5.3053  0.001 ***
-temp       1   0.2728 1.5829  0.083 .  
-Year:temp  1   0.3225 1.8715  0.047 *  
+temp       1   0.2728 1.5829  0.089 .  
+Year:temp  1   0.3225 1.8715  0.060 .  
 Residual  80  13.7880                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
@@ -2411,6 +2428,7 @@ legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,ano
 legend(&quot;left&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp), fill=tempcol)
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=tempcol[svf.otc$temp], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_comb_temp_tenN-1.svg" width="768" /></p>
@@ -2425,21 +2443,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          71.1122     1.0000     
-Constrained    10.7823     0.1516    7
-Unconstrained  84.9965     1.1952   92
-Imaginary     -24.6666    -0.3469  224
+Total          64.8473     1.0000     
+Constrained     9.2160     0.1421    6
+Unconstrained  77.5547     1.1960   88
+Imaginary     -21.9234    -0.3381  202
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
- CAP1  CAP2  CAP3  CAP4  CAP5  CAP6  CAP7 
-5.634 1.809 1.350 1.131 0.441 0.229 0.188 
+ CAP1  CAP2  CAP3  CAP4  CAP5  CAP6 
+4.519 1.775 1.357 1.026 0.348 0.190 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-12.249  7.912  5.930  4.498  4.401  4.067  3.094  2.945 
-(Showing 8 of 92 unconstrained eigenvalues)</code></pre>
+11.465  7.554  5.647  4.171  3.974  3.639  2.908  2.691 
+(Showing 8 of 88 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
 Terms added sequentially (first to last)
@@ -2447,12 +2465,12 @@ Permutation: free
 Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
-                       Df SumOfSqs       F Pr(&gt;F)    
-Year                    2    6.385 11.6812  0.001 ***
-Site                    3    3.072  3.7472  0.001 ***
-mean_temp_C_treatment   1    0.851  3.1134  0.001 ***
-temp                    1    0.474  1.7348  0.029 *  
-Residual              311   84.997                   
+                       Df SumOfSqs      F Pr(&gt;F)    
+Year                    2    5.329 9.8255  0.001 ***
+Site                    2    2.731 5.0347  0.001 ***
+mean_temp_C_treatment   1    0.687 2.5334  0.004 ** 
+temp                    1    0.470 1.7325  0.033 *  
+Residual              286   77.555                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -2469,6 +2487,7 @@ legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,
 legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_both_species-1.svg" width="768" /></p>
@@ -2615,7 +2634,7 @@ svf %&gt;% filter(expt==&quot;perc&quot;) %&gt;%  count(PlantType, DN, Temp,Year
     anova.cap &lt;- anova(cap.perc, by=&quot;margin&quot;)
     
     plot(cap.perc, type=&quot;n&quot;, xlim=range(cap.perc$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-    with(svf.perc, title(paste0(&quot;Percivals: I. &quot;, unique(PlantType),&quot; in &quot;, unique(Year), &quot;n =&quot;, nrow(svf.perc))))
+    with(svf.perc, title(paste0(&quot;Percivals: I. &quot;, unique(PlantType),&quot; in &quot;, unique(Year), &quot; n = &quot;, nrow(svf.perc))))
     #, &quot; (&quot;,round(100*summ.cap$constr.chi / summ.cap$tot.chi),&quot;% explained)&quot;)
     legend(&quot;topleft&quot;, title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;Temp&quot;,&quot;Pr(&gt;F)&quot;]), 
            levels(svf.perc$Temp), fill=Tempcol)
@@ -2623,6 +2642,7 @@ svf %&gt;% filter(expt==&quot;perc&quot;) %&gt;%  count(PlantType, DN, Temp,Year
            levels(svf.perc$DN), pch=c(1,19))
     if(plot.chems) text(cap.perc, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.perc$CCA$v[,1]^2 + cap.perc$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+    ordispider(cap.perc, with(svf.perc, paste(Year, Temp, Sample2)), col=&quot;grey80&quot;)
     points(cap.perc, display=&quot;sites&quot;, col=Tempcol[svf.perc$Temp], pch=c(1,19)[svf.perc$DN]) 
     text(cap.perc, display=&quot;cn&quot;)
     return(cap.perc)
@@ -2654,6 +2674,7 @@ class="section level2">
     legend(&quot;bottomleft&quot;, title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;Temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$Temp), fill=Tempcol)
   legend(&quot;bottomright&quot;, title=paste(&quot;Time&quot;,&quot;\nP =&quot;,anova.cap[&quot;DN&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$DN), fil=c(0,1))
   legend(&quot;topright&quot;, title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.perc$Year), pch=c(19,15))
+  ordispider(cap.perc.comb, with(svf.perc, paste(Year, Temp, Sample2)), col=&quot;grey80&quot;)
   points(cap.perc.comb, display=&quot;sites&quot;, col=Tempcol[svf.perc$Temp], pch=c(1,0,19,15)[factor(paste(svf.perc$DN, svf.perc$Year))]) 
   text(cap.perc.comb, display=&quot;cn&quot;)
   text(cap.perc.comb, display=&quot;species&quot;, cex=0.7, srt=45, col=ifelse(sqrt(cap.perc.comb$CCA$v[,1]^2 + cap.perc.comb$CCA$v[,2]^2)&gt;0.2, alpha(&quot;purple&quot;,1),alpha(&quot;purple&quot;,0)))

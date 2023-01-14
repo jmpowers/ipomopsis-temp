@@ -61,14 +61,14 @@
 <line x1='311.28' y1='502.56' x2='311.28' y2='59.04' style='stroke-width: 0.75; stroke-dasharray: 1.00,3.00;' />
 </g>
 <g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
-<text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>Percivals: I. agg in 2019n =20</text>
+<text x='302.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";'>Percivals: I. agg in 2019 n = 20</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NTQ1Ljc2fDU5LjA0fDUwMi41Ng==)'>
 <rect x='59.04' y='59.04' width='75.86' height='66.22' style='stroke-width: 0.75;' />
 <rect x='75.23' y='92.86' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #377EB8;' />
 <rect x='75.23' y='107.26' width='8.64' height='7.20' style='stroke-width: 0.75; fill: #E41A1C;' />
 <text x='96.97' y='67.66' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>Temperature </text>
-<text x='96.97' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.469</text>
+<text x='96.97' y='82.06' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";'>P = 0.466</text>
 <text x='94.67' y='100.83' style='font-size: 12.00px; font-family: "Arial";'>cool</text>
 <text x='94.67' y='115.23' style='font-size: 12.00px; font-family: "Arial";'>warm</text>
 <rect x='488.65' y='59.04' width='57.11' height='66.22' style='stroke-width: 0.75;' />
@@ -112,6 +112,24 @@
 <text transform='translate(307.58,275.37) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>2-methylundecane</text>
 <text transform='translate(312.91,281.30) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>2-phenylacetonitrile</text>
 <text transform='translate(311.41,279.04) rotate(-45)' text-anchor='middle' style='font-size: 8.40px;fill: none; font-family: "Arial";'>3-methylbutanal oxime</text>
+<line x1='331.30' y1='370.73' x2='272.14' y2='360.70' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='331.30' y1='370.73' x2='390.47' y2='380.76' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='340.56' y1='284.07' x2='283.92' y2='207.87' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='340.56' y1='284.07' x2='397.20' y2='360.26' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='299.91' y1='415.03' x2='213.60' y2='486.13' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='299.91' y1='415.03' x2='386.22' y2='343.92' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='278.05' y1='366.13' x2='183.53' y2='485.70' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='278.05' y1='366.13' x2='372.56' y2='246.56' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='370.70' y1='193.07' x2='351.23' y2='164.51' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='370.70' y1='193.07' x2='390.18' y2='221.63' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='322.53' y1='219.29' x2='259.08' y2='200.10' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='322.53' y1='219.29' x2='385.98' y2='238.49' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='334.62' y1='213.32' x2='279.67' y2='162.82' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='334.62' y1='213.32' x2='389.58' y2='263.83' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='314.17' y1='148.84' x2='247.16' y2='75.47' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='314.17' y1='148.84' x2='381.18' y2='222.22' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='302.05' y1='242.37' x2='227.64' y2='217.45' style='stroke-width: 0.75; stroke: #CCCCCC;' />
+<line x1='302.05' y1='242.37' x2='376.45' y2='267.29' style='stroke-width: 0.75; stroke: #CCCCCC;' />
 <circle cx='272.14' cy='360.70' r='2.70' style='stroke-width: 0.75; stroke: #377EB8;' />
 <circle cx='390.47' cy='380.76' r='2.70' style='stroke-width: 0.75; stroke: #377EB8; fill: #377EB8;' />
 <circle cx='351.23' cy='164.51' r='2.70' style='stroke-width: 0.75; stroke: #E41A1C;' />
