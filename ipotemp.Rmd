@@ -509,7 +509,11 @@ svf %>% filter(expt=="otc") %>% count(PlantType, DN, temp,Year, Site, is.na(mean
 
 samplesperplant <- svf %>% filter(Expt=="otc") %>% count(PlantType, DN, temp, Year, Site, PlantID)
 samplesperplant %>% count(PlantType, DN, Year, Site, n) %>% kable(caption="Sample size per plant")
-samplesperplant %>% ggplot(aes(x=n)) + facet_grid(Site ~ Year) + geom_histogram(binwidth=1)
+samplesperplant %>% ggplot(aes(x=n, fill=Site)) + facet_grid(Site ~ Year) + geom_histogram(binwidth=1) + 
+  stat_bin(aes(label=stat(count)), y=3, geom="text", binwidth=1) + guides(fill="none") + theme_minimal()
+
+ggplot(svf %>% filter(Expt=="otc"), aes(x=yday(date), fill=Site)) + 
+  geom_bar() + facet_wrap(vars(Year), ncol=1) + theme_minimal()
 
 plot.otc <- function(svf.otc, cap.terms=c("mean_temp_C_treatment", "temp"), plot.chems=T) {
   vol.otc <- vol[svf.otc$sample,]
