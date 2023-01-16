@@ -35,12 +35,20 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 ```
 
 ```{r read_data}
+# Load in all the Ipomopsis temperature experiment data
+# Includes census, phenology, floral and leaf traits, and seeds
+# census -------------------------------------------------------------------
+
 census.maxf <- read_csv("data/2021 Maxfield Rosettes - 2021OTCs.csv") %>% 
   mutate(across(c(plant, plot), as.character),
          temp=fct_relevel(fct_recode(temp,"warmed"="OTC"),"control"))
 
+#TODO look at survival and flowering from 2021 to 2022 (2021 Maxfield Rosettes - 2021.csv)
+
+# floral traits --------------------------------------------------------------
+
 morph <- bind_rows(GNA=read_csv("data/traits/GNA floral traits - 2021.csv", na="."),
-                SC=read_csv("data/traits/Spring Creek floral traits - 2021.csv", na="."), .id="site") %>% 
+                   SC=read_csv("data/traits/Spring Creek floral traits - 2021.csv", na="."), .id="site") %>% 
   rename(plantid = plant, temp = location, plotid=OTC) %>% drop_na(temp) %>% 
   mutate(temp=fct_relevel(fct_recode(temp,"warmed"="in", "control"="out"),"control")) %>% 
   bind_rows(read_csv("data/traits/2021 Maxfield Floral Traits - Morphology21.csv") %>% 
@@ -75,6 +83,8 @@ flrcol <- pivot_wider(flrcol.total,names_from=c("color","total"),values_from="va
   mutate(rep=as.integer(replace_na(rep, "0"))+1) %>% 
   left_join(census.maxf) %>% mutate(site="Maxfield", species="agg")
 
+# phenology ---------------------------------------------------------------
+
 phen.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>% 
   mutate(plot = as.character(plot), 
          plotid = paste0(plot, subplot),
@@ -90,14 +100,15 @@ phen.raw <- read_csv("data/traits/2021 Maxfield Phenology - 2021.csv")%>%
   mutate_if(is.character, as.factor) 
 
 #some plants were measured late, merge with the earlier date
-phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile()
 phen <- phen.raw %>% mutate(date=ymd(recode(as.character(date),
-                                             "2021-07-02"="2021-06-30", "2021-07-26"="2021-07-20")),
+                                            "2021-07-02"="2021-06-30", "2021-07-26"="2021-07-20")),
                             julian=yday(date)) %>% 
   complete(nesting(plantid, plotid, plot, subplot, snow, temp),nesting(julian, date), fill=list(open=0,buds=0)) %>% #add zeros to weeks the plant was not counted
   mutate(flowering = open + buds > 0,
          has_egg = eggs > 0, 
          site="Maxfield", species="agg", year=year(date))
+
+# seeds -------------------------------------------------------------------
 
 counts_19_20 <- c("seeds","fruits","fruits_split","aborts","fruits_fly_no_seeds","fruits_fly_with_seeds","seeds_fly","fruits_caterpillar","fruits_early_uncountable","flowers_buds","flowers_buds_collected_early","flowers_buds_collected_last")
 sds21.date <- read_csv("data/traits/2021 Maxfield Seeds - 2021.csv", skip=1) %>% 
@@ -144,8 +155,18 @@ sds <- sds21 %>%
     seeds_per_flower = seeds_est / flowers_est) %>% 
   filter(flowers_est > 0)#one plant "gone"
 
-sm <- read_csv("data/2019 & 2021 SC & GNA Soil Moisture - general.csv") %>% mutate(year=year(date))
-vt <- read_csv("data/volatiles/CWu_meta21.csv") %>% rename(date=Date, site=Site) %>% mutate(year=year(date))
+# soilmoisture ---------------------------------------------------------------
+
+sm <- bind_rows(read_csv("data/2019 & 2021 SC & GNA Soil Moisture - general.csv"),
+                read_csv("data/2021 Maxfield Soil Moisture - 2021.csv") %>% 
+                  mutate(temp = ifelse(location %in% c("OTCV","OTCO") | !is.na(OTC),"warmed", "control"),
+                         site="Maxfield"),
+                read_csv("data/2021 Maxfield Leaf Traits - 2021round1.csv") %>% 
+                  select(date=date_collected, plot, subplot, plant, temp, VWC, period=per_us) %>% 
+                  mutate(temp = ifelse(temp=="OTC", "warmed", "control"), site="Maxfield")) %>% 
+                  mutate(year=year(date))
+
+# meltdates ---------------------------------------------------------------
 
 # 2021 Maxfield HOBO threshold=10,000 lux
 # normal: plots
@@ -162,6 +183,9 @@ meltdates <- tibble::tribble( ~year, ~sun_date, # average light level melt day i
                               2019,      158, # threshold = 10,000 lux
                               2021,      121) %>% # Manually from lab drive: 2021 Maxfield Hobo overwinter
   mutate(site="Maxfield")
+
+
+# names --------------------------------------------------------------
 
 spnames <- c(agg="I. aggregata", ten="I. tenuituba")
 sitenames <- c(GNA="Gothic Natural Area",Maxfield="Maxfield Meadow",SC="Spring Creek")
@@ -197,8 +221,11 @@ traitnames <- set_names(c(
 timings <- bind_rows(
   meltdates=meltdates %>% rename(begin=sun_date) %>% mutate(end=begin),
   sm = sm %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
-  vt = vt %>% filter(Tissue=="flower", !is.na(site)) %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
-  mt = morph %>% drop_na(corolla_length) %>% group_by(site, year) %>% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
+  vt = read_csv("data/volatiles/CWu_meta21.csv") %>% rename(date=Date, site=Site) %>% mutate(year=year(date)) %>%
+    filter(Tissue=="flower", !is.na(site)) %>% group_by(site, year) %>% 
+    summarize(begin = min(yday(date)), end = max(yday(date))),
+  mt = morph %>% drop_na(corolla_length) %>% group_by(site, year) %>% 
+    summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
   nt = nectar %>% group_by(site, year) %>% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
   flrcol = data.frame(year=2021, site="Maxfield", begin=yday(ymd("2021-07-14")), end=yday(ymd("2021-07-26"))),
   ph = phen %>% drop_na(height_cm) %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
@@ -269,6 +296,16 @@ all.mean <- morph.mean %>% rename(n.morph=n) %>%
 traits.sd <- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %>% set_names(traits)
 ```
 
+# Soil moisture
+
+```{r soilmoisture}
+ggplot(sm, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
+  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90), legend.position="top") + 
+  scale_color_brewer(palette = "Set1", direction=-1)+
+  labs(y="Soil Volumetric Water Content (%)",
+       x="Year, site, date", color="Temperature")
+```
 
 # Trait correlations
 ```{r corr}
@@ -446,6 +483,11 @@ aggplot(flrspec.sum.zero, flrcol$temp, legend= T, main="Divided by sum")
 
 
 # Phenology and fly eggs
+
+```{r phenology_inventory}
+phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile()
+```
+
 
 ## Snowmelt effects
 

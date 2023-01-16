@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-13" />
+<meta name="date" content="2023-01-15" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-13</h4>
+<h4 class="date">2023-01-15</h4>
 
 </div>
 
@@ -392,7 +392,7 @@ otc &lt;- read_csv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - OTC2018_2
   rename(temp=OI) %&gt;% mutate(temp = recode(temp,&quot;in&quot;=&quot;warmed&quot;,&quot;out&quot;=&quot;control&quot;))
 
 sc21 &lt;- read_tsv(&quot;data/volatiles/2021 Spring Creek Volatiles - 2021.tsv&quot;) %&gt;% 
-   mutate(PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;ten&quot;))
+  mutate(PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;ten&quot;))
 gna21 &lt;- read_tsv(&quot;data/volatiles/2021 GNA Volatiles - 2021.tsv&quot;) %&gt;% 
   mutate(time=&quot;day&quot;, PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;agg&quot;))
 
@@ -437,9 +437,9 @@ GCMS_metadata1 &lt;- read_csv(&quot;data/volatiles/2021 Maxfield Volatiles - 202
             by=c(&quot;plotid&quot;,&quot;plant&quot;,&quot;plantid&quot;))
 
 max21.oldformat &lt;- bind_rows(
-left_join(maxfiles %&gt;% filter(vial %in% c(&quot;A&quot;,&quot;B&quot;)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;vial&quot;,&quot;date&quot;)),
-left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp; is.na(plantid)), GCMS_metadata1, by=c(&quot;vial&quot;,&quot;date&quot;)), #vial numbers only
-left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp;!is.na(plantid)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;date&quot;))) %&gt;%  #plantid
+  left_join(maxfiles %&gt;% filter(vial %in% c(&quot;A&quot;,&quot;B&quot;)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;vial&quot;,&quot;date&quot;)),
+  left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp; is.na(plantid)), GCMS_metadata1, by=c(&quot;vial&quot;,&quot;date&quot;)), #vial numbers only
+  left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp;!is.na(plantid)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;date&quot;))) %&gt;%  #plantid
   mutate(type=factor(ifelse(plant==&quot;air&quot;,&quot;ambient&quot;,&quot;floral&quot;)), 
          temp=factor(temp.y), snow=factor(snow),
          plantid= coalesce(plantid, plantid.y)) 
@@ -455,7 +455,7 @@ max21 &lt;- max21.oldformat %&gt;% #put in line with CWu metadata
          Tissue=recode(PlantType, &quot;agg&quot;=&quot;flower&quot;),
          Expt=&quot;otc&quot;,Site=&quot;Maxfield&quot;,DN=&quot;day&quot;,
          temp=recode(temp,&quot;OTC&quot;=&quot;warmed&quot;))
-  
+
 
 meta &lt;- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id=&quot;expt&quot;) %&gt;% 
   mutate_if(is.character, as.factor) %&gt;%
@@ -1587,14 +1587,6 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
   labs(x=&quot;Soil moisture, control (%VWC)&quot;, y=&quot;Soil moisture, warmed (%VWC)&quot;, shape=&quot;Year&quot;, 
        title=&quot;Effects of OTCs on Soil Moisture at Plant on Each Date&quot;)</code></pre>
 <p><img src="plots/soil-2.svg" width="768" /></p>
-<pre class="r"><code>sm.general &lt;- read_csv(&quot;data/2019 &amp; 2021 SC &amp; GNA Soil Moisture - general.csv&quot;)
-ggplot(sm.general, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
-  scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  labs(title=&quot;Effects of OTCs on Soil Moisture in Center&quot;,y=&quot;Soil Volumetric Water Content (%)&quot;,
-       x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
-<p><img src="plots/soil-3.svg" width="768" /></p>
 </div>
 <div id="otc-actual-temperature" class="section level2">
 <h2>OTC actual temperature</h2>
@@ -2079,8 +2071,12 @@ samplesperplant %&gt;% count(PlantType, DN, Year, Site, n) %&gt;% kable(caption=
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>samplesperplant %&gt;% ggplot(aes(x=n)) + facet_grid(Site ~ Year) + geom_histogram(binwidth=1)</code></pre>
+<pre class="r"><code>samplesperplant %&gt;% ggplot(aes(x=n, fill=Site)) + facet_grid(Site ~ Year) + geom_histogram(binwidth=1) + 
+  stat_bin(aes(label=stat(count)), y=3, geom=&quot;text&quot;, binwidth=1) + guides(fill=&quot;none&quot;) + theme_minimal()</code></pre>
 <p><img src="plots/otc-1.svg" width="768" /></p>
+<pre class="r"><code>ggplot(svf %&gt;% filter(Expt==&quot;otc&quot;), aes(x=yday(date), fill=Site)) + 
+  geom_bar() + facet_wrap(vars(Year), ncol=1) + theme_minimal()</code></pre>
+<p><img src="plots/otc-2.svg" width="768" /></p>
 <pre class="r"><code>plot.otc &lt;- function(svf.otc, cap.terms=c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;), plot.chems=T) {
   vol.otc &lt;- vol[svf.otc$sample,]
   cap.formula &lt;- reformulate(cap.terms, response = &quot;sqrt(vol.otc)&quot;)
@@ -2491,6 +2487,75 @@ ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&q
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
 text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p><img src="plots/otc_both_species-1.svg" width="768" /></p>
+</div>
+<div id="selection-gradients" class="section level2">
+<h2>Selection gradients</h2>
+<p>Following method of <a href="https://doi.org/10.1002/evl3.63">Chong
+et al. 2018</a> for reconstructing selection estimates from estimates of
+selection on PCs: Beta = E * A.</p>
+<pre class="r"><code># previously split the data before running PCA - now run PCA on the whole dataset
+
+# Run PCA on traits
+vols.PCA &lt;- vols.good.top %&gt;% mutate(across(everything(), ~ (.x-mean(.x, na.rm=T))/sd(.x, na.rm=T))) %&gt;% 
+  prcomp() 
+summary(vols.PCA) # PCs 1 - 5 explain 56% of the variation, 20 PCs total (20 top volatiles)
+vols.PCA.E &lt;- vols.PCA$rotation[,1:5] #min(4, ncol(vols.PCA$rotation))
+
+calculate_beta &lt;- function(E, slopes) {
+  data.frame(B = E %*% slopes$A,
+             SE = sqrt(E ^ 2 %*% slopes$SE ^ 2)) %&gt;% 
+    mutate(not_zero = abs(B) - SE &gt; 0) %&gt;% 
+    rownames_to_column(&quot;trait&quot;)
+}
+
+selection_pca &lt;- function(year, water=names(water_pal), snow=names(snow_pal), fitnesstrait = &quot;seeds_est&quot;) {
+  vols.std.PCA &lt;- volsmeta %&gt;% bind_cols(as.data.frame(vols.PCA$x)) %&gt;% 
+    filter(year == .env$year, water %in% .env$water, snow %in% .env$snow) %&gt;% 
+    left_join(mnps.plantyr.traits %&gt;% select(year, plotid, plant, all_of(fitnesstrait)), by=c(&quot;year&quot;, &quot;plotid&quot;, &quot;plant&quot;)) %&gt;% 
+    select(all_of(fitnesstrait), any_of(names(treatments)), starts_with(&quot;PC&quot;)) %&gt;% 
+    rename(&quot;fitness&quot; = fitnesstrait) %&gt;% 
+    group_by(year) %&gt;% mutate(relfitness = fitness/mean(fitness, na.rm=T), .keep=&quot;unused&quot;) %&gt;% ungroup %&gt;% 
+    drop_na(relfitness) %&gt;% 
+    select(where(~sum(is.na(.))==0))
+  
+  # Regress relative fitness on PCs
+  vols.PCA.regression &lt;- lm(relfitness ~ PC1 + PC2 + PC3 + PC4 + PC5, data = vols.std.PCA)
+  vols.PCA.slopes &lt;- tidy(vols.PCA.regression) %&gt;% filter(term != &quot;(Intercept)&quot;) %&gt;% rename(A=estimate, SE=std.error)
+  
+  # Convert selection gradients on PCs to gradients on traits
+  calculate_beta(vols.PCA.E, vols.PCA.slopes)
+}
+
+plot_beta &lt;- function(betas, colorby=&quot;year&quot;) {
+  bs &lt;- betas %&gt;% left_join(ipochems, by=c(&quot;trait&quot;=&quot;name&quot;)) %&gt;% 
+    mutate(trait = fct_reorder(trait, mean.floral))#order graph by mean emissions
+  if(colorby==&quot;water_snow&quot;)  bs &lt;- bs %&gt;%  mutate(water_snow = paste(water, snow))
+  ggplot(bs, aes(y=trait, x = B, xmin=B-SE, xmax=B+SE)) + 
+    geom_vline(xintercept=0)+ 
+    geom_pointrange(mapping=aes_string(color=colorby), position=position_dodge(width=0.5)) + 
+    labs(x = &quot;Selection gradient (beta) estimated from gradients on PCs&quot;, y = &quot;Trait&quot;,
+         color=list(year=&quot;Year&quot;, water=&quot;Precipitation&quot;, snow=&quot;Snowmelt&quot;, 
+                    water_snow = &quot;Precipitation and snowmelt&quot;)[[colorby]]) +
+    scale_color_manual(values=list(year=year_pal, water=water_pal, snow=snow_pal,
+                                   water_snow=water_snow_pal)[[colorby]]) +
+    theme_bw()
+}
+
+vols.beta.yr &lt;- expand_grid(year=unique(volsmeta$year), fitnesstrait=fitnesstraits)  %&gt;% 
+ mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
+plot_beta(vols.beta.yr)+ facet_wrap(vars(fitnesstrait), nrow=1, labeller=as_labeller(fitnessnames))
+
+vols.beta.water &lt;- expand_grid(year=unique(volsmeta$year), water=names(water_pal), fitnesstrait=fitnesstraits)  %&gt;% 
+ mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
+
+vols.beta.snow &lt;- expand_grid(year=unique(volsmeta$year), snow=names(snow_pal), fitnesstrait=fitnesstraits)  %&gt;% 
+ mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
+
+vols.beta.water.snow &lt;- expand_grid(year=unique(volsmeta$year), water=names(water_pal), snow=names(snow_pal),  fitnesstrait=fitnesstraits)  %&gt;% 
+  mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
+
+walk(fitnesstraits, ~print(plot_beta(filter(vols.beta.water.snow, fitnesstrait==.x), colorby=&quot;water_snow&quot;) + 
+                             facet_wrap(vars(year), nrow=1) + ggtitle(fitnessnames[.x])))</code></pre>
 </div>
 </div>
 <div id="percivals-warm-vs.-cool" class="section level1">
