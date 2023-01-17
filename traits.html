@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-15" />
+<meta name="date" content="2023-01-16" />
 
 <title>Ipomopsis temperature experiments: Floral traits</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 traits</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-15</h4>
+<h4 class="date">2023-01-16</h4>
 
 </div>
 
@@ -420,7 +420,6 @@ meltdates &lt;- tibble::tribble( ~year, ~sun_date, # average light level melt da
                               2021,      121) %&gt;% # Manually from lab drive: 2021 Maxfield Hobo overwinter
   mutate(site=&quot;Maxfield&quot;)
 
-
 # names --------------------------------------------------------------
 
 spnames &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)
@@ -453,6 +452,8 @@ traitnames &lt;- set_names(c(
 <h2>Timings</h2>
 <pre class="r"><code>timings &lt;- bind_rows(
   meltdates=meltdates %&gt;% rename(begin=sun_date) %&gt;% mutate(end=begin),
+  otc= read_csv(&quot;./data/CWu OTC Hobos - duration.csv&quot;) %&gt;% 
+    mutate(begin=yday(OTC_start)-1, end=yday(OTC_end)+1, .keep=&quot;unused&quot;), #start/end were trimmed 1 day 
   sm = sm %&gt;% group_by(site, year) %&gt;% summarize(begin = min(yday(date)), end = max(yday(date))),
   vt = read_csv(&quot;data/volatiles/CWu_meta21.csv&quot;) %&gt;% rename(date=Date, site=Site) %&gt;% mutate(year=year(date)) %&gt;%
     filter(Tissue==&quot;flower&quot;, !is.na(site)) %&gt;% group_by(site, year) %&gt;% 
@@ -465,7 +466,7 @@ traitnames &lt;- set_names(c(
   sds = sds21.date %&gt;% group_by(site, year) %&gt;% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)), 
   .id=&quot;variable&quot;) %&gt;% ungroup
 
-timings_labels &lt;- c(meltdates=&quot;Snowmelt&quot;, 
+timings_labels &lt;- c(meltdates=&quot;Snowmelt&quot;, otc=&quot;Open top chambers&quot;,
                    vt=&quot;Volatiles&quot;,
                    sm=&quot;Soil moisture&quot;,         ph=&quot;Fly eggs&quot;, #Inflorescence height
                    mt=&quot;Floral morphology&quot;,     nt=&quot;Nectar&quot;, 
@@ -473,24 +474,28 @@ timings_labels &lt;- c(meltdates=&quot;Snowmelt&quot;,
 
 timings %&gt;% mutate(range=paste(begin,end,sep=&quot; - &quot;), .keep=&quot;unused&quot;) %&gt;% 
   pivot_wider(names_from=year, values_from=range, names_sort=T)</code></pre>
-<pre><code># A tibble: 15 × 5
+<pre><code># A tibble: 19 × 5
    variable  site     `2018`    `2019`    `2021`   
    &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;    
  1 meltdates Maxfield 119 - 119 158 - 158 121 - 121
- 2 sm        GNA      &lt;NA&gt;      190 - 204 182 - 182
- 3 sm        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 201
- 4 sm        SC       &lt;NA&gt;      199 - 204 180 - 180
- 5 vt        bb       208 - 208 &lt;NA&gt;      &lt;NA&gt;     
- 6 vt        GNA      206 - 207 212 - 217 197 - 211
- 7 vt        Maxfield &lt;NA&gt;      &lt;NA&gt;      189 - 207
- 8 vt        SC       &lt;NA&gt;      214 - 214 194 - 209
- 9 mt        GNA      &lt;NA&gt;      &lt;NA&gt;      189 - 189
-10 mt        Maxfield &lt;NA&gt;      &lt;NA&gt;      183 - 207
-11 mt        SC       &lt;NA&gt;      &lt;NA&gt;      187 - 187
-12 nt        Maxfield &lt;NA&gt;      &lt;NA&gt;      188 - 195
-13 flrcol    Maxfield &lt;NA&gt;      &lt;NA&gt;      195 - 207
-14 ph        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 215
-15 sds       Maxfield &lt;NA&gt;      &lt;NA&gt;      207 - 239</code></pre>
+ 2 otc       Maxfield &lt;NA&gt;      &lt;NA&gt;      179 - 216
+ 3 otc       SC       &lt;NA&gt;      194 - 219 180 - 215
+ 4 otc       GNA      191 - 216 190 - 218 182 - 216
+ 5 otc       bb       191 - 216 &lt;NA&gt;      &lt;NA&gt;     
+ 6 sm        GNA      &lt;NA&gt;      190 - 204 182 - 182
+ 7 sm        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 201
+ 8 sm        SC       &lt;NA&gt;      199 - 204 180 - 180
+ 9 vt        bb       208 - 208 &lt;NA&gt;      &lt;NA&gt;     
+10 vt        GNA      206 - 207 212 - 217 197 - 211
+11 vt        Maxfield &lt;NA&gt;      &lt;NA&gt;      189 - 207
+12 vt        SC       &lt;NA&gt;      214 - 214 194 - 209
+13 mt        GNA      &lt;NA&gt;      &lt;NA&gt;      189 - 189
+14 mt        Maxfield &lt;NA&gt;      &lt;NA&gt;      183 - 207
+15 mt        SC       &lt;NA&gt;      &lt;NA&gt;      187 - 187
+16 nt        Maxfield &lt;NA&gt;      &lt;NA&gt;      188 - 195
+17 flrcol    Maxfield &lt;NA&gt;      &lt;NA&gt;      195 - 207
+18 ph        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 215
+19 sds       Maxfield &lt;NA&gt;      &lt;NA&gt;      207 - 239</code></pre>
 <pre class="r"><code>dodging &lt;- position_dodge2(width=1, reverse = T, preserve=&quot;single&quot;)
 timings %&gt;% filter(site!=&quot;bb&quot;) %&gt;% 
   mutate(variable=fct_reorder(variable, begin, na.rm=T, .desc=T), year=factor(year)) %&gt;% 
@@ -801,13 +806,14 @@ traits.sd &lt;- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %&gt;% set_nam
 </div>
 <div id="soil-moisture" class="section level1">
 <h1>Soil moisture</h1>
-<pre class="r"><code>ggplot(sm, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90), legend.position=&quot;top&quot;) + 
+<pre class="r"><code>ggplot(sm %&gt;% filter(date!=ymd(&quot;2021-06-23&quot;)), #before Maxfield OTCs started
+       aes(x=paste(year(date), site,format(date, &quot;%m-%d&quot;)), y=VWC, color=temp)) +
+  geom_boxplot(outlier.size = 0.5)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90, hjust=0), legend.position=&quot;top&quot;, 
+                          axis.title.x = element_blank()) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  labs(y=&quot;Soil Volumetric Water Content (%)&quot;,
-       x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
-<p><img src="plots-traits/soilmoisture-1.svg" width="480" /></p>
+  labs(y=&quot;Soil Volumetric Water Content (%)&quot;, x=&quot;&quot;, color=&quot;Temperature&quot;)</code></pre>
+<p><img src="plots-traits/soilmoisture-1.svg" width="672" /></p>
 </div>
 <div id="trait-correlations" class="section level1">
 <h1>Trait correlations</h1>
@@ -1478,7 +1484,7 @@ Residual 64   4.0795              </code></pre>
 </div>
 <div id="phenology-and-fly-eggs" class="section level1">
 <h1>Phenology and fly eggs</h1>
-<pre class="r"><code>phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom_tile()</code></pre>
+<pre class="r"><code>phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd(&quot;2021-06-28&quot;))</code></pre>
 <p><img src="plots-traits/phenology_inventory-1.svg" width="480" /></p>
 <div id="snowmelt-effects" class="section level2">
 <h2>Snowmelt effects</h2>

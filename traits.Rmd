@@ -155,6 +155,8 @@ sds <- sds21 %>%
     seeds_per_flower = seeds_est / flowers_est) %>% 
   filter(flowers_est > 0)#one plant "gone"
 
+write.csv(sds, "data/2021_Maxfield_sds.csv")
+
 # soilmoisture ---------------------------------------------------------------
 
 sm <- bind_rows(read_csv("data/2019 & 2021 SC & GNA Soil Moisture - general.csv"),
@@ -183,7 +185,6 @@ meltdates <- tibble::tribble( ~year, ~sun_date, # average light level melt day i
                               2019,      158, # threshold = 10,000 lux
                               2021,      121) %>% # Manually from lab drive: 2021 Maxfield Hobo overwinter
   mutate(site="Maxfield")
-
 
 # names --------------------------------------------------------------
 
@@ -220,6 +221,8 @@ traitnames <- set_names(c(
 ```{r timings, fig.height=6}
 timings <- bind_rows(
   meltdates=meltdates %>% rename(begin=sun_date) %>% mutate(end=begin),
+  otc= read_csv("./data/CWu OTC Hobos - duration.csv") %>% 
+    mutate(begin=yday(OTC_start)-1, end=yday(OTC_end)+1, .keep="unused"), #start/end were trimmed 1 day 
   sm = sm %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
   vt = read_csv("data/volatiles/CWu_meta21.csv") %>% rename(date=Date, site=Site) %>% mutate(year=year(date)) %>%
     filter(Tissue=="flower", !is.na(site)) %>% group_by(site, year) %>% 
@@ -232,7 +235,7 @@ timings <- bind_rows(
   sds = sds21.date %>% group_by(site, year) %>% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)), 
   .id="variable") %>% ungroup
 
-timings_labels <- c(meltdates="Snowmelt", 
+timings_labels <- c(meltdates="Snowmelt", otc="Open top chambers",
                    vt="Volatiles",
                    sm="Soil moisture",         ph="Fly eggs", #Inflorescence height
                    mt="Floral morphology",     nt="Nectar", 
@@ -298,13 +301,14 @@ traits.sd <- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %>% set_names(tra
 
 # Soil moisture
 
-```{r soilmoisture}
-ggplot(sm, aes(x=paste(year(date), site,date), y=VWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90), legend.position="top") + 
+```{r soilmoisture, fig.width=7}
+ggplot(sm %>% filter(date!=ymd("2021-06-23")), #before Maxfield OTCs started
+       aes(x=paste(year(date), site,format(date, "%m-%d")), y=VWC, color=temp)) +
+  geom_boxplot(outlier.size = 0.5)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90, hjust=0), legend.position="top", 
+                          axis.title.x = element_blank()) + 
   scale_color_brewer(palette = "Set1", direction=-1)+
-  labs(y="Soil Volumetric Water Content (%)",
-       x="Year, site, date", color="Temperature")
+  labs(y="Soil Volumetric Water Content (%)", x="", color="Temperature")
 ```
 
 # Trait correlations
@@ -485,7 +489,7 @@ aggplot(flrspec.sum.zero, flrcol$temp, legend= T, main="Divided by sum")
 # Phenology and fly eggs
 
 ```{r phenology_inventory}
-phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile()
+phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd("2021-06-28"))
 ```
 
 
