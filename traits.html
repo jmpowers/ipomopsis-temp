@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-16" />
+<meta name="date" content="2023-01-17" />
 
 <title>Ipomopsis temperature experiments: Floral traits</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 traits</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-16</h4>
+<h4 class="date">2023-01-17</h4>
 
 </div>
 
@@ -390,6 +390,8 @@ sds &lt;- sds21 %&gt;%
     prop_nonaborted = fruits_nonaborted / (fruits_nonaborted + fruits_aborted),
     seeds_per_flower = seeds_est / flowers_est) %&gt;% 
   filter(flowers_est &gt; 0)#one plant &quot;gone&quot;
+
+write.csv(sds, &quot;data/2021_Maxfield_sds.csv&quot;)
 
 # soilmoisture ---------------------------------------------------------------
 
@@ -792,7 +794,7 @@ morph.mean &lt;- morph %&gt;% drop_na(corolla_length) %&gt;%
 nectar.mean &lt;- nectar %&gt;% drop_na(nectar_volume) %&gt;% 
   group_by(species, site, temp, snow, plotid, plantid) %&gt;%
   summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
-phen.max &lt;- phen %&gt;% drop_na(height_cm, temp) %&gt;% 
+phen.max &lt;- phen %&gt;% drop_na(height_cm, temp) %&gt;% filter(date!=&quot;2021-06-23&quot;) %&gt;% #before OTCs
   group_by(species, site, temp, snow, plotid, plantid) %&gt;% 
   summarize(height_cm=max(height_cm, na.rm=T)) #use the maximum plant height instead of the mean across the year (deer browsing)
 flrcol.mean &lt;- flrcol %&gt;% drop_na(redness, temp) %&gt;% 
@@ -860,7 +862,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())</code></pre>
-<p><img src="plots-traits/plasticity-1.svg" width="720" /></p>
+<p><img src="plots-traits/plasticity-1.svg" width="864" /></p>
 <pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(seedtraits)) %&gt;% 
   filter(site==&quot;Maxfield&quot;) %&gt;% 
   drop_na(value) %&gt;% 
@@ -875,7 +877,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())</code></pre>
-<p><img src="plots-traits/plasticity-2.svg" width="720" /></p>
+<p><img src="plots-traits/plasticity-2.svg" width="864" /></p>
 </div>
 <div id="effect-of-snowmelt" class="section level1">
 <h1>Effect of snowmelt</h1>
@@ -1484,7 +1486,7 @@ Residual 64   4.0795              </code></pre>
 </div>
 <div id="phenology-and-fly-eggs" class="section level1">
 <h1>Phenology and fly eggs</h1>
-<pre class="r"><code>phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd(&quot;2021-06-28&quot;))</code></pre>
+<pre class="r"><code>phen.raw %&gt;% count(date, plantid) %&gt;% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd(&quot;2021-06-25&quot;))</code></pre>
 <p><img src="plots-traits/phenology_inventory-1.svg" width="480" /></p>
 <div id="snowmelt-effects" class="section level2">
 <h2>Snowmelt effects</h2>
@@ -1536,7 +1538,7 @@ Residual 64   4.0795              </code></pre>
 <pre class="r"><code>ggplot(phen %&gt;% drop_na(height_cm, temp), aes(x=julian, y=height_cm, color=temp))+ geom_point() + geom_path(aes(group=plantid))+
   labs(y=&quot;Plant height&quot;, x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+ 
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) +theme_minimal() </code></pre>
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) +theme_minimal() + geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
 <p><img src="plots-traits/phenology_temp-1.svg" width="480" /></p>
 <pre class="r"><code>phen %&gt;% drop_na(snow,temp) %&gt;% group_by(temp, julian) %&gt;% drop_na(open, buds) %&gt;% 
   summarize(openbuds.se = sd(open+buds)/sqrt(length(open+buds)), openbuds=mean(open+buds)) %&gt;% 
@@ -1545,9 +1547,9 @@ Residual 64   4.0795              </code></pre>
   labs(y=&quot;Mean total open flowers + elongated buds&quot;, 
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()</code></pre>
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()+ geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
 <p><img src="plots-traits/phenology_temp-2.svg" width="480" /></p>
-<pre class="r"><code>lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=phen.raw) %&gt;% anova %&gt;% kable(caption=&quot;mean open and buds&quot;)</code></pre>
+<pre class="r"><code>lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=filter(phen.raw, date!=&quot;2021-06-23&quot;)) %&gt;% anova %&gt;% kable(caption=&quot;mean open and buds&quot;)</code></pre>
 <table>
 <caption>mean open and buds</caption>
 <colgroup>
@@ -1573,30 +1575,30 @@ Residual 64   4.0795              </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">factor(date)</td>
-<td align="right">2848.83020</td>
-<td align="right">406.975742</td>
-<td align="right">7</td>
-<td align="right">224.28238</td>
-<td align="right">12.9854702</td>
+<td align="right">2748.08056</td>
+<td align="right">458.013427</td>
+<td align="right">6</td>
+<td align="right">201.44268</td>
+<td align="right">14.8305003</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
-<td align="right">43.85506</td>
-<td align="right">43.855061</td>
+<td align="right">37.96198</td>
+<td align="right">37.961981</td>
 <td align="right">1</td>
-<td align="right">73.28379</td>
-<td align="right">1.3992937</td>
-<td align="right">0.2406653</td>
+<td align="right">75.67022</td>
+<td align="right">1.2292111</td>
+<td align="right">0.2710719</td>
 </tr>
 <tr class="odd">
 <td align="left">factor(date):temp</td>
-<td align="right">56.98891</td>
-<td align="right">8.141273</td>
-<td align="right">7</td>
-<td align="right">224.28238</td>
-<td align="right">0.2597655</td>
-<td align="right">0.9685928</td>
+<td align="right">50.65027</td>
+<td align="right">8.441711</td>
+<td align="right">6</td>
+<td align="right">201.44268</td>
+<td align="right">0.2733431</td>
+<td align="right">0.9489477</td>
 </tr>
 </tbody>
 </table>
@@ -1616,14 +1618,14 @@ Residual 64   4.0795              </code></pre>
   labs(y=&quot;Mean total eggs&quot;, 
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() </code></pre>
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
 <p><img src="plots-traits/phenology_temp-4.svg" width="480" /></p>
-<pre class="r"><code>lmer(eggs ~ factor(date) * temp + (1|plantid), data=phen.raw) %&gt;% anova %&gt;% kable(caption=&quot;mean eggs&quot;)</code></pre>
-<table style="width:100%;">
+<pre class="r"><code>lmer(eggs ~ factor(date) * temp + (1|plantid), data=filter(phen.raw, date!=&quot;2021-06-23&quot;)) %&gt;% anova %&gt;% kable(caption=&quot;mean eggs&quot;)</code></pre>
+<table>
 <caption>mean eggs</caption>
 <colgroup>
 <col width="24%" />
-<col width="14%" />
+<col width="13%" />
 <col width="13%" />
 <col width="8%" />
 <col width="13%" />
@@ -1644,30 +1646,30 @@ Residual 64   4.0795              </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">factor(date)</td>
-<td align="right">427.829051</td>
-<td align="right">61.118436</td>
-<td align="right">7</td>
-<td align="right">227.55950</td>
-<td align="right">21.799580</td>
+<td align="right">186.95499</td>
+<td align="right">31.159165</td>
+<td align="right">6</td>
+<td align="right">205.83789</td>
+<td align="right">16.139282</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
-<td align="right">9.945029</td>
-<td align="right">9.945029</td>
+<td align="right">15.06743</td>
+<td align="right">15.067433</td>
 <td align="right">1</td>
-<td align="right">75.14566</td>
-<td align="right">3.547169</td>
-<td align="right">0.0635165</td>
+<td align="right">77.15736</td>
+<td align="right">7.804367</td>
+<td align="right">0.0065705</td>
 </tr>
 <tr class="odd">
 <td align="left">factor(date):temp</td>
-<td align="right">48.299698</td>
-<td align="right">6.899957</td>
-<td align="right">7</td>
-<td align="right">227.55950</td>
-<td align="right">2.461060</td>
-<td align="right">0.0188211</td>
+<td align="right">43.22882</td>
+<td align="right">7.204803</td>
+<td align="right">6</td>
+<td align="right">205.83789</td>
+<td align="right">3.731818</td>
+<td align="right">0.0015168</td>
 </tr>
 </tbody>
 </table>
@@ -1678,7 +1680,7 @@ Residual 64   4.0795              </code></pre>
        x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_y_continuous(labels = scales::percent)+
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() </code></pre>
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
 <p><img src="plots-traits/phenology_temp-5.svg" width="480" /></p>
 </div>
 </div>
@@ -1686,18 +1688,18 @@ Residual 64   4.0795              </code></pre>
 <h1>Selection</h1>
 <div id="seed-production" class="section level2">
 <h2>Seed production</h2>
-<pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;seeds_est&quot;))) %&gt;% 
+<pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;seeds_per_flower&quot;))) %&gt;% 
   pivot_longer(any_of(floraltraits), names_to=&quot;trait&quot;) %&gt;% 
-  ggplot(aes(x=value, y=seeds_est, color=temp)) + geom_point() + geom_smooth(method=&quot;lm&quot;,se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
+  ggplot(aes(x=value, y=seeds_per_flower, color=temp)) + geom_point() + geom_smooth(method=&quot;lm&quot;,se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
   facet_wrap(vars(trait), scales=&quot;free_x&quot;, labeller=as_labeller(traitnames.units)) + 
-  labs(x=&quot;Trait&quot;, y=traitnames[&quot;seeds_est&quot;], color=&quot;Temperature&quot;)+
+  labs(x=&quot;Trait&quot;, y=traitnames[&quot;seeds_per_flower&quot;], color=&quot;Temperature&quot;)+
   theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="plots-traits/selection-1.svg" width="672" /></p>
 <pre class="r"><code>#get the the standardized selection differential S&#39; (change in relative fitness / standardized trait value)
 mt.mod.seeds &lt;- map(set_names(floraltraits), 
                     ~ lm(seeds_rel ~ trait.z * temp, 
                          data=all.mean %&gt;% as.data.frame() %&gt;% mutate(trait.z = all.mean[[.x]] / traits.sd[[.x]]) %&gt;% 
-                           group_by(temp) %&gt;% mutate(seeds_rel = seeds_est/mean(seeds_est, na.rm=T)))) # mean seeds in each temp
+                           group_by(temp) %&gt;% mutate(seeds_rel = seeds_per_flower/mean(seeds_per_flower, na.rm=T)))) # mean seeds in each temp
 mt.mod.seeds.coefs &lt;- map_dfr(mt.mod.seeds, tidy, .id=&quot;trait&quot;)
 mt.mod.seeds.tests &lt;- map(mt.mod.seeds, car::Anova, type=3) %&gt;% map_dfr(tidy, .id=&quot;trait&quot;)
 mt.mod.seeds.emm &lt;- map_dfr(mt.mod.seeds, ~summary(emtrends(.x, ~temp, var=&quot;trait.z&quot;)), .id=&quot;trait&quot;)
@@ -1718,153 +1720,153 @@ mt.mod.seeds.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Resi
 <tr class="odd">
 <td align="left">corolla_length</td>
 <td align="left">trait.z</td>
-<td align="right">1.248</td>
+<td align="right">0.426</td>
 <td align="right">1</td>
-<td align="right">2.156</td>
-<td align="right">0.149</td>
+<td align="right">1.333</td>
+<td align="right">0.254</td>
 </tr>
 <tr class="even">
 <td align="left">corolla_length</td>
 <td align="left">temp</td>
-<td align="right">0.391</td>
+<td align="right">0.196</td>
 <td align="right">1</td>
-<td align="right">0.676</td>
-<td align="right">0.415</td>
+<td align="right">0.613</td>
+<td align="right">0.438</td>
 </tr>
 <tr class="odd">
 <td align="left">corolla_length</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.349</td>
+<td align="right">0.210</td>
 <td align="right">1</td>
-<td align="right">0.603</td>
-<td align="right">0.441</td>
+<td align="right">0.658</td>
+<td align="right">0.422</td>
 </tr>
 <tr class="even">
 <td align="left">corolla_width</td>
 <td align="left">trait.z</td>
-<td align="right">0.041</td>
+<td align="right">0.095</td>
 <td align="right">1</td>
-<td align="right">0.065</td>
-<td align="right">0.800</td>
+<td align="right">0.334</td>
+<td align="right">0.566</td>
 </tr>
 <tr class="odd">
 <td align="left">corolla_width</td>
 <td align="left">temp</td>
-<td align="right">0.707</td>
+<td align="right">0.410</td>
 <td align="right">1</td>
-<td align="right">1.113</td>
-<td align="right">0.298</td>
+<td align="right">1.441</td>
+<td align="right">0.237</td>
 </tr>
 <tr class="even">
 <td align="left">corolla_width</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.751</td>
+<td align="right">0.382</td>
 <td align="right">1</td>
-<td align="right">1.182</td>
-<td align="right">0.283</td>
+<td align="right">1.342</td>
+<td align="right">0.253</td>
 </tr>
 <tr class="odd">
 <td align="left">nectar_volume</td>
 <td align="left">trait.z</td>
-<td align="right">0.018</td>
+<td align="right">0.020</td>
 <td align="right">1</td>
-<td align="right">0.028</td>
-<td align="right">0.868</td>
+<td align="right">0.080</td>
+<td align="right">0.779</td>
 </tr>
 <tr class="even">
 <td align="left">nectar_volume</td>
 <td align="left">temp</td>
-<td align="right">0.192</td>
+<td align="right">0.122</td>
 <td align="right">1</td>
-<td align="right">0.304</td>
-<td align="right">0.584</td>
+<td align="right">0.488</td>
+<td align="right">0.489</td>
 </tr>
 <tr class="odd">
 <td align="left">nectar_volume</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.064</td>
+<td align="right">0.159</td>
 <td align="right">1</td>
-<td align="right">0.102</td>
-<td align="right">0.752</td>
+<td align="right">0.633</td>
+<td align="right">0.431</td>
 </tr>
 <tr class="even">
 <td align="left">nectar_conc</td>
 <td align="left">trait.z</td>
-<td align="right">0.018</td>
+<td align="right">0.130</td>
 <td align="right">1</td>
-<td align="right">0.029</td>
-<td align="right">0.866</td>
+<td align="right">0.570</td>
+<td align="right">0.455</td>
 </tr>
 <tr class="odd">
 <td align="left">nectar_conc</td>
 <td align="left">temp</td>
-<td align="right">0.179</td>
+<td align="right">0.377</td>
 <td align="right">1</td>
-<td align="right">0.292</td>
-<td align="right">0.592</td>
+<td align="right">1.649</td>
+<td align="right">0.207</td>
 </tr>
 <tr class="even">
 <td align="left">nectar_conc</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.139</td>
+<td align="right">0.390</td>
 <td align="right">1</td>
-<td align="right">0.227</td>
-<td align="right">0.637</td>
+<td align="right">1.709</td>
+<td align="right">0.199</td>
 </tr>
 <tr class="odd">
 <td align="left">height_cm</td>
 <td align="left">trait.z</td>
-<td align="right">4.370</td>
+<td align="right">0.182</td>
 <td align="right">1</td>
-<td align="right">10.857</td>
-<td align="right">0.002</td>
+<td align="right">0.643</td>
+<td align="right">0.427</td>
 </tr>
 <tr class="even">
 <td align="left">height_cm</td>
 <td align="left">temp</td>
-<td align="right">0.289</td>
+<td align="right">0.488</td>
 <td align="right">1</td>
-<td align="right">0.718</td>
-<td align="right">0.401</td>
+<td align="right">1.724</td>
+<td align="right">0.196</td>
 </tr>
 <tr class="odd">
 <td align="left">height_cm</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.359</td>
+<td align="right">0.530</td>
 <td align="right">1</td>
-<td align="right">0.891</td>
-<td align="right">0.350</td>
+<td align="right">1.871</td>
+<td align="right">0.178</td>
 </tr>
 <tr class="even">
 <td align="left">redness</td>
 <td align="left">trait.z</td>
-<td align="right">0.001</td>
+<td align="right">0.074</td>
 <td align="right">1</td>
-<td align="right">0.002</td>
-<td align="right">0.964</td>
+<td align="right">0.296</td>
+<td align="right">0.590</td>
 </tr>
 <tr class="odd">
 <td align="left">redness</td>
 <td align="left">temp</td>
-<td align="right">0.000</td>
+<td align="right">0.378</td>
 <td align="right">1</td>
-<td align="right">0.000</td>
-<td align="right">0.993</td>
+<td align="right">1.519</td>
+<td align="right">0.225</td>
 </tr>
 <tr class="even">
 <td align="left">redness</td>
 <td align="left">trait.z:temp</td>
-<td align="right">0.000</td>
+<td align="right">0.361</td>
 <td align="right">1</td>
-<td align="right">0.000</td>
-<td align="right">0.999</td>
+<td align="right">1.450</td>
+<td align="right">0.236</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code>ggplot(mt.mod.seeds.emm, aes(x=trait, color=temp, y=trait.z.trend, ymin=trait.z.trend-SE, ymax=trait.z.trend+SE)) + 
   geom_hline(yintercept=0)+ geom_pointrange(position=position_dodge(width=0.3)) + 
    theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;) + 
-  labs(x=&quot;&quot;, y=&quot;Standardized selection differential, total seeds&quot;, color=&quot;Temperature&quot;) +
+  labs(x=&quot;&quot;, y=&quot;Standardized selection differential, seeds per flower&quot;, color=&quot;Temperature&quot;) +
   scale_x_discrete(labels=traitnames)</code></pre>
 <p><img src="plots-traits/selection-2.svg" width="672" /></p>
 </div>

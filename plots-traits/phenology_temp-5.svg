@@ -54,6 +54,7 @@
 <circle cx='260.71' cy='313.35' r='1.95' style='stroke-width: 0.71; stroke: #E41A1C; fill: #E41A1C;' />
 <polyline points='53.50,65.25 88.88,90.06 124.25,179.89 159.63,281.10 189.95,291.11 260.71,313.35 ' style='stroke-width: 1.07; stroke: #377EB8; stroke-linecap: butt;' />
 <polyline points='53.50,20.14 88.88,181.95 124.25,276.14 159.63,302.23 189.95,313.35 260.71,313.35 ' style='stroke-width: 1.07; stroke: #E41A1C; stroke-linecap: butt;' />
+<line x1='63.61' y1='328.01' x2='63.61' y2='5.48' style='stroke-width: 1.07; stroke-linecap: butt;' />
 </g>
 <g clip-path='url(#cpMC4wMHwzNjAuMDB8MC4wMHwzNjAuMDA=)'>
 <text x='38.21' y='316.56' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";'>0%</text>

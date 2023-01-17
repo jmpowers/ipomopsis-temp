@@ -287,7 +287,7 @@ morph.mean <- morph %>% drop_na(corolla_length) %>%
 nectar.mean <- nectar %>% drop_na(nectar_volume) %>% 
   group_by(species, site, temp, snow, plotid, plantid) %>%
   summarize(across(c(nectar_volume, nectar_conc, nectar_sugar), mean, na.rm=T), n = n())
-phen.max <- phen %>% drop_na(height_cm, temp) %>% 
+phen.max <- phen %>% drop_na(height_cm, temp) %>% filter(date!="2021-06-23") %>% #before OTCs
   group_by(species, site, temp, snow, plotid, plantid) %>% 
   summarize(height_cm=max(height_cm, na.rm=T)) #use the maximum plant height instead of the mean across the year (deer browsing)
 flrcol.mean <- flrcol %>% drop_na(redness, temp) %>% 
@@ -342,7 +342,7 @@ ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[si
         panel.grid.major.x = element_blank())
 ```
 
-```{r plasticity, fig.width=7.5}
+```{r plasticity, fig.width=9, fig.height=7}
 all.mean %>% pivot_longer(any_of(floraltraits[-c(1:2)])) %>% 
   filter(site=="Maxfield") %>% 
   drop_na(value) %>% 
@@ -489,7 +489,7 @@ aggplot(flrspec.sum.zero, flrcol$temp, legend= T, main="Divided by sum")
 # Phenology and fly eggs
 
 ```{r phenology_inventory}
-phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd("2021-06-28"))
+phen.raw %>% count(date, plantid) %>% ggplot(aes(x=date, y=plantid))+ geom_tile() + geom_vline(xintercept=ymd("2021-06-25"))
 ```
 
 
@@ -545,7 +545,7 @@ phen%>% drop_na(snow,temp) %>% group_by(year, snow, temp, julian) %>% summarize_
 ggplot(phen %>% drop_na(height_cm, temp), aes(x=julian, y=height_cm, color=temp))+ geom_point() + geom_path(aes(group=plantid))+
   labs(y="Plant height", x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+ 
-  scale_color_brewer(palette="Set1", direction=-1) +theme_minimal() 
+  scale_color_brewer(palette="Set1", direction=-1) +theme_minimal() + geom_vline(xintercept=yday(ymd("2021-06-25")))
 
 phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% drop_na(open, buds) %>% 
   summarize(openbuds.se = sd(open+buds)/sqrt(length(open+buds)), openbuds=mean(open+buds)) %>% 
@@ -554,8 +554,8 @@ phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% drop_na(open, buds) %
   labs(y="Mean total open flowers + elongated buds", 
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()
-lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=phen.raw) %>% anova %>% kable(caption="mean open and buds")
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()+ geom_vline(xintercept=yday(ymd("2021-06-25")))
+lmer(I(open+buds) ~ factor(date) * temp + (1|plantid), data=filter(phen.raw, date!="2021-06-23")) %>% anova %>% kable(caption="mean open and buds")
 
 phen %>% drop_na(temp)%>% group_by(temp, julian) %>% summarize_at("flowering", mean, na.rm=T) %>% 
   ggplot(aes(x=julian, y=flowering, color=temp))+ geom_point() + 
@@ -573,8 +573,8 @@ phen %>% drop_na(temp) %>% group_by(temp, julian) %>% drop_na(eggs) %>%
   labs(y="Mean total eggs", 
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() 
-lmer(eggs ~ factor(date) * temp + (1|plantid), data=phen.raw) %>% anova %>% kable(caption="mean eggs")
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd("2021-06-25")))
+lmer(eggs ~ factor(date) * temp + (1|plantid), data=filter(phen.raw, date!="2021-06-23")) %>% anova %>% kable(caption="mean eggs")
 
 phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_egg", mean, na.rm=T) %>% 
   ggplot(aes(x=julian, y=has_egg, color=temp))+ geom_point() + 
@@ -583,7 +583,7 @@ phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_eg
        x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_y_continuous(labels = scales::percent)+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() 
+  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd("2021-06-25")))
 ```
 
 # Selection
@@ -591,18 +591,18 @@ phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_eg
 ##  Seed production
 
 ```{r selection, fig.width=7, fig.height=7}
-all.mean %>% select(all_of(c(floraltraits, "seeds_est"))) %>% 
+all.mean %>% select(all_of(c(floraltraits, "seeds_per_flower"))) %>% 
   pivot_longer(any_of(floraltraits), names_to="trait") %>% 
-  ggplot(aes(x=value, y=seeds_est, color=temp)) + geom_point() + geom_smooth(method="lm",se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
+  ggplot(aes(x=value, y=seeds_per_flower, color=temp)) + geom_point() + geom_smooth(method="lm",se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
   facet_wrap(vars(trait), scales="free_x", labeller=as_labeller(traitnames.units)) + 
-  labs(x="Trait", y=traitnames["seeds_est"], color="Temperature")+
+  labs(x="Trait", y=traitnames["seeds_per_flower"], color="Temperature")+
   theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top")
 
 #get the the standardized selection differential S' (change in relative fitness / standardized trait value)
 mt.mod.seeds <- map(set_names(floraltraits), 
                     ~ lm(seeds_rel ~ trait.z * temp, 
                          data=all.mean %>% as.data.frame() %>% mutate(trait.z = all.mean[[.x]] / traits.sd[[.x]]) %>% 
-                           group_by(temp) %>% mutate(seeds_rel = seeds_est/mean(seeds_est, na.rm=T)))) # mean seeds in each temp
+                           group_by(temp) %>% mutate(seeds_rel = seeds_per_flower/mean(seeds_per_flower, na.rm=T)))) # mean seeds in each temp
 mt.mod.seeds.coefs <- map_dfr(mt.mod.seeds, tidy, .id="trait")
 mt.mod.seeds.tests <- map(mt.mod.seeds, car::Anova, type=3) %>% map_dfr(tidy, .id="trait")
 mt.mod.seeds.emm <- map_dfr(mt.mod.seeds, ~summary(emtrends(.x, ~temp, var="trait.z")), .id="trait")
@@ -610,7 +610,7 @@ mt.mod.seeds.tests %>% filter(!term %in% c("(Intercept)","Residuals")) %>% kable
 ggplot(mt.mod.seeds.emm, aes(x=trait, color=temp, y=trait.z.trend, ymin=trait.z.trend-SE, ymax=trait.z.trend+SE)) + 
   geom_hline(yintercept=0)+ geom_pointrange(position=position_dodge(width=0.3)) + 
    theme_bw() + scale_color_brewer(palette="Set1", direction=-1) + theme(legend.position = "top") + 
-  labs(x="", y="Standardized selection differential, total seeds", color="Temperature") +
+  labs(x="", y="Standardized selection differential, seeds per flower", color="Temperature") +
   scale_x_discrete(labels=traitnames)
 ```
 

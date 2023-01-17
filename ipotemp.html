@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-16" />
+<meta name="date" content="2023-01-17" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-16</h4>
+<h4 class="date">2023-01-17</h4>
 
 </div>
 
@@ -1571,12 +1571,13 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 </div>
 <div id="otc-soil-moisture" class="section level2">
 <h2>OTC soil moisture</h2>
-<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), aes(x=paste(Year, Site, Date), y=SoilVWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
+<pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
+       aes(x=paste(Year, Site, format(Date, &quot;%m-%d&quot;)), y=SoilVWC, color=temp)) +
+  geom_boxplot(outlier.size=0.5)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90, hjust=0), legend.position=&quot;top&quot;, 
+                          axis.title.x = element_blank()) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  labs(title=&quot;Effects of OTCs on Soil Moisture at Plant&quot;,y=&quot;Soil Volumetric Water Content (%)&quot;,
-       x=&quot;Year, site, date&quot;, color=&quot;Temperature&quot;)</code></pre>
+  labs(y=&quot;Soil Volumetric Water Content (%)&quot;, x=&quot;&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/soil-1.svg" width="768" /></p>
 <pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;,Site != &quot;bb&quot;) %&gt;% 
          group_by(Year, Site, Date, temp) %&gt;% summarize(SoilVWC=mean(SoilVWC, na.rm=T)) %&gt;% 
@@ -2554,9 +2555,8 @@ plot_beta &lt;- function(betas) {
   ggplot(bs, aes(y=trait, x = B, xmin=B-SE, xmax=B+SE)) + 
     geom_vline(xintercept=0)+ 
     geom_pointrange(aes(color=temp), position=position_dodge(width=0.5)) + 
-    labs(x = &quot;Selection gradient (beta) estimated PCs&quot;, y = &quot;Trait&quot;,
-         color=&quot;Temperature&quot;) +
-    scale_color_manual(values=tempcol)  + scale_x_continuous(limits=c(-0.55,0.55), n.breaks=10) + theme_minimal() +
+    labs(x = &quot;Selection gradient (beta) estimated from PCs&quot;, y = &quot;&quot;,   color=&quot;Temperature&quot;) +
+    scale_color_manual(values=tempcol) + theme_minimal() + #+ scale_x_continuous(limits=c(-0.55,0.55), n.breaks=10)  +
     theme(legend.position=&quot;bottom&quot;)
 }
 

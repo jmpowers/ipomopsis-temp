@@ -279,12 +279,13 @@ ggplot(meta, aes(x=paste(Expt, Site, Year), y=Total/60, color=Tissue)) +
 
 ## OTC soil moisture
 ```{r soil}
-ggplot(meta %>% filter(Expt=="otc", temp !="air", Site != "bb"), aes(x=paste(Year, Site, Date), y=SoilVWC, color=temp)) +
-  geom_boxplot()+#geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + #geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
+ggplot(meta %>% filter(Expt=="otc", temp !="air", Site != "bb"), 
+       aes(x=paste(Year, Site, format(Date, "%m-%d")), y=SoilVWC, color=temp)) +
+  geom_boxplot(outlier.size=0.5)+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90, hjust=0), legend.position="top", 
+                          axis.title.x = element_blank()) + 
   scale_color_brewer(palette = "Set1", direction=-1)+
-  labs(title="Effects of OTCs on Soil Moisture at Plant",y="Soil Volumetric Water Content (%)",
-       x="Year, site, date", color="Temperature")
+  labs(y="Soil Volumetric Water Content (%)", x="", color="Temperature")
 
 ggplot(meta %>% filter(Expt=="otc", temp !="air",Site != "bb") %>% 
          group_by(Year, Site, Date, temp) %>% summarize(SoilVWC=mean(SoilVWC, na.rm=T)) %>% 
@@ -751,9 +752,8 @@ plot_beta <- function(betas) {
   ggplot(bs, aes(y=trait, x = B, xmin=B-SE, xmax=B+SE)) + 
     geom_vline(xintercept=0)+ 
     geom_pointrange(aes(color=temp), position=position_dodge(width=0.5)) + 
-    labs(x = "Selection gradient (beta) estimated PCs", y = "Trait",
-         color="Temperature") +
-    scale_color_manual(values=tempcol)  + scale_x_continuous(limits=c(-0.55,0.55), n.breaks=10) + theme_minimal() +
+    labs(x = "Selection gradient (beta) estimated from PCs", y = "",   color="Temperature") +
+    scale_color_manual(values=tempcol) + theme_minimal() + #+ scale_x_continuous(limits=c(-0.55,0.55), n.breaks=10)  +
     theme(legend.position="bottom")
 }
 
