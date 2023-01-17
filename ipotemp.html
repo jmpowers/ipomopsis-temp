@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-15" />
+<meta name="date" content="2023-01-16" />
 
 <title>Ipomopsis temperature experiments: Volatiles</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 Volatiles</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-15</h4>
+<h4 class="date">2023-01-16</h4>
 
 </div>
 
@@ -2493,13 +2493,34 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <p>Following method of <a href="https://doi.org/10.1002/evl3.63">Chong
 et al. 2018</a> for reconstructing selection estimates from estimates of
 selection on PCs: Beta = E * A.</p>
-<pre class="r"><code># previously split the data before running PCA - now run PCA on the whole dataset
+<pre class="r"><code>minsamples &lt;- 70
+vol.top &lt;- vol[,colSums(decostand(vol,&quot;pa&quot;))&gt; minsamples]#occur in more than minsamples
+
+sds &lt;- read_csv(&quot;data/2021_Maxfield_sds.csv&quot;) %&gt;% 
+  mutate(prop_uninfested = 1 - prop_infested, 
+         plant=as.character(plant))
+
+fitnesstraits &lt;- c(&quot;seeds_est&quot;, &quot;seeds_per_flower&quot;, &quot;prop_uninfested&quot;) #&quot;eggs_per_flower&quot;
+fitnessnames &lt;- set_names(c(&quot;Estimated total seeds&quot;, &quot;Estimated seeds per flower&quot;, &quot;Prop. nonaborted fruits uninfested&quot;), fitnesstraits)
 
 # Run PCA on traits
-vols.PCA &lt;- vols.good.top %&gt;% mutate(across(everything(), ~ (.x-mean(.x, na.rm=T))/sd(.x, na.rm=T))) %&gt;% 
+vols.PCA &lt;- vol.top %&gt;% mutate(across(everything(), ~ (.x-mean(.x, na.rm=T))/sd(.x, na.rm=T))) %&gt;% 
   prcomp() 
-summary(vols.PCA) # PCs 1 - 5 explain 56% of the variation, 20 PCs total (20 top volatiles)
-vols.PCA.E &lt;- vols.PCA$rotation[,1:5] #min(4, ncol(vols.PCA$rotation))
+summary(vols.PCA) # PCs 1 - 5 explain 63% of the variation, #PCs total = top volatiles</code></pre>
+<pre><code>Importance of components:
+                          PC1    PC2     PC3     PC4     PC5     PC6     PC7
+Standard deviation     1.9830 1.3088 1.20628 1.13258 1.05065 0.96813 0.91968
+Proportion of Variance 0.2621 0.1142 0.09701 0.08552 0.07359 0.06249 0.05639
+Cumulative Proportion  0.2621 0.3763 0.47335 0.55886 0.63246 0.69494 0.75133
+                           PC8    PC9    PC10    PC11    PC12    PC13    PC14
+Standard deviation     0.87102 0.7823 0.75839 0.73102 0.66360 0.59450 0.52018
+Proportion of Variance 0.05058 0.0408 0.03834 0.03563 0.02936 0.02356 0.01804
+Cumulative Proportion  0.80191 0.8427 0.88105 0.91667 0.94603 0.96959 0.98763
+                          PC15
+Standard deviation     0.43071
+Proportion of Variance 0.01237
+Cumulative Proportion  1.00000</code></pre>
+<pre class="r"><code>vols.PCA.E &lt;- vols.PCA$rotation[,1:5] #min(4, ncol(vols.PCA$rotation))
 
 calculate_beta &lt;- function(E, slopes) {
   data.frame(B = E %*% slopes$A,
@@ -2508,13 +2529,14 @@ calculate_beta &lt;- function(E, slopes) {
     rownames_to_column(&quot;trait&quot;)
 }
 
-selection_pca &lt;- function(year, water=names(water_pal), snow=names(snow_pal), fitnesstrait = &quot;seeds_est&quot;) {
-  vols.std.PCA &lt;- volsmeta %&gt;% bind_cols(as.data.frame(vols.PCA$x)) %&gt;% 
-    filter(year == .env$year, water %in% .env$water, snow %in% .env$snow) %&gt;% 
-    left_join(mnps.plantyr.traits %&gt;% select(year, plotid, plant, all_of(fitnesstrait)), by=c(&quot;year&quot;, &quot;plotid&quot;, &quot;plant&quot;)) %&gt;% 
-    select(all_of(fitnesstrait), any_of(names(treatments)), starts_with(&quot;PC&quot;)) %&gt;% 
+selection_pca &lt;- function(temp=c(&quot;control&quot;,&quot;warmed&quot;), fitnesstrait = &quot;seeds_est&quot;) {
+  vols.std.PCA &lt;- svf %&gt;% bind_cols(as.data.frame(vols.PCA$x)) %&gt;% 
+    filter(temp %in% .env$temp) %&gt;% 
+    mutate(plant=as.character(plant)) %&gt;% 
+    left_join(sds, by=c(&quot;plotid&quot;, &quot;plant&quot;,&quot;temp&quot;)) %&gt;% 
+    select(all_of(fitnesstrait), &quot;temp&quot;, starts_with(&quot;PC&quot;)) %&gt;% 
     rename(&quot;fitness&quot; = fitnesstrait) %&gt;% 
-    group_by(year) %&gt;% mutate(relfitness = fitness/mean(fitness, na.rm=T), .keep=&quot;unused&quot;) %&gt;% ungroup %&gt;% 
+    mutate(relfitness = fitness/mean(fitness, na.rm=T), .keep=&quot;unused&quot;) %&gt;% ungroup %&gt;% 
     drop_na(relfitness) %&gt;% 
     select(where(~sum(is.na(.))==0))
   
@@ -2526,36 +2548,23 @@ selection_pca &lt;- function(year, water=names(water_pal), snow=names(snow_pal),
   calculate_beta(vols.PCA.E, vols.PCA.slopes)
 }
 
-plot_beta &lt;- function(betas, colorby=&quot;year&quot;) {
+plot_beta &lt;- function(betas) {
   bs &lt;- betas %&gt;% left_join(ipochems, by=c(&quot;trait&quot;=&quot;name&quot;)) %&gt;% 
-    mutate(trait = fct_reorder(trait, mean.floral))#order graph by mean emissions
-  if(colorby==&quot;water_snow&quot;)  bs &lt;- bs %&gt;%  mutate(water_snow = paste(water, snow))
+    mutate(trait = fct_reorder(trait, map_dbl(vol.top[,trait], mean)))#order graph by mean emissions
   ggplot(bs, aes(y=trait, x = B, xmin=B-SE, xmax=B+SE)) + 
     geom_vline(xintercept=0)+ 
-    geom_pointrange(mapping=aes_string(color=colorby), position=position_dodge(width=0.5)) + 
-    labs(x = &quot;Selection gradient (beta) estimated from gradients on PCs&quot;, y = &quot;Trait&quot;,
-         color=list(year=&quot;Year&quot;, water=&quot;Precipitation&quot;, snow=&quot;Snowmelt&quot;, 
-                    water_snow = &quot;Precipitation and snowmelt&quot;)[[colorby]]) +
-    scale_color_manual(values=list(year=year_pal, water=water_pal, snow=snow_pal,
-                                   water_snow=water_snow_pal)[[colorby]]) +
-    theme_bw()
+    geom_pointrange(aes(color=temp), position=position_dodge(width=0.5)) + 
+    labs(x = &quot;Selection gradient (beta) estimated PCs&quot;, y = &quot;Trait&quot;,
+         color=&quot;Temperature&quot;) +
+    scale_color_manual(values=tempcol)  + scale_x_continuous(limits=c(-0.55,0.55), n.breaks=10) + theme_minimal() +
+    theme(legend.position=&quot;bottom&quot;)
 }
 
-vols.beta.yr &lt;- expand_grid(year=unique(volsmeta$year), fitnesstrait=fitnesstraits)  %&gt;% 
- mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
-plot_beta(vols.beta.yr)+ facet_wrap(vars(fitnesstrait), nrow=1, labeller=as_labeller(fitnessnames))
-
-vols.beta.water &lt;- expand_grid(year=unique(volsmeta$year), water=names(water_pal), fitnesstrait=fitnesstraits)  %&gt;% 
- mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
-
-vols.beta.snow &lt;- expand_grid(year=unique(volsmeta$year), snow=names(snow_pal), fitnesstrait=fitnesstraits)  %&gt;% 
- mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
-
-vols.beta.water.snow &lt;- expand_grid(year=unique(volsmeta$year), water=names(water_pal), snow=names(snow_pal),  fitnesstrait=fitnesstraits)  %&gt;% 
+vols.beta.temp &lt;- expand_grid(temp=c(&quot;control&quot;,&quot;warmed&quot;),  fitnesstrait=fitnesstraits)  %&gt;% 
   mutate(betas = pmap(., selection_pca)) %&gt;% unnest(betas)
 
-walk(fitnesstraits, ~print(plot_beta(filter(vols.beta.water.snow, fitnesstrait==.x), colorby=&quot;water_snow&quot;) + 
-                             facet_wrap(vars(year), nrow=1) + ggtitle(fitnessnames[.x])))</code></pre>
+walk(fitnesstraits, ~print(plot_beta(filter(vols.beta.temp, fitnesstrait==.x)) + ggtitle(fitnessnames[.x])))</code></pre>
+<p><img src="plots/gradients-1.svg" width="768" /><img src="plots/gradients-2.svg" width="768" /><img src="plots/gradients-3.svg" width="768" /></p>
 </div>
 </div>
 <div id="percivals-warm-vs.-cool" class="section level1">
