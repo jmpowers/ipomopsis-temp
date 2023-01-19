@@ -11,9 +11,9 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-17" />
+<meta name="date" content="2023-01-19" />
 
-<title>Ipomopsis temperature experiments: Floral traits</title>
+<title>Floral traits - Ipomopsis temperature experiments</title>
 
 <script src="libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -257,11 +257,11 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Ipomopsis temperature experiments: Floral
-traits</h1>
+<h1 class="title toc-ignore">Floral traits - Ipomopsis temperature
+experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-17</h4>
+<h4 class="date">2023-01-19</h4>
 
 </div>
 
@@ -331,7 +331,8 @@ phen.raw &lt;- read_csv(&quot;data/traits/2021 Maxfield Phenology - 2021.csv&quo
          height_cm=as.integer(as.character(height_cm)),
          open = rowSums(select(., starts_with(&quot;open&quot;)), na.rm=T),
          buds = rowSums(select(., starts_with(&quot;buds&quot;)), na.rm=T),
-         eggs = rowSums(select(., starts_with(&quot;eggs&quot;)), na.rm=T)) %&gt;% 
+         eggs = rowSums(select(., starts_with(&quot;eggs&quot;)), na.rm=T),
+         eggs_per_flower = replace_na(eggs,0)/(open+buds)) %&gt;% 
   left_join(census.maxf) %&gt;% 
   mutate_if(is.character, as.factor) 
 
@@ -393,16 +394,28 @@ sds &lt;- sds21 %&gt;%
 
 write.csv(sds, &quot;data/2021_Maxfield_sds.csv&quot;)
 
+# volatiles ---------------------------------------------------------------
+
+vt &lt;- read_csv(&quot;data/volatiles/CWu_meta21.csv&quot;) %&gt;% 
+  rename(date=Date, site=Site, VWC=SoilVWC, notes=Notes) %&gt;% 
+  mutate(year=year(date)) %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, site != &quot;bb&quot;)
+
 # soilmoisture ---------------------------------------------------------------
 
-sm &lt;- bind_rows(read_csv(&quot;data/2019 &amp; 2021 SC &amp; GNA Soil Moisture - general.csv&quot;),
+sm &lt;- bind_rows(general=bind_rows(read_csv(&quot;data/2019 &amp; 2021 SC &amp; GNA Soil Moisture - general.csv&quot;),
                 read_csv(&quot;data/2021 Maxfield Soil Moisture - 2021.csv&quot;) %&gt;% 
+                  filter(date!=ymd(&quot;2021-06-23&quot;)) %&gt;% #no OTCs yet
                   mutate(temp = ifelse(location %in% c(&quot;OTCV&quot;,&quot;OTCO&quot;) | !is.na(OTC),&quot;warmed&quot;, &quot;control&quot;),
-                         site=&quot;Maxfield&quot;),
-                read_csv(&quot;data/2021 Maxfield Leaf Traits - 2021round1.csv&quot;) %&gt;% 
+                         site=&quot;Maxfield&quot;)),
+                atplant=bind_rows(read_csv(&quot;data/2021 Maxfield Leaf Traits - 2021round1.csv&quot;) %&gt;% 
                   select(date=date_collected, plot, subplot, plant, temp, VWC, period=per_us) %&gt;% 
-                  mutate(temp = ifelse(temp==&quot;OTC&quot;, &quot;warmed&quot;, &quot;control&quot;), site=&quot;Maxfield&quot;)) %&gt;% 
+                  mutate(temp = ifelse(temp==&quot;OTC&quot;, &quot;warmed&quot;, &quot;control&quot;), site=&quot;Maxfield&quot;, plant=as.character(plant)),
+                vt %&gt;% select(site, date, temp, chamber, plotid, plant, VWC, notes)), .id=&quot;type&quot;) %&gt;% 
                   mutate(year=year(date))
+
+# OTCs ---------------------------------------------------------------
+otc_duration &lt;- read_csv(&quot;./data/CWu OTC Hobos - duration.csv&quot;) %&gt;% 
+    mutate(begin=OTC_start-days(1), end=OTC_end+days(1), .keep=&quot;unused&quot;) #start/end were trimmed 1 day for hobos
 
 # meltdates ---------------------------------------------------------------
 
@@ -454,11 +467,9 @@ traitnames &lt;- set_names(c(
 <h2>Timings</h2>
 <pre class="r"><code>timings &lt;- bind_rows(
   meltdates=meltdates %&gt;% rename(begin=sun_date) %&gt;% mutate(end=begin),
-  otc= read_csv(&quot;./data/CWu OTC Hobos - duration.csv&quot;) %&gt;% 
-    mutate(begin=yday(OTC_start)-1, end=yday(OTC_end)+1, .keep=&quot;unused&quot;), #start/end were trimmed 1 day 
+  otc= otc_duration %&gt;% mutate(begin=yday(begin), end=yday(end)), 
   sm = sm %&gt;% group_by(site, year) %&gt;% summarize(begin = min(yday(date)), end = max(yday(date))),
-  vt = read_csv(&quot;data/volatiles/CWu_meta21.csv&quot;) %&gt;% rename(date=Date, site=Site) %&gt;% mutate(year=year(date)) %&gt;%
-    filter(Tissue==&quot;flower&quot;, !is.na(site)) %&gt;% group_by(site, year) %&gt;% 
+  vt = vt %&gt;% filter(Tissue==&quot;flower&quot;, !is.na(site)) %&gt;% group_by(site, year) %&gt;% 
     summarize(begin = min(yday(date)), end = max(yday(date))),
   mt = morph %&gt;% drop_na(corolla_length) %&gt;% group_by(site, year) %&gt;% 
     summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
@@ -476,7 +487,7 @@ timings_labels &lt;- c(meltdates=&quot;Snowmelt&quot;, otc=&quot;Open top chambe
 
 timings %&gt;% mutate(range=paste(begin,end,sep=&quot; - &quot;), .keep=&quot;unused&quot;) %&gt;% 
   pivot_wider(names_from=year, values_from=range, names_sort=T)</code></pre>
-<pre><code># A tibble: 19 × 5
+<pre><code># A tibble: 18 × 5
    variable  site     `2018`    `2019`    `2021`   
    &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;    
  1 meltdates Maxfield 119 - 119 158 - 158 121 - 121
@@ -484,28 +495,28 @@ timings %&gt;% mutate(range=paste(begin,end,sep=&quot; - &quot;), .keep=&quot;un
  3 otc       SC       &lt;NA&gt;      194 - 219 180 - 215
  4 otc       GNA      191 - 216 190 - 218 182 - 216
  5 otc       bb       191 - 216 &lt;NA&gt;      &lt;NA&gt;     
- 6 sm        GNA      &lt;NA&gt;      190 - 204 182 - 182
- 7 sm        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 201
- 8 sm        SC       &lt;NA&gt;      199 - 204 180 - 180
- 9 vt        bb       208 - 208 &lt;NA&gt;      &lt;NA&gt;     
-10 vt        GNA      206 - 207 212 - 217 197 - 211
-11 vt        Maxfield &lt;NA&gt;      &lt;NA&gt;      189 - 207
-12 vt        SC       &lt;NA&gt;      214 - 214 194 - 209
-13 mt        GNA      &lt;NA&gt;      &lt;NA&gt;      189 - 189
-14 mt        Maxfield &lt;NA&gt;      &lt;NA&gt;      183 - 207
-15 mt        SC       &lt;NA&gt;      &lt;NA&gt;      187 - 187
-16 nt        Maxfield &lt;NA&gt;      &lt;NA&gt;      188 - 195
-17 flrcol    Maxfield &lt;NA&gt;      &lt;NA&gt;      195 - 207
-18 ph        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 215
-19 sds       Maxfield &lt;NA&gt;      &lt;NA&gt;      207 - 239</code></pre>
-<pre class="r"><code>dodging &lt;- position_dodge2(width=1, reverse = T, preserve=&quot;single&quot;)
-timings %&gt;% filter(site!=&quot;bb&quot;) %&gt;% 
-  mutate(variable=fct_reorder(variable, begin, na.rm=T, .desc=T), year=factor(year)) %&gt;% 
+ 6 sm        GNA      206 - 207 190 - 217 182 - 211
+ 7 sm        Maxfield &lt;NA&gt;      &lt;NA&gt;      176 - 207
+ 8 sm        SC       &lt;NA&gt;      199 - 214 180 - 209
+ 9 vt        GNA      206 - 207 212 - 217 197 - 211
+10 vt        Maxfield &lt;NA&gt;      &lt;NA&gt;      189 - 207
+11 vt        SC       &lt;NA&gt;      214 - 214 194 - 209
+12 mt        GNA      &lt;NA&gt;      &lt;NA&gt;      189 - 189
+13 mt        Maxfield &lt;NA&gt;      &lt;NA&gt;      183 - 207
+14 mt        SC       &lt;NA&gt;      &lt;NA&gt;      187 - 187
+15 nt        Maxfield &lt;NA&gt;      &lt;NA&gt;      188 - 195
+16 flrcol    Maxfield &lt;NA&gt;      &lt;NA&gt;      195 - 207
+17 ph        Maxfield &lt;NA&gt;      &lt;NA&gt;      174 - 215
+18 sds       Maxfield &lt;NA&gt;      &lt;NA&gt;      207 - 239</code></pre>
+<pre class="r"><code>dodging &lt;- position_dodge2(width=0.9, reverse = T, preserve=&quot;single&quot;)
+timings %&gt;% filter(site!=&quot;bb&quot;, variable !=&quot;meltdates&quot;) %&gt;% 
+  mutate(variable=fct_reorder(variable, begin, na.rm=T) %&gt;% fct_relevel(&quot;otc&quot;) %&gt;% fct_rev(), 
+         year=factor(year)) %&gt;% 
   ggplot(aes(y=variable, color=year, shape=site))+ 
   geom_linerange(aes(xmin=begin, xmax=end), 
-                 position = dodging, size=1.2, show.legend=FALSE) + 
-  geom_point(aes(x=begin), position = dodging, size=2.5)+
-  geom_point(aes(x=end), position = dodging, size=2.5) + 
+                 position = dodging, size=1, show.legend=FALSE) + 
+  geom_point(aes(x=begin), position = dodging, size=2)+
+  geom_point(aes(x=end), position = dodging, size=2) + 
   scale_y_discrete(&quot;&quot;, labels=timings_labels)+
   scale_x_continuous(&quot;Day of year&quot;, breaks=seq(80,240, by=20)) +
   labs(color=&quot;Year&quot;, shape=&quot;Site&quot;)+ scale_color_manual(values=year_pal)+
@@ -808,14 +819,30 @@ traits.sd &lt;- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %&gt;% set_nam
 </div>
 <div id="soil-moisture" class="section level1">
 <h1>Soil moisture</h1>
-<pre class="r"><code>ggplot(sm %&gt;% filter(date!=ymd(&quot;2021-06-23&quot;)), #before Maxfield OTCs started
-       aes(x=paste(year(date), site,format(date, &quot;%m-%d&quot;)), y=VWC, color=temp)) +
+<pre class="r"><code>ggplot(sm, aes(x=factor(date), y=VWC, color=temp)) + 
+  facet_wrap(vars(type, site), scales=&quot;free_x&quot;, labeller = as_labeller(c(atplant=&quot;Next to plant&quot;, general=&quot;General&quot;, sitenames)))+
   geom_boxplot(outlier.size = 0.5)+
   theme_minimal() + theme(axis.text.x=element_text(angle=90, hjust=0), legend.position=&quot;top&quot;, 
                           axis.title.x = element_blank()) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
   labs(y=&quot;Soil Volumetric Water Content (%)&quot;, x=&quot;&quot;, color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots-traits/soilmoisture-1.svg" width="672" /></p>
+<pre class="r"><code>sm.mean &lt;- sm %&gt;% group_by(type, year, site, date, temp) %&gt;% 
+  summarize(SE=sd(VWC, na.rm=T)/sqrt(length(VWC)), VWC=mean(VWC, na.rm=T), .groups=&quot;drop&quot;) %&gt;% 
+  pivot_wider(names_from=temp, values_from=c(VWC, SE)) %&gt;% 
+  mutate(VWC_diff = VWC_warmed-VWC_control)
+
+print(paste(&quot;Mean difference in VWC across dates and sites (mean +-SD):&quot;, round(mean(sm.mean$VWC_diff),1),&quot;+-&quot;, round(sd(sm.mean$VWC_diff),1)))</code></pre>
+<pre><code>[1] &quot;Mean difference in VWC across dates and sites (mean +-SD): -1.9 +- 1.8&quot;</code></pre>
+<pre class="r"><code>ggplot(sm.mean, aes(x=VWC_control, y=VWC_warmed, shape=paste(site, type), color=factor(year))) +
+  #facet_wrap(vars(type, site), labeller = as_labeller(c(atplant=&quot;Next to plant&quot;, general=&quot;General&quot;, sitenames)))+
+  geom_abline(intercept=0, slope=1)+ geom_smooth(aes(group=1), color=&quot;black&quot;, se=F)+ geom_point(size=3) + 
+  geom_errorbar(aes(ymin=VWC_warmed-SE_warmed, ymax=VWC_warmed+SE_warmed))+
+  geom_errorbarh(aes(xmin=VWC_control-SE_control, xmax=VWC_control+SE_control))+
+  coord_fixed(xlim=c(0,17), ylim=c(0,17))+  theme_minimal() + scale_color_manual(&quot;Year&quot;, values=year_pal)+
+  scale_shape_manual(&quot;Site, location&quot;, values = c(19,1, 17, 2, 15, 0), labels=~str_replace(.x, &quot;atplant&quot;,&quot;at plant&quot;)) + 
+  labs(x=&quot;Soil moisture, control (%VWC)&quot;, y=&quot;Soil moisture, warmed (%VWC)&quot;)</code></pre>
+<p><img src="plots-traits/soilmoisture-2.svg" width="672" /></p>
 </div>
 <div id="trait-correlations" class="section level1">
 <h1>Trait correlations</h1>
@@ -848,6 +875,58 @@ ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[si
   theme(legend.position = &quot;top&quot;, axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())</code></pre>
 <p><img src="plots-traits/plasticity_multisite-1.svg" width="480" /></p>
+<pre class="r"><code>morph %&gt;% pivot_longer(c(corolla_length, corolla_width)) %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% 
+ggplot(aes(x=temp, y=value, color=temp)) +
+  facet_grid(name~date, scales=&quot;free_y&quot;)+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
+              map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield floral morphology by date&quot;, subtitle=&quot;1-2 flowers/plant/date, unaveraged. OTCs deployed 6-28&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/plasticity_multisite-2.svg" width="480" /></p>
+<pre class="r"><code>nectar %&gt;% pivot_longer(c(nectar_conc, nectar_volume)) %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% 
+ggplot(aes(x=temp, y=value, color=temp)) +
+  facet_grid(name~date, scales=&quot;free_y&quot;)+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
+              map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield nectar by date&quot;, subtitle=&quot;OTCs deployed 6-28&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/plasticity_multisite-3.svg" width="480" /></p>
+<pre class="r"><code>morph.meandate &lt;- morph %&gt;%  filter(site==&quot;Maxfield&quot;) %&gt;% 
+  group_by(plantid, date, temp) %&gt;% summarize(across(where(is.numeric), mean, na.rm=T)) %&gt;% #mean for each date
+  pivot_longer(c(corolla_length, corolla_width))
+
+ggplot(morph.meandate, aes(x=date, y=value, color=temp)) +
+  facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller=as_labeller(traitnames.units))+
+  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(begin)))+
+  geom_path(aes(group=plantid), alpha=0.6) +  geom_point(size=1) + 
+  geom_path(data=morph.meandate %&gt;% group_by(name, date, temp) %&gt;% summarize(value=mean(value, na.rm=T)), aes(group=temp), size=2)+
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield floral morphology by date&quot;, subtitle=&quot;1-2 flowers/plant/date, averaged by plant&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-27&quot;), NA))+ 
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/plasticity_multisite-4.svg" width="480" /></p>
+<pre class="r"><code>nectar.meandate &lt;- nectar %&gt;%  filter(site==&quot;Maxfield&quot;) %&gt;% 
+  group_by(plantid, date, temp) %&gt;% summarize(across(where(is.numeric), mean, na.rm=T)) %&gt;% #mean for each date
+  pivot_longer(c(nectar_conc, nectar_volume))
+
+ggplot(nectar.meandate, aes(x=date, y=value, color=temp)) +
+  facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller=as_labeller(traitnames.units))+
+  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(begin)))+
+  geom_path(aes(group=plantid), alpha=0.6) +  geom_point(size=1) + 
+  geom_path(data=nectar.meandate %&gt;% group_by(name, date, temp) %&gt;% summarize(value=mean(value, na.rm=T)), aes(group=temp), size=2)+
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield nectar by date&quot;, subtitle=&quot;1-2 flowers/plant/date, averaged by plant&quot;) + 
+  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-27&quot;), NA))+ 
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="plots-traits/plasticity_multisite-5.svg" width="480" /></p>
 <pre class="r"><code>all.mean %&gt;% pivot_longer(any_of(floraltraits[-c(1:2)])) %&gt;% 
   filter(site==&quot;Maxfield&quot;) %&gt;% 
   drop_na(value) %&gt;% 
@@ -1673,6 +1752,121 @@ Residual 64   4.0795              </code></pre>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>phen %&gt;% drop_na(temp) %&gt;% group_by(temp, julian) %&gt;% drop_na(eggs_per_flower) %&gt;% 
+  summarize(eggs_per_flower.se = sd(eggs_per_flower)/sqrt(length(eggs_per_flower)), eggs_per_flower=mean(eggs_per_flower)) %&gt;% 
+  ggplot(aes(x=julian, y=eggs_per_flower, color=temp))+ geom_point() + 
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=eggs_per_flower-eggs_per_flower.se, ymax=eggs_per_flower+eggs_per_flower.se))+
+  labs(y=&quot;Eggs per flower&quot;, 
+       x=&quot;Day of year&quot;, color=&quot;Temperature&quot;) +
+  scale_x_continuous(breaks=seq(120,240, by=20))+
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
+<p><img src="plots-traits/phenology_temp-5.svg" width="480" /></p>
+<pre class="r"><code>lmer(eggs_per_flower ~ factor(date) * temp + (1|plantid), data=filter(phen.raw, date!=&quot;2021-06-23&quot;)) %&gt;% anova %&gt;% kable(caption=&quot;eggs per flower&quot;)</code></pre>
+<table>
+<caption>eggs per flower</caption>
+<colgroup>
+<col width="24%" />
+<col width="13%" />
+<col width="13%" />
+<col width="8%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">factor(date)</td>
+<td align="right">1.0951582</td>
+<td align="right">0.1825264</td>
+<td align="right">6</td>
+<td align="right">146.26779</td>
+<td align="right">13.685155</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">temp</td>
+<td align="right">0.0711076</td>
+<td align="right">0.0711076</td>
+<td align="right">1</td>
+<td align="right">87.42029</td>
+<td align="right">5.331387</td>
+<td align="right">0.0233031</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(date):temp</td>
+<td align="right">0.2621148</td>
+<td align="right">0.0436858</td>
+<td align="right">6</td>
+<td align="right">146.26779</td>
+<td align="right">3.275400</td>
+<td align="right">0.0047243</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>phen.raw %&gt;% drop_na(temp) %&gt;%  group_by(temp, date) %&gt;% summarize(eggs_per_flower=mean(eggs_per_flower, na.rm=T)) %&gt;% 
+  pivot_wider(names_from=&quot;temp&quot;, values_from=&quot;eggs_per_flower&quot;) %&gt;% kable(digits=3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">date</th>
+<th align="right">control</th>
+<th align="right">warmed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2021-06-23</td>
+<td align="right">0.427</td>
+<td align="right">0.419</td>
+</tr>
+<tr class="even">
+<td align="left">2021-06-30</td>
+<td align="right">0.346</td>
+<td align="right">0.098</td>
+</tr>
+<tr class="odd">
+<td align="left">2021-07-02</td>
+<td align="right">0.222</td>
+<td align="right">0.139</td>
+</tr>
+<tr class="even">
+<td align="left">2021-07-07</td>
+<td align="right">0.098</td>
+<td align="right">0.008</td>
+</tr>
+<tr class="odd">
+<td align="left">2021-07-14</td>
+<td align="right">0.065</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="left">2021-07-20</td>
+<td align="right">0.048</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">2021-07-26</td>
+<td align="right">0.069</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">2021-08-03</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>phen %&gt;% drop_na(temp) %&gt;% group_by(year, temp, julian) %&gt;% summarize_at(&quot;has_egg&quot;, mean, na.rm=T) %&gt;% 
   ggplot(aes(x=julian, y=has_egg, color=temp))+ geom_point() + 
   geom_path(aes(group=temp)) +
@@ -1681,7 +1875,7 @@ Residual 64   4.0795              </code></pre>
   scale_x_continuous(breaks=seq(120,240, by=20))+
   scale_y_continuous(labels = scales::percent)+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd(&quot;2021-06-25&quot;)))</code></pre>
-<p><img src="plots-traits/phenology_temp-5.svg" width="480" /></p>
+<p><img src="plots-traits/phenology_temp-6.svg" width="480" /></p>
 </div>
 </div>
 <div id="selection" class="section level1">
@@ -1690,175 +1884,69 @@ Residual 64   4.0795              </code></pre>
 <h2>Seed production</h2>
 <pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;seeds_per_flower&quot;))) %&gt;% 
   pivot_longer(any_of(floraltraits), names_to=&quot;trait&quot;) %&gt;% 
-  ggplot(aes(x=value, y=seeds_per_flower, color=temp)) + geom_point() + geom_smooth(method=&quot;lm&quot;,se=F, formula = y ~ poly(x, 2, raw=TRUE) ) + 
+  ggplot(aes(x=value, y=seeds_per_flower, color=temp)) + 
+  geom_smooth(method=&quot;lm&quot;,se=F) + # formula = y ~ poly(x, 2, raw=TRUE) 
+  geom_point() + 
   facet_wrap(vars(trait), scales=&quot;free_x&quot;, labeller=as_labeller(traitnames.units)) + 
   labs(x=&quot;Trait&quot;, y=traitnames[&quot;seeds_per_flower&quot;], color=&quot;Temperature&quot;)+
   theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="plots-traits/selection-1.svg" width="672" /></p>
 <pre class="r"><code>#get the the standardized selection differential S&#39; (change in relative fitness / standardized trait value)
 mt.mod.seeds &lt;- map(set_names(floraltraits), 
-                    ~ lm(seeds_rel ~ trait.z * temp, 
+                    ~ lm(seeds_rel ~ trait.z *temp, 
                          data=all.mean %&gt;% as.data.frame() %&gt;% mutate(trait.z = all.mean[[.x]] / traits.sd[[.x]]) %&gt;% 
                            group_by(temp) %&gt;% mutate(seeds_rel = seeds_per_flower/mean(seeds_per_flower, na.rm=T)))) # mean seeds in each temp
 mt.mod.seeds.coefs &lt;- map_dfr(mt.mod.seeds, tidy, .id=&quot;trait&quot;)
 mt.mod.seeds.tests &lt;- map(mt.mod.seeds, car::Anova, type=3) %&gt;% map_dfr(tidy, .id=&quot;trait&quot;)
 mt.mod.seeds.emm &lt;- map_dfr(mt.mod.seeds, ~summary(emtrends(.x, ~temp, var=&quot;trait.z&quot;)), .id=&quot;trait&quot;)
-mt.mod.seeds.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Residuals&quot;)) %&gt;% kable(caption=&quot;Seeds selection vs. temperature&quot;, digits=3)</code></pre>
+mt.mod.seeds.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Residuals&quot;)) %&gt;% select(-sumsq, -df, -statistic) %&gt;% 
+  pivot_wider(names_from=&quot;term&quot;, values_from=&quot;p.value&quot;) %&gt;% 
+  kable(caption=&quot;Seeds selection vs. temperature&quot;, digits=3)</code></pre>
 <table>
 <caption>Seeds selection vs. temperature</caption>
 <thead>
 <tr class="header">
 <th align="left">trait</th>
-<th align="left">term</th>
-<th align="right">sumsq</th>
-<th align="right">df</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
+<th align="right">trait.z</th>
+<th align="right">temp</th>
+<th align="right">trait.z:temp</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">corolla_length</td>
-<td align="left">trait.z</td>
-<td align="right">0.426</td>
-<td align="right">1</td>
-<td align="right">1.333</td>
 <td align="right">0.254</td>
-</tr>
-<tr class="even">
-<td align="left">corolla_length</td>
-<td align="left">temp</td>
-<td align="right">0.196</td>
-<td align="right">1</td>
-<td align="right">0.613</td>
 <td align="right">0.438</td>
-</tr>
-<tr class="odd">
-<td align="left">corolla_length</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.210</td>
-<td align="right">1</td>
-<td align="right">0.658</td>
 <td align="right">0.422</td>
 </tr>
 <tr class="even">
 <td align="left">corolla_width</td>
-<td align="left">trait.z</td>
-<td align="right">0.095</td>
-<td align="right">1</td>
-<td align="right">0.334</td>
 <td align="right">0.566</td>
-</tr>
-<tr class="odd">
-<td align="left">corolla_width</td>
-<td align="left">temp</td>
-<td align="right">0.410</td>
-<td align="right">1</td>
-<td align="right">1.441</td>
 <td align="right">0.237</td>
-</tr>
-<tr class="even">
-<td align="left">corolla_width</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.382</td>
-<td align="right">1</td>
-<td align="right">1.342</td>
 <td align="right">0.253</td>
 </tr>
 <tr class="odd">
 <td align="left">nectar_volume</td>
-<td align="left">trait.z</td>
-<td align="right">0.020</td>
-<td align="right">1</td>
-<td align="right">0.080</td>
 <td align="right">0.779</td>
-</tr>
-<tr class="even">
-<td align="left">nectar_volume</td>
-<td align="left">temp</td>
-<td align="right">0.122</td>
-<td align="right">1</td>
-<td align="right">0.488</td>
 <td align="right">0.489</td>
-</tr>
-<tr class="odd">
-<td align="left">nectar_volume</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.159</td>
-<td align="right">1</td>
-<td align="right">0.633</td>
 <td align="right">0.431</td>
 </tr>
 <tr class="even">
 <td align="left">nectar_conc</td>
-<td align="left">trait.z</td>
-<td align="right">0.130</td>
-<td align="right">1</td>
-<td align="right">0.570</td>
 <td align="right">0.455</td>
-</tr>
-<tr class="odd">
-<td align="left">nectar_conc</td>
-<td align="left">temp</td>
-<td align="right">0.377</td>
-<td align="right">1</td>
-<td align="right">1.649</td>
 <td align="right">0.207</td>
-</tr>
-<tr class="even">
-<td align="left">nectar_conc</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.390</td>
-<td align="right">1</td>
-<td align="right">1.709</td>
 <td align="right">0.199</td>
 </tr>
 <tr class="odd">
 <td align="left">height_cm</td>
-<td align="left">trait.z</td>
-<td align="right">0.182</td>
-<td align="right">1</td>
-<td align="right">0.643</td>
 <td align="right">0.427</td>
-</tr>
-<tr class="even">
-<td align="left">height_cm</td>
-<td align="left">temp</td>
-<td align="right">0.488</td>
-<td align="right">1</td>
-<td align="right">1.724</td>
 <td align="right">0.196</td>
-</tr>
-<tr class="odd">
-<td align="left">height_cm</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.530</td>
-<td align="right">1</td>
-<td align="right">1.871</td>
 <td align="right">0.178</td>
 </tr>
 <tr class="even">
 <td align="left">redness</td>
-<td align="left">trait.z</td>
-<td align="right">0.074</td>
-<td align="right">1</td>
-<td align="right">0.296</td>
 <td align="right">0.590</td>
-</tr>
-<tr class="odd">
-<td align="left">redness</td>
-<td align="left">temp</td>
-<td align="right">0.378</td>
-<td align="right">1</td>
-<td align="right">1.519</td>
 <td align="right">0.225</td>
-</tr>
-<tr class="even">
-<td align="left">redness</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.361</td>
-<td align="right">1</td>
-<td align="right">1.450</td>
 <td align="right">0.236</td>
 </tr>
 </tbody>
@@ -1874,7 +1962,8 @@ mt.mod.seeds.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Resi
 <h2>Fly damage</h2>
 <pre class="r"><code>all.mean %&gt;% select(all_of(c(floraltraits, &quot;prop_infested&quot;))) %&gt;% 
   pivot_longer(any_of(floraltraits), names_to=&quot;trait&quot;) %&gt;% 
-  ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() + geom_smooth(method=&quot;glm&quot;,se=F, method.args = list(family=&quot;binomial&quot;)) + 
+  ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() +
+  geom_smooth(method=&quot;glm&quot;,se=F, method.args = list(family=&quot;binomial&quot;)) + 
   facet_wrap(vars(trait), scales=&quot;free_x&quot;, labeller=as_labeller(traitnames.units)) + 
   labs(x=&quot;Trait&quot;, y=traitnames[&quot;prop_infested&quot;], color=&quot;Temperature&quot;)+
   theme_bw() + scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme(legend.position = &quot;top&quot;)</code></pre>
@@ -1886,162 +1975,53 @@ mt.mod.seeds.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Resi
 mt.mod.infested.coefs &lt;- map_dfr(mt.mod.infested, tidy, .id=&quot;trait&quot;)
 mt.mod.infested.tests &lt;- map(mt.mod.infested, car::Anova, type=3) %&gt;% map_dfr(tidy, .id=&quot;trait&quot;)
 mt.mod.infested.emm &lt;- map_dfr(mt.mod.infested, ~summary(emtrends(.x, ~temp, var=&quot;trait.z&quot;)), .id=&quot;trait&quot;)
-mt.mod.infested.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Residuals&quot;)) %&gt;% kable(caption=&quot;Fly selection vs. temperature&quot;, digits=3)</code></pre>
+mt.mod.infested.tests %&gt;% filter(!term %in% c(&quot;(Intercept)&quot;,&quot;Residuals&quot;)) %&gt;% select(-sumsq, -df, -statistic) %&gt;% 
+  pivot_wider(names_from=&quot;term&quot;, values_from=&quot;p.value&quot;) %&gt;% kable(caption=&quot;Fly selection vs. temperature&quot;, digits=3)</code></pre>
 <table>
 <caption>Fly selection vs. temperature</caption>
 <thead>
 <tr class="header">
 <th align="left">trait</th>
-<th align="left">term</th>
-<th align="right">sumsq</th>
-<th align="right">df</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
+<th align="right">trait.z</th>
+<th align="right">temp</th>
+<th align="right">trait.z:temp</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">corolla_length</td>
-<td align="left">trait.z</td>
-<td align="right">0.557</td>
-<td align="right">1</td>
-<td align="right">0.392</td>
 <td align="right">0.534</td>
-</tr>
-<tr class="even">
-<td align="left">corolla_length</td>
-<td align="left">temp</td>
-<td align="right">0.007</td>
-<td align="right">1</td>
-<td align="right">0.005</td>
 <td align="right">0.945</td>
-</tr>
-<tr class="odd">
-<td align="left">corolla_length</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.007</td>
-<td align="right">1</td>
-<td align="right">0.005</td>
 <td align="right">0.943</td>
 </tr>
 <tr class="even">
 <td align="left">corolla_width</td>
-<td align="left">trait.z</td>
-<td align="right">0.673</td>
-<td align="right">1</td>
-<td align="right">0.783</td>
 <td align="right">0.381</td>
-</tr>
-<tr class="odd">
-<td align="left">corolla_width</td>
-<td align="left">temp</td>
-<td align="right">0.236</td>
-<td align="right">1</td>
-<td align="right">0.274</td>
 <td align="right">0.603</td>
-</tr>
-<tr class="even">
-<td align="left">corolla_width</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.290</td>
-<td align="right">1</td>
-<td align="right">0.337</td>
 <td align="right">0.564</td>
 </tr>
 <tr class="odd">
 <td align="left">nectar_volume</td>
-<td align="left">trait.z</td>
-<td align="right">0.059</td>
-<td align="right">1</td>
-<td align="right">0.061</td>
 <td align="right">0.807</td>
-</tr>
-<tr class="even">
-<td align="left">nectar_volume</td>
-<td align="left">temp</td>
-<td align="right">0.041</td>
-<td align="right">1</td>
-<td align="right">0.042</td>
 <td align="right">0.839</td>
-</tr>
-<tr class="odd">
-<td align="left">nectar_volume</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.001</td>
-<td align="right">1</td>
-<td align="right">0.001</td>
 <td align="right">0.980</td>
 </tr>
 <tr class="even">
 <td align="left">nectar_conc</td>
-<td align="left">trait.z</td>
-<td align="right">0.007</td>
-<td align="right">1</td>
-<td align="right">0.008</td>
 <td align="right">0.930</td>
-</tr>
-<tr class="odd">
-<td align="left">nectar_conc</td>
-<td align="left">temp</td>
-<td align="right">1.134</td>
-<td align="right">1</td>
-<td align="right">1.267</td>
 <td align="right">0.266</td>
-</tr>
-<tr class="even">
-<td align="left">nectar_conc</td>
-<td align="left">trait.z:temp</td>
-<td align="right">1.342</td>
-<td align="right">1</td>
-<td align="right">1.499</td>
 <td align="right">0.227</td>
 </tr>
 <tr class="odd">
 <td align="left">height_cm</td>
-<td align="left">trait.z</td>
-<td align="right">0.311</td>
-<td align="right">1</td>
-<td align="right">0.220</td>
 <td align="right">0.641</td>
-</tr>
-<tr class="even">
-<td align="left">height_cm</td>
-<td align="left">temp</td>
-<td align="right">1.157</td>
-<td align="right">1</td>
-<td align="right">0.818</td>
-<td align="right">0.370</td>
-</tr>
-<tr class="odd">
-<td align="left">height_cm</td>
-<td align="left">trait.z:temp</td>
-<td align="right">1.058</td>
-<td align="right">1</td>
-<td align="right">0.747</td>
-<td align="right">0.391</td>
+<td align="right">0.376</td>
+<td align="right">0.397</td>
 </tr>
 <tr class="even">
 <td align="left">redness</td>
-<td align="left">trait.z</td>
-<td align="right">0.459</td>
-<td align="right">1</td>
-<td align="right">0.263</td>
 <td align="right">0.611</td>
-</tr>
-<tr class="odd">
-<td align="left">redness</td>
-<td align="left">temp</td>
-<td align="right">0.108</td>
-<td align="right">1</td>
-<td align="right">0.062</td>
 <td align="right">0.805</td>
-</tr>
-<tr class="even">
-<td align="left">redness</td>
-<td align="left">trait.z:temp</td>
-<td align="right">0.068</td>
-<td align="right">1</td>
-<td align="right">0.039</td>
 <td align="right">0.845</td>
 </tr>
 </tbody>
