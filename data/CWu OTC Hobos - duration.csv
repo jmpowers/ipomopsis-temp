@@ -1,8 +1,8 @@
-year,site,OTC_start,OTC_end
-2021,Maxfield,2021-06-29,2021-08-03
-2021,SC,2021-06-30,2021-08-02
-2021,GNA,2021-07-02,2021-08-03
-2019,SC,2019-07-14,2019-08-06
-2019,GNA,2019-07-10,2019-08-05
-2018,GNA,2018-07-11,2018-08-03
-2018,bb,2018-07-11,2018-08-03
+year,site,OTC_start,logger_start,start_diff,OTC_end,logger_end,end_diff,note
+2021,Maxfield,2021-06-25,2021-06-28,3,2021-08-18,2021-08-03,-15,JP: Maxfield loggers taken in before OTCs taken down (to send them back with CWu)
+2021,SC,2021-06-29,2021-06-29,0,2021-08-02,2021-08-02,0,logger_start is the day loggers were placed in the field (throw out that first day)
+2021,GNA,2021-07-01,2021-07-01,0,2021-08-03,2021-08-03,0,logger_end is the day loggers were taken down (throw out the last day)
+2019,SC,2019-07-10,2019-07-13,3,2019-08-06,2019-08-06,0,
+2019,GNA,2019-07-09,2019-07-09,0,2019-08-05,2019-08-05,0,
+2018,GNA,2018-07-05,2018-07-10,5,2018-08-03,2018-08-03,0,"JP: CWu sheet has OTC_end=7/25, but logger warming clearly continues until 8/3"
+2018,bb,2018-07-06,2018-07-10,4,2018-08-03,2018-08-03,0,"JP: CWu sheet has OTC_end=7/27, but logger warming clearly continues until 8/3"

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-18" />
+<meta name="date" content="2023-01-24" />
 
 <title>OTC performance - Ipomopsis temperature experiments</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-18</h4>
+<h4 class="date">2023-01-24</h4>
 
 </div>
 
@@ -707,11 +707,11 @@ hobo_objects &lt;- map(set_names(paste0(&quot;./data/hobo/&quot;, hobometa$file)
 #ggplot(hobo_startstop, aes(x=timestamp, y=file, color=logger)) + geom_point() + facet_grid(rows=vars(year), scales=&quot;free&quot;, space=&quot;free&quot;) +
 #  labs(title = &quot;Logging Events&quot;)
 
-#trim to dates that OTCs were deployed (CWu OTC Hobos - duration.csv)
-#TODO changing some of these cutoff dates manually based on data
+#trim to dates that loggers were deployed
+#todo check that all the HOBOS had the same timezone - in 2018 the two treatments seem to be lagged after deployment
 hobos &lt;- hobo_objects %&gt;% map_dfr(~.x$df_env, .id=&quot;file&quot;)%&gt;% left_join(hobometa) %&gt;% 
   left_join(read_csv(&quot;./data/CWu OTC Hobos - duration.csv&quot;)) %&gt;%
-  filter(Timestamp &gt; OTC_start, Timestamp &lt; OTC_end) %&gt;% 
+  filter(Timestamp &gt; logger_start + days(1), Timestamp &lt; logger_end) %&gt;% #throw out the first and last days
   rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %&gt;% 
   mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60) %&gt;% 
   filter(site != &quot;bb&quot;)</code></pre>
@@ -728,10 +728,11 @@ hobos &lt;- hobo_objects %&gt;% map_dfr(~.x$df_env, .id=&quot;file&quot;)%&gt;% 
   geom_tile() + scale_fill_viridis_c(option=&quot;viridis&quot;)+
   labs(title = &quot;Light over time&quot;, x=&quot;Day of year&quot;, y=&quot;Year, site, temp, plot&quot;, fill=&quot;Light intensity (lux)&quot;)</code></pre>
 <p><img src="plots-otcs/heatmap-2.png" width="960" /></p>
-<pre class="r"><code>hobos %&gt;% filter(year==&quot;2018&quot;, site==&quot;GNA&quot;, date&gt;=ymd(&quot;2018-07-16&quot;), date &lt;=ymd(&quot;2018-07-20&quot;)) %&gt;% drop_na(temp_C) %&gt;% 
-  ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) + geom_path() +
-  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()+
-  labs(x=&quot;Date&quot;, y=&quot;Temperature (C)&quot;, color=&quot;Temperature&quot;)</code></pre>
+<pre class="r"><code>hobos %&gt;% filter(year==&quot;2018&quot;, site==&quot;GNA&quot;, date&gt;=ymd(&quot;2018-07-29&quot;)) %&gt;% drop_na(temp_C) %&gt;% 
+  ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) +
+  facet_wrap(vars(site))+
+  geom_path() +  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal()+
+  labs(x=&quot;Date&quot;, y=&quot;Temperature (C)&quot;, color=&quot;Temperature&quot;) + scale_x_datetime(date_breaks=&quot;1 day&quot;)</code></pre>
 <p><img src="plots-otcs/lineplot-1.png" width="960" /></p>
 </div>
 <div id="hourly-mean-temps" class="section level1">

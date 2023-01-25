@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-19" />
+<meta name="date" content="2023-01-24" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-19</h4>
+<h4 class="date">2023-01-24</h4>
 
 </div>
 
@@ -1559,9 +1559,194 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <h2>Times</h2>
 <pre class="r"><code>ggplot(meta, aes(x=paste(Expt, DN,Year), y=Pump, color=DN)) + 
   geom_boxplot() + geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90))+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90))+ 
   ggtitle(&quot;Sampling time of day&quot;)</code></pre>
 <p><img src="plots/times-1.svg" width="768" /></p>
+<pre class="r"><code>meta %&gt;% group_by(Expt, DN, Tissue, Year) %&gt;% drop_na(Pump) %&gt;% 
+  summarize(first=seconds_to_period(min(Pump)), last=seconds_to_period(max(Pump))) %&gt;% kable(caption=&quot;Pump times&quot;)</code></pre>
+<table>
+<caption>Pump times</caption>
+<thead>
+<tr class="header">
+<th align="left">Expt</th>
+<th align="left">DN</th>
+<th align="left">Tissue</th>
+<th align="right">Year</th>
+<th align="right">first</th>
+<th align="right">last</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">air</td>
+<td align="right">2018</td>
+<td align="right">9H 15M 0S</td>
+<td align="right">14H 14M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">air</td>
+<td align="right">2019</td>
+<td align="right">9H 51M 0S</td>
+<td align="right">13H 4M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">air</td>
+<td align="right">2021</td>
+<td align="right">9H 31M 0S</td>
+<td align="right">12H 3M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">flower</td>
+<td align="right">2018</td>
+<td align="right">9H 10M 0S</td>
+<td align="right">14H 55M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">flower</td>
+<td align="right">2019</td>
+<td align="right">10H 10M 0S</td>
+<td align="right">13H 24M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">flower</td>
+<td align="right">2021</td>
+<td align="right">9H 10M 0S</td>
+<td align="right">13H 1M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">leaf</td>
+<td align="right">2018</td>
+<td align="right">10H 25M 0S</td>
+<td align="right">10H 47M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">day</td>
+<td align="left">leaf</td>
+<td align="right">2019</td>
+<td align="right">9H 55M 0S</td>
+<td align="right">13H 58M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">night</td>
+<td align="left">air</td>
+<td align="right">2019</td>
+<td align="right">19H 43M 0S</td>
+<td align="right">21H 48M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">night</td>
+<td align="left">air</td>
+<td align="right">2021</td>
+<td align="right">20H 17M 0S</td>
+<td align="right">22H 26M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">otc</td>
+<td align="left">night</td>
+<td align="left">flower</td>
+<td align="right">2019</td>
+<td align="right">20H 7M 0S</td>
+<td align="right">21H 50M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">otc</td>
+<td align="left">night</td>
+<td align="left">flower</td>
+<td align="right">2021</td>
+<td align="right">20H 15M 0S</td>
+<td align="right">22H 56M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">perc</td>
+<td align="left">day</td>
+<td align="left">air</td>
+<td align="right">2018</td>
+<td align="right">9H 20M 0S</td>
+<td align="right">13H 50M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">perc</td>
+<td align="left">day</td>
+<td align="left">air</td>
+<td align="right">2019</td>
+<td align="right">9H 21M 0S</td>
+<td align="right">17H 37M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">perc</td>
+<td align="left">day</td>
+<td align="left">flower</td>
+<td align="right">2018</td>
+<td align="right">9H 34M 0S</td>
+<td align="right">13H 53M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">perc</td>
+<td align="left">day</td>
+<td align="left">flower</td>
+<td align="right">2019</td>
+<td align="right">9H 31M 0S</td>
+<td align="right">12H 39M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">perc</td>
+<td align="left">day</td>
+<td align="left">leaf</td>
+<td align="right">2019</td>
+<td align="right">14H 17M 0S</td>
+<td align="right">17H 51M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">perc</td>
+<td align="left">night</td>
+<td align="left">air</td>
+<td align="right">2018</td>
+<td align="right">20H 34M 0S</td>
+<td align="right">22H 43M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">perc</td>
+<td align="left">night</td>
+<td align="left">air</td>
+<td align="right">2019</td>
+<td align="right">20H 30M 0S</td>
+<td align="right">23H 32M 0S</td>
+</tr>
+<tr class="even">
+<td align="left">perc</td>
+<td align="left">night</td>
+<td align="left">flower</td>
+<td align="right">2018</td>
+<td align="right">21H 0M 0S</td>
+<td align="right">22H 50M 0S</td>
+</tr>
+<tr class="odd">
+<td align="left">perc</td>
+<td align="left">night</td>
+<td align="left">flower</td>
+<td align="right">2019</td>
+<td align="right">20H 44M 0S</td>
+<td align="right">23H 18M 0S</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>ggplot(meta, aes(x=paste(Expt, Site, Year), y=Total/60, color=Tissue)) + 
   geom_point(position=position_dodge(width=0.3))+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
@@ -3037,7 +3222,7 @@ ggplot(vol.plot %&gt;% drop_na(PlantType, expt) %&gt;% filter(expt==&quot;otc&qu
 <h2>Inventory</h2>
 <p>Dropped 2 samples from 2018 without leaf mass. Volatiles units are ng
 per hour per gram dry leaf.</p>
-<pre class="r"><code>svl %&gt;% count(PlantType, Treat, expt) %&gt;% kable(caption=&quot;Sample size&quot;)</code></pre>
+<pre class="r"><code>svl %&gt;% count(PlantType, Treat, expt, Year) %&gt;% kable(caption=&quot;Sample size&quot;)</code></pre>
 <table>
 <caption>Sample size</caption>
 <thead>
@@ -3045,6 +3230,7 @@ per hour per gram dry leaf.</p>
 <th align="left">PlantType</th>
 <th align="left">Treat</th>
 <th align="left">expt</th>
+<th align="right">Year</th>
 <th align="right">n</th>
 </tr>
 </thead>
@@ -3053,48 +3239,56 @@ per hour per gram dry leaf.</p>
 <td align="left">aggleaf</td>
 <td align="left">control</td>
 <td align="left">otc</td>
+<td align="right">2019</td>
 <td align="right">8</td>
 </tr>
 <tr class="even">
 <td align="left">aggleaf</td>
 <td align="left">control</td>
 <td align="left">perc</td>
+<td align="right">2019</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">aggleaf</td>
 <td align="left">warmed</td>
 <td align="left">otc</td>
+<td align="right">2019</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">aggleaf</td>
 <td align="left">warmed</td>
 <td align="left">perc</td>
+<td align="right">2019</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">tenleaf</td>
 <td align="left">control</td>
 <td align="left">otc</td>
+<td align="right">2019</td>
 <td align="right">9</td>
 </tr>
 <tr class="even">
 <td align="left">tenleaf</td>
 <td align="left">control</td>
 <td align="left">perc</td>
+<td align="right">2019</td>
 <td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">tenleaf</td>
 <td align="left">warmed</td>
 <td align="left">otc</td>
+<td align="right">2019</td>
 <td align="right">9</td>
 </tr>
 <tr class="even">
 <td align="left">tenleaf</td>
 <td align="left">warmed</td>
 <td align="left">perc</td>
+<td align="right">2019</td>
 <td align="right">2</td>
 </tr>
 </tbody>

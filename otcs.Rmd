@@ -53,11 +53,11 @@ hobo_objects <- map(set_names(paste0("./data/hobo/", hobometa$file), hobometa$fi
 #ggplot(hobo_startstop, aes(x=timestamp, y=file, color=logger)) + geom_point() + facet_grid(rows=vars(year), scales="free", space="free") +
 #  labs(title = "Logging Events")
 
-#trim to dates that OTCs were deployed (CWu OTC Hobos - duration.csv)
-#TODO changing some of these cutoff dates manually based on data
+#trim to dates that loggers were deployed
+#todo check that all the HOBOS had the same timezone - in 2018 the two treatments seem to be lagged after deployment
 hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa) %>% 
   left_join(read_csv("./data/CWu OTC Hobos - duration.csv")) %>%
-  filter(Timestamp > OTC_start, Timestamp < OTC_end) %>% 
+  filter(Timestamp > logger_start + days(1), Timestamp < logger_end) %>% #throw out the first and last days
   rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %>% 
   mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60) %>% 
   filter(site != "bb")
@@ -77,10 +77,11 @@ ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=in
 ```
 
 ```{r lineplot}
-hobos %>% filter(year=="2018", site=="GNA", date>=ymd("2018-07-16"), date <=ymd("2018-07-20")) %>% drop_na(temp_C) %>% 
-  ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) + geom_path() +
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()+
-  labs(x="Date", y="Temperature (C)", color="Temperature")
+hobos %>% filter(year=="2018", site=="GNA", date>=ymd("2018-07-29")) %>% drop_na(temp_C) %>% 
+  ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) +
+  facet_wrap(vars(site))+
+  geom_path() +  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()+
+  labs(x="Date", y="Temperature (C)", color="Temperature") + scale_x_datetime(date_breaks="1 day")
 ```
 
 # Hourly mean temps

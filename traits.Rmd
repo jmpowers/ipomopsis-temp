@@ -29,7 +29,7 @@ library(broom)
 library(viridis)
 library(ggsignif)
 library(RColorBrewer)
-knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
+knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, knitr.kable.NA = "",
                       fig.path = "plots-traits/", dev="svglite", dev.args=list(fix_text_size=FALSE), 
                       fig.height=5, fig.width=5)
 ```
@@ -41,7 +41,7 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 
 census.maxf <- read_csv("data/2021 Maxfield Rosettes - 2021OTCs.csv") %>% 
   mutate(across(c(plant, plot), as.character),
-         temp=fct_relevel(fct_recode(temp,"warmed"="OTC"),"control"))
+         temp=fct_relevel(fct_recode(temp,"warmed"="OTC"),"control"), site="Maxfield")
 
 #TODO look at survival and flowering from 2021 to 2022 (2021 Maxfield Rosettes - 2021.csv)
 
@@ -168,18 +168,17 @@ vt <- read_csv("data/volatiles/CWu_meta21.csv") %>%
 
 sm <- bind_rows(general=bind_rows(read_csv("data/2019 & 2021 SC & GNA Soil Moisture - general.csv"),
                 read_csv("data/2021 Maxfield Soil Moisture - 2021.csv") %>% 
-                  filter(date!=ymd("2021-06-23")) %>% #no OTCs yet
+                  filter(date!=ymd("2021-06-23")) %>% #no OTCs at Maxfield yet
                   mutate(temp = ifelse(location %in% c("OTCV","OTCO") | !is.na(OTC),"warmed", "control"),
                          site="Maxfield")),
                 atplant=bind_rows(read_csv("data/2021 Maxfield Leaf Traits - 2021round1.csv") %>% 
                   select(date=date_collected, plot, subplot, plant, temp, VWC, period=per_us) %>% 
                   mutate(temp = ifelse(temp=="OTC", "warmed", "control"), site="Maxfield", plant=as.character(plant)),
                 vt %>% select(site, date, temp, chamber, plotid, plant, VWC, notes)), .id="type") %>% 
-                  mutate(year=year(date))
+                  mutate(year=year(date)) %>% filter(date!=ymd("2019-08-05")) #only one warmed VWC at GNA that day
 
 # OTCs ---------------------------------------------------------------
-otc_duration <- read_csv("./data/CWu OTC Hobos - duration.csv") %>% 
-    mutate(begin=OTC_start-days(1), end=OTC_end+days(1), .keep="unused") #start/end were trimmed 1 day for hobos
+otc_duration <- read_csv("./data/CWu OTC Hobos - duration.csv")
 
 # meltdates ---------------------------------------------------------------
 
@@ -234,9 +233,12 @@ traitnames <- set_names(c(
 ```{r timings, fig.height=6}
 timings <- bind_rows(
   meltdates=meltdates %>% rename(begin=sun_date) %>% mutate(end=begin),
-  otc= otc_duration %>% mutate(begin=yday(begin), end=yday(end)), 
-  sm = sm %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
+  otc = otc_duration %>% mutate(begin=yday(OTC_start), end=yday(OTC_end)), 
+  hobo = otc_duration %>% mutate(begin=yday(logger_start), end=yday(logger_end)),
+  sm = sm %>% filter(type=="general") %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
   vt = vt %>% filter(Tissue=="flower", !is.na(site)) %>% group_by(site, year) %>% 
+    summarize(begin = min(yday(date)), end = max(yday(date))),
+  vt.leaf = vt %>% filter(Tissue=="leaf", !is.na(site)) %>% group_by(site, year) %>% 
     summarize(begin = min(yday(date)), end = max(yday(date))),
   mt = morph %>% drop_na(corolla_length) %>% group_by(site, year) %>% 
     summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
@@ -244,32 +246,38 @@ timings <- bind_rows(
   flrcol = data.frame(year=2021, site="Maxfield", begin=yday(ymd("2021-07-14")), end=yday(ymd("2021-07-26"))),
   ph = phen %>% drop_na(height_cm) %>% group_by(site, year) %>% summarize(begin = min(yday(date)), end = max(yday(date))),
   sds = sds21.date %>% group_by(site, year) %>% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)), 
-  .id="variable") %>% ungroup
+  .id="variable") %>% ungroup %>% select(variable, year, site, begin, end)
 
-timings_labels <- c(meltdates="Snowmelt", otc="Open top chambers",
-                   vt="Volatiles",
-                   sm="Soil moisture",         ph="Fly eggs", #Inflorescence height
+timings_labels <- c(meltdates="Snowmelt",      otc="Open top chambers", hobo="Loggers",
+                   vt="Floral volatiles",      vt.leaf="Leaf volatiles",
+                   sm="General soil moisture",         ph="Height, flowers, fly eggs",
                    mt="Floral morphology",     nt="Nectar", 
-                   sds="Seeds", flrcol="Flower color")
+                   sds="Seeds",                flrcol="Flower color")
 
-timings %>% mutate(range=paste(begin,end,sep=" - "), .keep="unused") %>% 
-  pivot_wider(names_from=year, values_from=range, names_sort=T)
+timings.otc <- timings %>% left_join(select(otc_duration, year, site, OTC_start)) %>% 
+  mutate(begin=begin-yday(OTC_start), end=end-yday(OTC_start))
 
-dodging <- position_dodge2(width=0.9, reverse = T, preserve="single")
-timings %>% filter(site!="bb", variable !="meltdates") %>% 
-  mutate(variable=fct_reorder(variable, begin, na.rm=T) %>% fct_relevel("otc") %>% fct_rev(), 
+timings.otc %>% mutate(range=paste(begin, end=end, sep=" : "), .keep="unused") %>% select(-OTC_start) %>% 
+  pivot_wider(names_from=year, values_from=range, names_sort=T) %>% 
+  mutate(variable=recode(variable, !!!timings_labels)) %>% arrange(site) %>% kable(caption="Days after OTCs deployed")
+
+dodging <- position_dodge2(width=1, reverse = T, preserve="single")
+shading <- data.frame(ystart=0:6+0.5, yend=1:7+0.5, col=letters[c(1,2,1,2,1,2,1)])
+timings.otc %>% filter(site!="bb", !variable %in% c("meltdates","sds","hobo","otc")) %>% 
+  mutate(variable=fct_reorder(variable, begin, na.rm=T) %>% 
+           fct_relevel(c("vt","vt.leaf","mt","nt","flrcol","ph")) %>% fct_rev(), 
          year=factor(year)) %>% 
   ggplot(aes(y=variable, color=year, shape=site))+ 
+  geom_rect(data=shading, aes(ymin=ystart, ymax=yend, xmin=-Inf, xmax=Inf, fill=col), inherit.aes = F, alpha=0.05)+
+  scale_fill_grey(start=0, end=1, guide="none")+
   geom_linerange(aes(xmin=begin, xmax=end), 
                  position = dodging, size=1, show.legend=FALSE) + 
   geom_point(aes(x=begin), position = dodging, size=2)+
   geom_point(aes(x=end), position = dodging, size=2) + 
-  scale_y_discrete("", labels=timings_labels)+
-  scale_x_continuous("Day of year", breaks=seq(80,240, by=20)) +
-  labs(color="Year", shape="Site")+ scale_color_manual(values=year_pal)+
-  theme_minimal() + theme(legend.position = "top", text=element_text(size=14, color="black"), 
-                          axis.text = element_text(color="black"),
-                          panel.border = element_rect(fill=NA, colour = "black"), legend.box="vertical")
+  scale_y_discrete(labels=timings_labels)+
+  labs(color="Year", shape="Site", x="Days after OTCs deployed")+ scale_color_manual(values=year_pal)+
+  theme_minimal() + theme(legend.position = "top", legend.box="vertical",
+                          panel.grid.major.y=element_blank(), axis.title.y=element_blank())
 ```
 
 
@@ -291,6 +299,7 @@ morph %>% drop_na(corolla_length) %>% count(site, temp, plantid) %>% count(site,
 nectar%>% drop_na(nectar_volume)  %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="nectar_volume")
 phen  %>% drop_na(height_cm, temp)  %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="height_cm")
 flrcol%>% drop_na(redness, temp)    %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="redness")
+sds   %>% drop_na(seeds, temp)    %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="seeds")
 
 #Average data by plant
 morph.mean <- morph %>% drop_na(corolla_length) %>% 
@@ -307,8 +316,13 @@ flrcol.mean <- flrcol %>% drop_na(redness, temp) %>%
   summarize(redness=mean(redness, na.rm=T))
 
 all.mean <- morph.mean %>% rename(n.morph=n) %>% 
-  full_join(rename(nectar.mean, n.nectar=n)) %>% full_join(phen.max) %>% full_join(flrcol.mean) %>% full_join(sds)
+  full_join(rename(nectar.mean, n.nectar=n)) %>% full_join(phen.max) %>% full_join(flrcol.mean) %>% full_join(sds) %>% ungroup()
 traits.sd <- map_dbl(traits,     ~sd(all.mean[[.x]], na.rm=T)) %>% set_names(traits)
+
+all.mean %>% count(site, temp, plotid, plantid) %>% count(site, temp, plotid) %>% 
+  ggplot(aes(x=n, fill=temp)) + facet_grid(site~temp) + geom_histogram(binwidth=1) +
+  theme_bw() + scale_fill_brewer(palette="Set1", direction=-1, guide="none") + 
+  labs(x="Number of OTCs",y="Number of morphology plants")
 ```
 
 # Soil moisture
@@ -322,10 +336,21 @@ ggplot(sm, aes(x=factor(date), y=VWC, color=temp)) +
   scale_color_brewer(palette = "Set1", direction=-1)+
   labs(y="Soil Volumetric Water Content (%)", x="", color="Temperature")
 
-sm.mean <- sm %>% group_by(type, year, site, date, temp) %>% 
-  summarize(SE=sd(VWC, na.rm=T)/sqrt(length(VWC)), VWC=mean(VWC, na.rm=T), .groups="drop") %>% 
-  pivot_wider(names_from=temp, values_from=c(VWC, SE)) %>% 
-  mutate(VWC_diff = VWC_warmed-VWC_control)
+sm.mean.long <- sm %>% group_by(type, year, site, date, temp) %>% drop_na(VWC) %>% 
+  summarize(SE=sd(VWC, na.rm=T)/sqrt(length(VWC)), VWC=mean(VWC, na.rm=T), n=n(), .groups="drop") %>% 
+  left_join(select(otc_duration, year, site, OTC_start)) %>% 
+  mutate(days_since_OTC = date-OTC_start)
+
+ggplot(sm.mean.long, aes(x=days_since_OTC, y=VWC, shape=type, color=temp)) + 
+  facet_wrap(vars(year, site), labeller=as_labeller(c(set_names(unique(sm.mean.long$year)), sitenames)))+
+  geom_point(size=2) + geom_linerange(aes(ymin=VWC-SE, ymax=VWC+SE))+  geom_line(aes(group=temp))+
+  theme_minimal() +   scale_color_brewer("Temperature", palette = "Set1", direction=-1) +
+  scale_shape_manual("Location", values=c(19, 1), labels=c("next to plant", "general"))+
+  labs(x="Days since OTC deployment", y="Soil volumetric water content (%)")
+
+sm.mean <- sm.mean.long %>% select(-n) %>% pivot_wider(names_from=temp, values_from=c(VWC, SE)) %>% 
+  mutate(VWC_diff = VWC_warmed-VWC_control) %>% 
+  filter(days_since_OTC > 0) # some baseline VWC measurements right when OTCs deployed
 
 print(paste("Mean difference in VWC across dates and sites (mean +-SD):", round(mean(sm.mean$VWC_diff),1),"+-", round(sd(sm.mean$VWC_diff),1)))
 
@@ -683,7 +708,7 @@ phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_eg
 ##  Seed production
 
 ```{r selection, fig.width=7, fig.height=7}
-all.mean %>% select(all_of(c(floraltraits, "seeds_per_flower"))) %>% 
+all.mean %>% select(all_of(c(floraltraits, "seeds_per_flower","temp"))) %>% 
   pivot_longer(any_of(floraltraits), names_to="trait") %>% 
   ggplot(aes(x=value, y=seeds_per_flower, color=temp)) + 
   geom_smooth(method="lm",se=F) + # formula = y ~ poly(x, 2, raw=TRUE) 
@@ -714,7 +739,7 @@ ggplot(mt.mod.seeds.emm, aes(x=trait, color=temp, y=trait.z.trend, ymin=trait.z.
 ## Fly damage
 
 ```{r selection_fly , fig.width=7, fig.height=7}
-all.mean %>% select(all_of(c(floraltraits, "prop_infested"))) %>% 
+all.mean %>% select(all_of(c(floraltraits, "prop_infested","temp"))) %>% 
   pivot_longer(any_of(floraltraits), names_to="trait") %>% 
   ggplot(aes(x=value, y=prop_infested, color=temp)) + geom_point() +
   geom_smooth(method="glm",se=F, method.args = list(family="binomial")) + 

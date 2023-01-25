@@ -266,8 +266,11 @@ files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filena
 ```{r times}
 ggplot(meta, aes(x=paste(Expt, DN,Year), y=Pump, color=DN)) + 
   geom_boxplot() + geom_point()+
-  theme_minimal() + theme(axis.text.x=element_text(angle=90))+
+  theme_minimal() + theme(axis.text.x=element_text(angle=90))+ 
   ggtitle("Sampling time of day")
+
+meta %>% group_by(Expt, DN, Tissue, Year) %>% drop_na(Pump) %>% 
+  summarize(first=seconds_to_period(min(Pump)), last=seconds_to_period(max(Pump))) %>% kable(caption="Pump times")
 
 ggplot(meta, aes(x=paste(Expt, Site, Year), y=Total/60, color=Tissue)) + 
   geom_point(position=position_dodge(width=0.3))+
@@ -916,7 +919,7 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#T
 Dropped 2 samples from 2018 without leaf mass. Volatiles units are ng per hour per gram dry leaf.
 
 ```{r inventory_leaf}
-svl %>% count(PlantType, Treat, expt) %>% kable(caption="Sample size")
+svl %>% count(PlantType, Treat, expt, Year) %>% kable(caption="Sample size")
 ```
 
 ## Heatmap
