@@ -23,7 +23,7 @@ library(tidyverse)
 library(lubridate)
 library(knitr)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
-                      fig.path = "plots-otcs/", dev="png", fig.height=10, fig.width=10)
+                      fig.path = "plots-otcs/", dev="png", fig.height=7, fig.width=9)
 
 ```
 
@@ -61,6 +61,8 @@ hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa)
   rename(datetime = Timestamp, temp_C=Temp, intensity_lux=Illum) %>% 
   mutate(date = date(datetime), time = hour(datetime)+minute(datetime)/60) %>% 
   filter(site != "bb")
+
+sitenames <- c(GNA="Gothic Natural Area",Maxfield="Maxfield Meadow",SC="Spring Creek")
 ```
 
 # Raw data
@@ -69,7 +71,7 @@ hobos <- hobo_objects %>% map_dfr(~.x$df_env, .id="file")%>% left_join(hobometa)
 ggplot(drop_na(hobos,temp_C), aes(x=yday(date)+time/24, fill=temp_C, y=paste(year, site, temp, plotid))) + 
   facet_wrap(vars(year), ncol=1, scales="free_y") +
   geom_tile() + scale_fill_viridis_c(option="inferno") +
-  labs(title = "Temperature over time", x="Day of year", y="Year, site, temp, plot", fill="Temp (C)")
+  labs(title = "Temperature over time", x="Day of year", y="Year, site, temp, plot", fill="Temp (\u00B0C)")
 ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=intensity_lux, y=paste(year, site, temp, plotid))) + 
   facet_wrap(vars(year), ncol=1, scales="free_y") +
   geom_tile() + scale_fill_viridis_c(option="viridis")+
@@ -80,8 +82,8 @@ ggplot(drop_na(hobos,intensity_lux), aes(x=yday(date)+hour(datetime)/24, fill=in
 hobos %>% filter(year=="2018", site=="GNA", date>=ymd("2018-07-29")) %>% drop_na(temp_C) %>% 
   ggplot(aes(x=datetime, y=temp_C, color=temp, group=paste(site, temp,plotid, id))) +
   facet_wrap(vars(site))+
-  geom_path() +  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal()+
-  labs(x="Date", y="Temperature (C)", color="Temperature") + scale_x_datetime(date_breaks="1 day")
+  geom_path() +  scale_color_brewer(palette="Set1", direction=-1, guide="none") + theme_minimal()+
+  labs(x="Date", y="Temperature (\u00B0C)", color="Temperature") + scale_x_datetime(date_breaks="1 day")
 ```
 
 # Hourly mean temps
@@ -93,51 +95,53 @@ hobos.mean <- hobos %>% group_by(year, site, datetime, date, time, temp) %>%
   mutate(OTC_diff_C = mean_temp_C_warmed - mean_temp_C_control, OTC_diff_lux = mean_intensity_lux_warmed - mean_intensity_lux_control) %>%
   write_csv("./data/hobos_mean.csv")
 
-hobos.mean %>% ungroup() %>% group_by(year, site) %>% 
+hobos.mean.mean <- hobos.mean %>% ungroup() %>% group_by(year, site) %>% 
   summarize(across(contains(c("C","lux")), list(mean=mean, sd=sd))) %>% 
-  select(-contains("lux")) %>% 
-  kable(caption="Mean temperatures across season in each treatment")
+  select(-contains("lux"))
+hobos.mean.mean %>% kable(caption="Mean temperatures across season in each treatment", digits=2)
 
 ggplot(hobos.mean, aes(x=mean_temp_C_control, y=mean_temp_C_warmed, color=OTC_diff_C)) + 
-    facet_grid(rows=vars(site), cols=vars(year))+
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_point(size=0.5) + geom_abline(slope=1, intercept=0, color="white") + coord_fixed() +
   scale_color_viridis_c(option="magma") + geom_smooth(se=F, color="pink", span=0.2) + theme_dark() +
   labs(title = "Average Hourly Temp Comparison (Scatter)")
 
 ggplot(hobos.mean, aes(x=time, y=OTC_diff_C))+
-  facet_grid(rows=vars(site), cols=vars(year))+
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_line(aes(group=date),size=0.5, alpha=0.2) +
   geom_smooth(se=F, color="black", span=0.15, method="loess") + 
-  labs(x="Time of day", y="Temperature difference (C)") + 
+  labs(x="Time of day (h)", y="Temperature difference (\u00B0C)") + 
   scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()
   
 hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, 
                             names_to="temp", names_prefix="mean_temp_C_", values_to="temp_C") %>% 
-  ggplot(aes(x=time, y=temp_C, color=temp, group=date)) + 
-    facet_grid(rows=vars(site), cols=vars(year))+
+  ggplot(aes(x=time, y=temp_C, color=temp)) + 
+    facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_line(aes(group=paste(date, site, year, temp)),size=0.3, alpha=0.2) +
-  geom_smooth(aes(group=temp), se=F, span=0.15, method="loess", size=1) + 
-  labs(y="Temperature (C)", x="Time of day", color="Temperature") +
-  scale_color_brewer(palette="Set1", direction=-1) +
+  geom_smooth(aes(group=temp), se=F, span=0.15, method="loess", size=1) +
+  geom_text(data=hobos.mean.mean, aes(label=paste0("+",round(OTC_diff_C_mean,1)," \U00B0","C"), 
+                                      y=OTC_diff_C_mean, x=12, color="warmed"))+
+  labs(y="Temperature (\u00B0C)", x="Time of day (h)", color="Temperature") +
+  scale_color_brewer(palette="Set1", direction=-1, guide="none") +
   scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()
 
 hobos.mean %>% pivot_longer(mean_intensity_lux_control:mean_intensity_lux_warmed, 
                             names_to="temp", names_prefix="mean_intensity_lux_", values_to="intensity_lux") %>% 
   ggplot(aes(x=time, y=intensity_lux, color=temp, group=date)) + 
-    facet_grid(rows=vars(site), cols=vars(year))+
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_line(aes(group=paste(date, site, year, temp)),size=0.3, alpha=0.2) +
   geom_smooth(aes(group=temp), se=F, span=0.15, method="loess", size=1) + 
-  labs(y="Light intensity (lux)", x="Time of day", color="Temperature") +
-  scale_color_brewer(palette="Set1", direction=-1) +
+  labs(y="Light intensity (lux)", x="Time of day (h)", color="Temperature") +
+  scale_color_brewer(palette="Set1", direction=-1, guide="none") +
   scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()
 
 library(colorspace)
 circlecol <- hex(polarLAB(70, 60, seq(0, 2*pi, length.out = 20)*180/pi), fixup=T)
 ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(datetime)+minute(datetime)/60)) + 
-    facet_grid(rows=vars(site), cols=vars(year))+
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_point() + geom_smooth(method="loess", se=F, color="black") +
   scale_color_gradientn(colors=circlecol) +
-  labs(x="Mean light intensity at controls (lux)", y="Mean temperature difference OTCs - controls (C)", color="Hour",
+  labs(x="Mean light intensity at controls (lux)", y="Mean temperature difference OTCs - controls (\u00B0C)", color="Hour",
        title = "Temp vs. Light at different times of day")+ theme_minimal()
 ```
 
@@ -153,34 +157,46 @@ hobos.max.date.long <- hobos.minmax.date %>% filter(name !="min_temp_C") %>% piv
   pivot_wider(names_from=temp, values_from=max_temp_C) %>% mutate(OTC_diff_C = warmed-control)
 
 ggplot(hobos.minmax, aes(x=yday(date), y=value, color=temp)) + 
-      facet_grid(rows=vars(site), cols=vars(year))+
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_point(size=0.7) + geom_line(aes(group=paste(name, Logger.SN)))+
-  labs(y="Temperature (C)", x="Date",  color="Temperature") +
-  scale_color_brewer(palette="Set1", direction=-1) + scale_y_continuous(n.breaks=10) +
+  labs(y="Temperature (\u00B0C)", x="Date",  color="Temperature") +
+  scale_color_brewer(palette="Set1", direction=-1, guide="none") + scale_y_continuous(n.breaks=10) +
   labs(title = "Min and Max Daily Temp across Season") + theme_minimal()
 
 ggplot(hobos.max.date.long, aes(x=control, y=OTC_diff_C)) + 
   geom_point() + geom_smooth(span=0.6, se=F, color="black") + geom_hline(yintercept=0) +
-  labs(y = "Maximum temperature difference (C)", x="Maximum temperature in controls (C)", 
+  labs(y = "Maximum temperature difference (\u00B0C)", x="Maximum temperature in controls (\u00B0C)", 
        title="OTC effect on daily maximum temperature") + theme_minimal()
 
-hobos.max.date.long %>% group_by(year, site) %>% 
+hobos.max.diff <- hobos.max.date.long %>% group_by(year, site) %>% 
   summarize(OTC_diff_C.mean = mean(OTC_diff_C),
-            OTC_diff_C.sd = sd(OTC_diff_C)) %>% 
-  kable(digits=1, caption = "Difference in daily maximum temperature")
+            OTC_diff_C.sd = sd(OTC_diff_C))
+hobos.max.diff %>% kable(digits=1, caption = "Difference in daily maximum temperature")
 ```
 
 # Variation among loggers
 
 ```{r variation}
-hobos.max.vsmean <- left_join(filter(hobos.minmax, name=="max_temp_C"), hobos.max.date.long) %>% mutate(diff_C = value-control) 
+hobos.max.vsmean <- left_join(filter(hobos.minmax, name=="max_temp_C"), hobos.max.date.long) %>% 
+  mutate(diff_C = value-control) 
 
 ggplot(hobos.max.vsmean, aes(x=control, y=diff_C, color=temp)) + 
-  facet_grid(rows=vars(site), cols=vars(year)) + 
-  #geom_abline(slope=1, intercept=0) +  geom_abline(slope=1, intercept=7) + 
-  geom_point(size=0.5) +
+  facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
+  geom_point(size=0.5) + geom_hline(yintercept=0)+
   geom_smooth(aes(group=paste(year, site, Logger.SN)), se=F, method="loess", size=0.5) + 
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() + 
-  labs(x="Mean maximum temperature in controls (C)", y="Maximum - mean maximum in controls (C)", color="Temperature")
+  geom_text(data=hobos.max.diff, aes(label=paste0("+",round(OTC_diff_C.mean,1), " \u00B0C"), 
+                                     y=OTC_diff_C.mean, x=17, color="warmed"))+
+  scale_color_brewer(palette="Set1", direction=-1, guide="none") + theme_minimal() + 
+  labs(x="Daily maximum temperature in controls (\u00B0C)", y="Difference in daily maximum temperature (\u00B0C)", color="Temperature")
+
+library(ggExtra)
+p <- ggplot(hobos.max.vsmean %>% filter(temp=="warmed"), aes(x=control, y=diff_C, color=paste(year, sitenames[site]))) + 
+  geom_point(size=0.5, show.legend=F) + geom_hline(yintercept=0)+
+  geom_smooth(method="loess", se=F, span=0.8, size=1.2) + #geom_rug(color="black", alpha=0.1)+
+  scale_color_brewer(palette="Set2") + theme_minimal() + theme(legend.position="left")+
+  scale_x_continuous(n.breaks = 6)+ guides(color = guide_legend(override.aes = list(size = 2))) +
+  labs(x="Mean daily maximum ambient temperature (\u00B0C)", y="Difference in daily maximum temperature (\u00B0C)", color="")
+ggExtra::ggMarginal(p, fill="white", groupColour = T, xparams=list(bw=1.5, size=1), yparams=list(bw=0.8, size=1)) %>% 
+  print(newpage=T)
 ```
 
