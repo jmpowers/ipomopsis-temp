@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-24" />
+<meta name="date" content="2023-01-30" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-24</h4>
+<h4 class="date">2023-01-30</h4>
 
 </div>
 
@@ -1763,29 +1763,56 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
   geom_path(aes(group=paste(Year, Site, Pump_datehour)), color=&quot;black&quot;, alpha=0.3)+
   theme_minimal() + theme(axis.text.x=element_text(angle=90)) + 
   scale_color_brewer(palette = &quot;Set1&quot;, direction=-1)+
-  labs(y=&quot;Mean hourly temperature (C)&quot;, x=(&quot;Year, site&quot;), color=&quot;Temperature&quot;)</code></pre>
+  labs(y=&quot;Mean hourly temperature (\u00B0C)&quot;, x=(&quot;Year, site&quot;), color=&quot;Temperature&quot;)</code></pre>
 <p><img src="plots/actualtemp-1.svg" width="768" /></p>
 <pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed, x=mean_temp_C_control, color=DN))+
   geom_abline(slope=1, intercept=0)+ geom_smooth(se=F)+
   geom_text(aes(label=round(mean_temp_C_warmed-mean_temp_C_control)), alpha=0.2)+ theme_minimal() +
-  labs(x= &quot;Mean temperature, controls (C)&quot;, y=&quot;Mean temperature, warmed (C)&quot;, color=&quot;Time&quot;)</code></pre>
+  labs(x= &quot;Mean temperature, controls (\u00B0C)&quot;, y=&quot;Mean temperature, warmed (\u00B0C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-2.svg" width="768" /></p>
 <pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed-mean_temp_C_control, x=hour(Pump), color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
-    labs(x= &quot;Time of day&quot;, y=&quot;Temperature difference (C)&quot;, color=&quot;Time&quot;)</code></pre>
+    labs(x= &quot;Time of day&quot;, y=&quot;Temperature difference (\u00B0C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-3.svg" width="768" /></p>
+<pre class="r"><code>meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;) %&gt;% 
+  mutate(mean_temp_C_diff = mean_temp_C_warmed-mean_temp_C_control) %&gt;% 
+  group_by(DN) %&gt;% summarize(mean_temp_C_diff.SD = sd(mean_temp_C_diff, na.rm=T), 
+                             mean_temp_C_diff = mean(mean_temp_C_diff, na.rm=T)) %&gt;% 
+  kable(caption=&quot;temp difference during sampling&quot;)</code></pre>
+<table>
+<caption>temp difference during sampling</caption>
+<thead>
+<tr class="header">
+<th align="left">DN</th>
+<th align="right">mean_temp_C_diff.SD</th>
+<th align="right">mean_temp_C_diff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">day</td>
+<td align="right">2.5117706</td>
+<td align="right">5.307497</td>
+</tr>
+<tr class="even">
+<td align="left">night</td>
+<td align="right">0.4110246</td>
+<td align="right">1.040040</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(y=mean_temp_C_warmed-mean_temp_C_control, x=mean_temp_C_control, color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
-      labs(x= &quot;Mean temperature, controls (C)&quot;, y=&quot;Temperature difference (C)&quot;, color=&quot;Time&quot;)</code></pre>
+      labs(x= &quot;Mean temperature, controls (\u00B0C)&quot;, y=&quot;Temperature difference (\u00B0C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-4.svg" width="768" /></p>
 <pre class="r"><code>ggplot(meta %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, Site != &quot;bb&quot;), 
        aes(x=hour(Pump), y=mean_temp_C_control, color=DN))+
   geom_point(alpha=0.1)+geom_smooth(aes(group=paste(Site, Year, DN)), se=F, method=&quot;lm&quot;)+ theme_minimal() +
   scale_x_continuous(n.breaks=20) +
-      labs(x= &quot;Time of day&quot;, y=&quot;Temperature in controls (C)&quot;, color=&quot;Time&quot;)</code></pre>
+      labs(x= &quot;Time of day&quot;, y=&quot;Temperature in controls (\u00B0C)&quot;, color=&quot;Time&quot;)</code></pre>
 <p><img src="plots/actualtemp-5.svg" width="768" /></p>
 </div>
 </div>
@@ -1905,8 +1932,11 @@ for(yr in levels(svf$Year)) {
   thisyr &lt;- svf$Year==yr
   vol[thisyr,] &lt;- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0(&quot;area_per_ng&quot;,yr)), FUN = &#39;/&#39;)
 }
+svf$Total &lt;- rowSums(vol)
+
 ipochemsl &lt;- ipochems[match(colnames(vol.leaf), ipochems$shortname),]
-vol.leaf &lt;- sweep(vol.leaf, 2, ipochemsl$area_per_ng2019, FUN = &#39;/&#39;)</code></pre>
+vol.leaf &lt;- sweep(vol.leaf, 2, ipochemsl$area_per_ng2019, FUN = &#39;/&#39;)
+svl$Total &lt;- rowSums(vol.leaf)</code></pre>
 </div>
 </div>
 <div id="all-filtered-samples" class="section level1">
@@ -2069,7 +2099,95 @@ points(nmds.vol, display=&quot;sites&quot;, col=svf$Year, pch=c(1,4)[svf$DN])</c
 </tbody>
 </table>
 <pre class="r"><code>samplesperplant &lt;- svf %&gt;% filter(Expt==&quot;otc&quot;) %&gt;% count(PlantType, DN, temp, Year, Site, PlantID)
-samplesperplant %&gt;% count(PlantType, DN, Year, Site, n) %&gt;% kable(caption=&quot;Sample size per plant&quot;)</code></pre>
+samplesperplant %&gt;% count(PlantType, DN, Year, Site, temp) %&gt;%  pivot_wider(names_from=temp, values_from=n) %&gt;% kable(caption=&quot;Number of plants&quot;)</code></pre>
+<table>
+<caption>Number of plants</caption>
+<thead>
+<tr class="header">
+<th align="left">PlantType</th>
+<th align="left">DN</th>
+<th align="left">Year</th>
+<th align="left">Site</th>
+<th align="right">control</th>
+<th align="right">warmed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2018</td>
+<td align="left">bb</td>
+<td align="right">13</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2018</td>
+<td align="left">GNA</td>
+<td align="right">16</td>
+<td align="right">28</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2019</td>
+<td align="left">GNA</td>
+<td align="right">10</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">GNA</td>
+<td align="right">18</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">Maxfield</td>
+<td align="right">26</td>
+<td align="right">27</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2019</td>
+<td align="left">SC</td>
+<td align="right">10</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">16</td>
+<td align="right">24</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2019</td>
+<td align="left">SC</td>
+<td align="right">8</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="left">2021</td>
+<td align="left">SC</td>
+<td align="right">16</td>
+<td align="right">25</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>samplesperplant %&gt;% count(PlantType, DN, Year, Site, n) %&gt;% kable(caption=&quot;Sample size per plant&quot;)</code></pre>
 <table>
 <caption>Sample size per plant</caption>
 <thead>
@@ -2437,12 +2555,56 @@ legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quo
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
 legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
 legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))</code></pre>
 <p><img src="plots/otc_comb_temp-1.svg" width="768" /></p>
+<pre class="r"><code>lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<table>
+<caption>total emissions</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Year</td>
+<td align="right">762.76744</td>
+<td align="right">381.38372</td>
+<td align="right">2</td>
+<td align="right">177.8899</td>
+<td align="right">11.3760516</td>
+<td align="right">0.0000224</td>
+</tr>
+<tr class="even">
+<td align="left">Site</td>
+<td align="right">12.47178</td>
+<td align="right">12.47178</td>
+<td align="right">1</td>
+<td align="right">134.0008</td>
+<td align="right">0.3720129</td>
+<td align="right">0.5429420</td>
+</tr>
+<tr class="odd">
+<td align="left">temp</td>
+<td align="right">33.75707</td>
+<td align="right">33.75707</td>
+<td align="right">1</td>
+<td align="right">157.3793</td>
+<td align="right">1.0069182</td>
+<td align="right">0.3171826</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="cap-of-i.-tenuituba" class="section level2">
@@ -2539,12 +2701,47 @@ temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_tem
 legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;), fill=rev(viridis(2)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
 legend(&quot;left&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))</code></pre>
 <p><img src="plots/otc_comb_temp_tenD-1.svg" width="768" /></p>
+<pre class="r"><code>lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<table>
+<caption>total emissions</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Year</td>
+<td align="right">12.52674</td>
+<td align="right">12.52674</td>
+<td align="right">1</td>
+<td align="right">90</td>
+<td align="right">0.3463473</td>
+<td align="right">0.5576622</td>
+</tr>
+<tr class="even">
+<td align="left">temp</td>
+<td align="right">94.79351</td>
+<td align="right">94.79351</td>
+<td align="right">1</td>
+<td align="right">90</td>
+<td align="right">2.6209118</td>
+<td align="right">0.1089631</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="both-years-night" class="section level3">
 <h3>Both years, night</h3>
@@ -2593,12 +2790,47 @@ plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
 title(paste(&quot;OTC warming: I. ten, 2019/2021 night&quot;,&quot;n =&quot;, nrow(svf.otc)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
 legend(&quot;left&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp), fill=tempcol)
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=tempcol[svf.otc$temp], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))</code></pre>
 <p><img src="plots/otc_comb_temp_tenN-1.svg" width="768" /></p>
+<pre class="r"><code>lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<table>
+<caption>total emissions</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Year</td>
+<td align="right">463.63144</td>
+<td align="right">463.63144</td>
+<td align="right">1</td>
+<td align="right">66.60305</td>
+<td align="right">13.6609001</td>
+<td align="right">0.0004446</td>
+</tr>
+<tr class="even">
+<td align="left">temp</td>
+<td align="right">10.24176</td>
+<td align="right">10.24176</td>
+<td align="right">1</td>
+<td align="right">55.20099</td>
+<td align="right">0.3017735</td>
+<td align="right">0.5849883</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="night-vwc" class="section level3">
 <h3>2021, night, VWC</h3>
@@ -2688,12 +2920,56 @@ legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quo
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
 legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
 legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(temprange[1]-temprange[2]))[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;red&quot;,0.7),alpha(&quot;red&quot;,0)))</code></pre>
 <p><img src="plots/otc_both_species-1.svg" width="768" /></p>
+<pre class="r"><code>lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<table>
+<caption>total emissions</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Year</td>
+<td align="right">714.9814</td>
+<td align="right">357.4907</td>
+<td align="right">2</td>
+<td align="right">287</td>
+<td align="right">10.363667</td>
+<td align="right">0.0000451</td>
+</tr>
+<tr class="even">
+<td align="left">Site</td>
+<td align="right">267.9796</td>
+<td align="right">133.9898</td>
+<td align="right">2</td>
+<td align="right">287</td>
+<td align="right">3.884368</td>
+<td align="right">0.0216505</td>
+</tr>
+<tr class="odd">
+<td align="left">temp</td>
+<td align="right">103.6076</td>
+<td align="right">103.6076</td>
+<td align="right">1</td>
+<td align="right">287</td>
+<td align="right">3.003587</td>
+<td align="right">0.0841545</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="both-species-day-by-week" class="section level2">
 <h2>2021 both species, day, by week</h2>
@@ -2764,18 +3040,18 @@ title(paste(&quot;OTC warming, week: I. agg &amp; ten at all sites, 2021, day&qu
 legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
 legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
 legend(&quot;topleft&quot;,  title=paste(&quot;Week&quot;,&quot;\nP =&quot;,anova.cap[&quot;sampround&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$sampround), pch=c(1,2))
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
 points(cap.otc.comb, display=&quot;sites&quot;, col=tempcol[svf.otc$temp], pch=as.integer(svf.otc$sampround))
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))</code></pre>
 <p><img src="plots/otc_week-1.svg" width="768" /></p>
 </div>
-<div id="both-species-vwc-day" class="section level2">
-<h2>Both species, VWC day</h2>
-<pre class="r"><code>svf %&gt;% mutate(hasVWC=!is.na(SoilVWC)) %&gt;% filter(Expt==&quot;otc&quot;)%&gt;% count(Year, Site, DN, hasVWC) %&gt;% pivot_wider(names_from=hasVWC, values_from=n) %&gt;%   kable(caption=&quot;VOC samples with soil moisture&quot;)</code></pre>
+<div id="both-species-vwctemp-day" class="section level2">
+<h2>Both species, VWC+temp, day</h2>
+<pre class="r"><code>svf %&gt;% mutate(hasVWC=!is.na(SoilVWC+mean_temp_C_treatment)) %&gt;% filter(Expt==&quot;otc&quot;)%&gt;% count(Year, Site, DN, hasVWC) %&gt;% pivot_wider(names_from=hasVWC, values_from=n) %&gt;%   kable(caption=&quot;VOC samples with soil moisture and temp&quot;)</code></pre>
 <table>
-<caption>VOC samples with soil moisture</caption>
+<caption>VOC samples with soil moisture and temp</caption>
 <thead>
 <tr class="header">
 <th align="left">Year</th>
@@ -2790,8 +3066,8 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <td align="left">2018</td>
 <td align="left">bb</td>
 <td align="left">day</td>
-<td align="right">1</td>
-<td align="right">25</td>
+<td align="right">26</td>
+<td align="right">NA</td>
 </tr>
 <tr class="even">
 <td align="left">2018</td>
@@ -2804,8 +3080,8 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 <td align="left">2019</td>
 <td align="left">GNA</td>
 <td align="left">day</td>
-<td align="right">12</td>
-<td align="right">10</td>
+<td align="right">13</td>
+<td align="right">9</td>
 </tr>
 <tr class="even">
 <td align="left">2019</td>
@@ -2851,27 +3127,27 @@ text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>svf.otc &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, DN==&quot;day&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(SoilVWC)
+<pre class="r"><code>svf.otc &lt;- svf %&gt;% filter(expt==&quot;otc&quot;, DN==&quot;day&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(SoilVWC, mean_temp_C_treatment)
 vol.otc &lt;- vol[svf.otc$sample,]
-(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ Year + Site + SoilVWC + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
-<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + Site + SoilVWC + temp,
-data = svf.otc, distance = &quot;bray&quot;)
+(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ Year + Site + SoilVWC + mean_temp_C_treatment, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
+<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + Site + SoilVWC +
+mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          61.6164     1.0000     
-Constrained     8.0878     0.1313    6
-Unconstrained  73.9242     1.1997   85
-Imaginary     -20.3956    -0.3310  191
+Total          61.5072     1.0000     
+Constrained     8.5097     0.1384    6
+Unconstrained  73.3347     1.1923   85
+Imaginary     -20.3371    -0.3306  190
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
  CAP1  CAP2  CAP3  CAP4  CAP5  CAP6 
-4.024 1.761 1.112 0.726 0.283 0.181 
+4.026 1.770 1.247 0.775 0.491 0.201 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-11.074  7.420  5.497  4.107  3.853  3.631  2.750  2.628 
+10.914  7.403  5.549  4.084  3.632  3.536  2.721  2.617 
 (Showing 8 of 85 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
@@ -2879,13 +3155,13 @@ Marginal effects of terms
 Permutation: free
 Number of permutations: 999
 
-Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + SoilVWC + temp, data = svf.otc, distance = &quot;bray&quot;)
-          Df SumOfSqs      F Pr(&gt;F)    
-Year       2    3.351 6.1657  0.001 ***
-Site       2    2.484 4.5692  0.001 ***
-SoilVWC    1    0.462 1.6985  0.047 *  
-temp       1    0.307 1.1291  0.268    
-Residual 272   73.924                  
+Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + SoilVWC + mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
+                       Df SumOfSqs      F Pr(&gt;F)    
+Year                    2    3.293 6.0846  0.001 ***
+Site                    2    2.227 4.1157  0.001 ***
+SoilVWC                 1    0.589 2.1760  0.012 *  
+mean_temp_C_treatment   1    0.721 2.6657  0.003 ** 
+Residual              271   73.335                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -2894,18 +3170,21 @@ ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.exp
 
 yearpch &lt;- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type=&quot;n&quot;, xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste(&quot;Soil moisture: I. agg &amp; ten at all sites, all years, day&quot;,&quot;n =&quot;, nrow(svf.otc)))
+title(paste(&quot;Soil moisture + temperature: I. agg &amp; ten at all sites, all years, day&quot;,&quot;n =&quot;, nrow(svf.otc)))
 VWCrange &lt;- round(c(max(svf.otc$SoilVWC), min(svf.otc$SoilVWC)))
-legend(&quot;topleft&quot;,  title=paste(&quot;VWC&quot;,&quot;\nP =&quot;,anova.cap[&quot;SoilVWC&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(VWCrange, &quot;%&quot;), fill=rev(viridis(2)))
+legend(&quot;left&quot;,  title=paste(&quot;VWC&quot;,&quot;\nP =&quot;,anova.cap[&quot;SoilVWC&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(VWCrange, &quot;%&quot;), fill=rev(viridis(2)))
 legend(&quot;topright&quot;,  title=paste(&quot;Year&quot;,&quot;\nP =&quot;,anova.cap[&quot;Year&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$Year), pch=yearpch)
-legend(&quot;bottomright&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
-legend(&quot;bottomleft&quot;,  title=paste(&quot;Treatment&quot;,&quot;\nP =&quot;,anova.cap[&quot;temp&quot;,&quot;Pr(&gt;F)&quot;]), levels(svf.otc$temp))
-text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))
+legend(&quot;bottomleft&quot;,  title=paste(&quot;Site&quot;,&quot;\nP =&quot;,anova.cap[&quot;Site&quot;,&quot;Pr(&gt;F)&quot;]), legend=unique(svf.otc$Site))
+temprange &lt;- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
+legend(&quot;topleft&quot;,  title=paste(&quot;Temperature&quot;,&quot;\nP =&quot;,anova.cap[&quot;mean_temp_C_treatment&quot;,&quot;Pr(&gt;F)&quot;]), legend=paste(temprange, &quot; C&quot;))
 ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col=&quot;grey80&quot;)
-points(cap.otc.comb, display=&quot;sites&quot;, col=inferno(round(VWCrange[1]-VWCrange[2]))[round(svf.otc$SoilVWC-VWCrange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display=&quot;cn&quot;)</code></pre>
-<p><img src="plots/otc_both_species_VWC-1.svg" width="768" /></p>
+points(cap.otc.comb, display=&quot;sites&quot;, col=viridis(round(VWCrange[1]-VWCrange[2]))[round(svf.otc$SoilVWC-VWCrange[2])+1], pch=yearpch[svf.otc$Year]) 
+text(cap.otc.comb, display=&quot;cn&quot;)
+text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
+                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;red&quot;,1),alpha(&quot;red&quot;,0)))</code></pre>
+<p><img src="plots/otc_both_species_VWC_temp-1.svg" width="768" /></p>
+<pre class="r"><code>ggplot(svf.otc, aes(x=mean_temp_C_treatment, y=SoilVWC))+ geom_point() + geom_smooth()</code></pre>
+<p><img src="plots/otc_both_species_VWC_temp-2.svg" width="768" /></p>
 </div>
 <div id="selection-gradients" class="section level2">
 <h2>Selection gradients</h2>
@@ -3196,7 +3475,7 @@ ggplot(vol.plot %&gt;% drop_na(PlantType, expt) %&gt;% filter(expt==&quot;otc&qu
   geom_boxplot(size=0.7, outlier.size=0.7, position=position_dodge2(preserve=&quot;total&quot;)) + 
   facet_wrap(vars(chem), scales=&quot;free&quot;) + 
   scale_y_sqrt(&quot;Emissions (ng/flower/hr)&quot;) + 
-  scale_color_brewer(&quot;Year, treatment&quot;, palette = &quot;Set1&quot;, direction=-1)+
+  scale_color_brewer(&quot;Treatment&quot;, palette = &quot;Set1&quot;, direction=-1)+
   scale_x_discrete(&quot;Site, year&quot;)+
   scale_fill_manual(&quot;Time of day&quot;,values=DNcols) + 
   theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))</code></pre>
@@ -3209,11 +3488,24 @@ ggplot(vol.plot %&gt;% drop_na(PlantType, expt) %&gt;% filter(expt==&quot;otc&qu
   geom_point() + geom_smooth(se=F, method=&quot;lm&quot;)+
   facet_wrap(vars(chem), scales=&quot;free_y&quot;) + 
   scale_y_sqrt(&quot;Emissions (ng/flower/hr)&quot;) + 
-  scale_x_continuous(&quot;Mean temperature in controls or OTCs (C)&quot;)+
+  scale_x_continuous(&quot;Mean temperature in controls or OTCs (\u00B0C)&quot;)+
   scale_color_brewer(&quot;Species, site, year&quot;, palette = &quot;Dark2&quot;, direction=-1)+#scale_color_manual(&quot;Species&quot;, values=spcols) + 
   scale_shape_manual(&quot;Time of day&quot;,values=c(1,19)) + 
   theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))</code></pre>
 <p><img src="plots/temptrend-1.svg" width="1152" /></p>
+</div>
+<div id="soil-moisture-effects" class="section level2">
+<h2>Soil moisture effects</h2>
+<pre class="r"><code>ggplot(drop_na(vol.plot, PlantType, expt) %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;),#TODO track down NAs
+       aes(x=SoilVWC, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
+  geom_point() + geom_smooth(se=F, method=&quot;lm&quot;)+
+  facet_wrap(vars(chem), scales=&quot;free_y&quot;) + 
+  scale_y_sqrt(&quot;Emissions (ng/flower/hr)&quot;) + 
+  scale_x_continuous(&quot;Soil volumetric water content (%)&quot;)+
+  scale_color_brewer(&quot;Species, site, year&quot;, palette = &quot;Dark2&quot;, direction=-1)+#scale_color_manual(&quot;Species&quot;, values=spcols) + 
+  scale_shape_manual(&quot;Time of day&quot;,values=c(1,19)) + 
+  theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))</code></pre>
+<p><img src="plots/VWCtrend-1.svg" width="1152" /></p>
 </div>
 </div>
 <div id="leaf-volatiles" class="section level1">
@@ -3293,6 +3585,31 @@ per hour per gram dry leaf.</p>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>sort(colSums(vol.leaf)/sum(colSums(vol.leaf)) )</code></pre>
+<pre><code>                          undecanal 2,2,4,7-tetramethyloctane-3,5-dione 
+                        0.004682966                         0.005735366 
+                        nonan-2-one                          hexan-1-ol 
+                        0.006579109                         0.008933983 
+ (E)-12-cyclopropyldodec-11-en-1-ol                   (Z)-hex-2-en-1-ol 
+                        0.009388218                         0.011518029 
+        [(Z)-hex-3-enyl] pentanoate                        pseudoionone 
+                        0.013308094                         0.014021370 
+                         hex-2-enal                       1-penten-3-ol 
+                        0.015621827                         0.015685913 
+                 3,7-dimethyldecane                 4-methylpentan-1-ol 
+                        0.015811380                         0.018826771 
+                         petasitene                     b-caryophyllene 
+                        0.019925304                         0.021561362 
+                      a-campholenal                        tridec-1-ene 
+                        0.022321232                         0.026126936 
+                  (E)-tridec-2-enal                 (E)-4-oxohex-2-enal 
+                        0.028061874                         0.028555519 
+                      5-butylnonane                4,6-dimethyldodecane 
+                        0.032276024                         0.036435511 
+                     (E)-hex-2-enal            [(E)-hex-3-enyl] acetate 
+                        0.101587668                         0.158466414 
+                  (E)-hex-3-en-1-ol 
+                        0.384569131 </code></pre>
 </div>
 <div id="heatmap" class="section level2">
 <h2>Heatmap</h2>
