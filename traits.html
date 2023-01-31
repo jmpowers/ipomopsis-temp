@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-24" />
+<meta name="date" content="2023-01-26" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -261,7 +261,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-24</h4>
+<h4 class="date">2023-01-26</h4>
 
 </div>
 
@@ -438,6 +438,8 @@ meltdates &lt;- tibble::tribble( ~year, ~sun_date, # average light level melt da
 
 spnames &lt;- c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;)
 sitenames &lt;- c(GNA=&quot;Gothic Natural Area&quot;,Maxfield=&quot;Maxfield Meadow&quot;,SC=&quot;Spring Creek&quot;)
+speciessitenames &lt;- c(GNA=&quot;I. aggregata\nGothic Natural Area&quot;,Maxfield=&quot;I. aggregata\nMaxfield Meadow&quot;,
+                      SC=&quot;I. tenuituba\nSpring Creek&quot;)
 year_pal &lt;- setNames(brewer.pal(3, name=&quot;Set2&quot;)[c(2,3,1)], meltdates$year)
 
 traits &lt;- c(&quot;corolla_length&quot;, &quot;corolla_width&quot;, 
@@ -471,8 +473,8 @@ traitnames &lt;- set_names(c(
   sm = sm %&gt;% filter(type==&quot;general&quot;) %&gt;% group_by(site, year) %&gt;% summarize(begin = min(yday(date)), end = max(yday(date))),
   vt = vt %&gt;% filter(Tissue==&quot;flower&quot;, !is.na(site)) %&gt;% group_by(site, year) %&gt;% 
     summarize(begin = min(yday(date)), end = max(yday(date))),
-  vt.leaf = vt %&gt;% filter(Tissue==&quot;leaf&quot;, !is.na(site)) %&gt;% group_by(site, year) %&gt;% 
-    summarize(begin = min(yday(date)), end = max(yday(date))),
+  vt.leaf = vt %&gt;% filter(Tissue==&quot;leaf&quot;, !is.na(site), year==&quot;2019&quot;) %&gt;% 
+    group_by(site, year) %&gt;% summarize(begin = min(yday(date)), end = max(yday(date))),
   mt = morph %&gt;% drop_na(corolla_length) %&gt;% group_by(site, year) %&gt;% 
     summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
   nt = nectar %&gt;% group_by(site, year) %&gt;% summarize(begin = min(yday(date), na.rm=T), end = max(yday(date), na.rm=T)),
@@ -550,7 +552,7 @@ timings.otc %&gt;% mutate(range=paste(begin, end=end, sep=&quot; : &quot;), .kee
 <tr class="odd">
 <td align="left">Leaf volatiles</td>
 <td align="left">GNA</td>
-<td align="left">20 : 20</td>
+<td align="left">NA</td>
 <td align="left">27 : 27</td>
 <td align="left">NA</td>
 </tr>
@@ -1073,7 +1075,7 @@ print(paste(&quot;Mean difference in VWC across dates and sites (mean +-SD):&quo
 <h1>Trait plasticity</h1>
 <pre class="r"><code>morph.mean %&gt;% pivot_longer(c(corolla_length, corolla_width)) %&gt;% 
 ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep=&quot;\n&quot;)
-  facet_grid(name~site, scales=&quot;free_y&quot;, labeller = as_labeller(c(traitnames.units, sitenames)))+
+  facet_grid(name~site, scales=&quot;free_y&quot;, labeller = as_labeller(c(traitnames.units, speciessitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
               map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
@@ -1091,7 +1093,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
               map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
-  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield floral morphology by date&quot;, subtitle=&quot;1-2 flowers/plant/date, unaveraged. OTCs deployed 6-28&quot;) + 
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield floral morphology by date&quot;, subtitle=&quot;1-2 flowers/plant/date, unaveraged. OTCs deployed 6-25&quot;) + 
   scale_y_continuous(limits=c(0,NA))+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;)</code></pre>
@@ -1103,7 +1105,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
               map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
-  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield nectar by date&quot;, subtitle=&quot;OTCs deployed 6-28&quot;) + 
+  labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield nectar by date&quot;, subtitle=&quot;OTCs deployed 6-25&quot;) + 
   scale_y_continuous(limits=c(0,NA))+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;)</code></pre>
@@ -1114,11 +1116,11 @@ ggplot(aes(x=temp, y=value, color=temp)) +
 
 ggplot(morph.meandate, aes(x=date, y=value, color=temp)) +
   facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller=as_labeller(traitnames.units))+
-  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(begin)))+
+  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(OTC_start)))+
   geom_path(aes(group=plantid), alpha=0.6) +  geom_point(size=1) + 
   geom_path(data=morph.meandate %&gt;% group_by(name, date, temp) %&gt;% summarize(value=mean(value, na.rm=T)), aes(group=temp), size=2)+
   labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield floral morphology by date&quot;, subtitle=&quot;1-2 flowers/plant/date, averaged by plant&quot;) + 
-  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-27&quot;), NA))+ 
+  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-24&quot;), NA))+ 
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="plots-traits/plasticity_multisite-4.svg" width="480" /></p>
@@ -1128,11 +1130,11 @@ ggplot(morph.meandate, aes(x=date, y=value, color=temp)) +
 
 ggplot(nectar.meandate, aes(x=date, y=value, color=temp)) +
   facet_wrap(vars(name), scales=&quot;free_y&quot;, labeller=as_labeller(traitnames.units))+
-  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(begin)))+
+  geom_vline(aes(xintercept=otc_duration %&gt;% filter(site==&quot;Maxfield&quot;) %&gt;% pull(OTC_start)))+
   geom_path(aes(group=plantid), alpha=0.6) +  geom_point(size=1) + 
   geom_path(data=nectar.meandate %&gt;% group_by(name, date, temp) %&gt;% summarize(value=mean(value, na.rm=T)), aes(group=temp), size=2)+
   labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;, title=&quot;Maxfield nectar by date&quot;, subtitle=&quot;1-2 flowers/plant/date, averaged by plant&quot;) + 
-  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-27&quot;), NA))+ 
+  scale_y_continuous(limits=c(0,NA))+ scale_x_date(limits=c(ymd(&quot;2021-06-24&quot;), NA))+ 
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1) + theme_minimal() +
   theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="plots-traits/plasticity_multisite-5.svg" width="480" /></p>
