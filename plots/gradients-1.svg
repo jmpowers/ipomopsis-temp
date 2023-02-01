@@ -137,9 +137,9 @@
 <text x='545.91' y='372.16' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";'>0.50</text>
 <text x='374.76' y='384.90' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";'>Selection gradient (beta) estimated from PCs</text>
 <text x='286.20' y='416.41' style='font-size: 11.00px; font-family: "Arial";'>Temperature</text>
-<line x1='361.86' y1='419.31' x2='361.86' y2='405.49' style='stroke-width: 1.07; stroke: #377EB8; stroke-linecap: butt;' />
+<line x1='354.95' y1='412.40' x2='368.77' y2='412.40' style='stroke-width: 1.07; stroke: #377EB8; stroke-linecap: butt;' />
 <circle cx='361.86' cy='412.40' r='2.84' style='stroke-width: 1.42; stroke: #377EB8; fill: #377EB8;' />
-<line x1='417.11' y1='419.31' x2='417.11' y2='405.49' style='stroke-width: 1.07; stroke: #E41A1C; stroke-linecap: butt;' />
+<line x1='410.19' y1='412.40' x2='424.02' y2='412.40' style='stroke-width: 1.07; stroke: #E41A1C; stroke-linecap: butt;' />
 <circle cx='417.11' cy='412.40' r='2.84' style='stroke-width: 1.42; stroke: #E41A1C; fill: #E41A1C;' />
 <text x='375.98' y='415.61' style='font-size: 8.80px; font-family: "Arial";'>control</text>
 <text x='431.23' y='415.61' style='font-size: 8.80px; font-family: "Arial";'>warmed</text>
