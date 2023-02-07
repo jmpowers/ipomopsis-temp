@@ -73,7 +73,7 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
 load("data/volatiles/Maxfield_21.Rdata") #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
 load("data/volatiles/CWu_181921.Rdata")
 #write(rownames(ipo.all), "data/volatiles/CWu_samples.txt")
-ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date"))
+ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date")) #TODO this filename split is outdated
 ipo.data <- bind_rows(ipo.data, GCMS_Maxfield_21)
 
 # load short names and standard regessions
@@ -160,33 +160,39 @@ legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, 
 
 # Read metadata
 ```{r metadata}
-files <- read_tsv("data/volatiles/CWu_samples_text2.csv") %>% 
-  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
+#TODO I think I still need to account for skips in 2021 SC + GNA file names! Also likely for 2019, don't see any "renamed" files
+#TODO sc21 row 61 matches multiple rows
+
+##### 2018 + 2019 | bb + GNA + SC  | OTC + Perc ######
+# field metadata
 perc <- read_csv("data/volatiles/CWu Ipomopsis Scent Metadata - Percivals2018_2019.csv")
 otc <- read_csv("data/volatiles/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv")  %>%  
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
+# manually split filenames and drop chromatograms that were redone
+files <- read_tsv("data/volatiles/CWu Ipomopsis Scent Metadata - CWu_samples_text2.tsv") %>% 
+  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control")) %>% filter(is.na(Drop))
+# merge metadata and filenames
+perc2 <- left_join(perc,files, by=c("Date","DN","Tissue","Sample2"), suffix=c("",".f"))
+otc2 <-  left_join(otc, files, by=c("Date","Site","temp","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
+  mutate(PlantType = if_else(temp == "air", "air", PlantType))
 
+###### 2021 | GNA + SC | OTC ######
+# field metadata
 sc21 <- read_tsv("data/volatiles/2021 Spring Creek Volatiles - 2021.tsv") %>% 
   mutate(PlantType=if_else(plant=="air", "air", "ten"))
 gna21 <- read_tsv("data/volatiles/2021 GNA Volatiles - 2021.tsv") %>% 
   mutate(time="day", PlantType=if_else(plant=="air", "air", "agg"))
-
-files21 <- tibble(Filename = rownames(ipo.all)) %>% 
-  filter(str_detect(Filename, "2021"), 
-         str_detect(Filename, "SC_|GNA_")) %>%
-  separate(Filename, into=c("site","vial","sampledate","rundate","GCn"), sep="_", remove=FALSE, convert=TRUE) %>% 
-  mutate(GCn = str_remove(GCn, ".qgd"))
-#write_tsv(files21, "files21.tsv")  
-files21 <- read_tsv("data/volatiles/files21.tsv")
-
-perc2 <- left_join(perc,files, by=c("Date","DN","Tissue","Sample2"), suffix=c("",".f"))
-otc2 <- left_join(otc,files, by=c("Date","Site","temp","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
-  mutate(PlantType = if_else(temp == "air", "air", PlantType))
-
-drop2021 <- c("SC_126_210727_8182021_04.qgd", "SC_101_210727_8202021_02.qgd", "GNA_121_210730_7312021_05.qgd")#don't include these
+# automatically split filenames, manually edit, drop chromatograms that were redone, and read back in
+# tibble(Filename = rownames(ipo.all)) %>% 
+#   filter(str_detect(Filename, "2021"), 
+#          str_detect(Filename, "SC_|GNA_")) %>%
+#   separate(Filename, into=c("site","vial","sampledate","rundate","GCn"), sep="_", remove=FALSE, convert=TRUE) %>% 
+#   mutate(GCn = str_remove(GCn, ".qgd")) %>% write_tsv("files21_auto.tsv")  
+files21 <- read_tsv("data/volatiles/CWu Ipomopsis Scent Metadata - files21.tsv") %>% filter(is.na(drop))
+#TODO check that the presumed redos in files21 were actually leaks/skips
+#merge metadata and filenames
 otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>% 
   left_join(files21, by=c("vial","site")) %>% 
-  filter(!Filename %in% drop2021 | is.na(Filename)) %>% 
   mutate(sampledate = as.character(sampledate),
          Year = 2021, Tissue = if_else(plant == "air", "air", "flower"), Expt="otc",
          location = recode(location,"inside"="warmed","outside"="control"),
@@ -195,10 +201,8 @@ otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>%
          NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate_text=sampledate,
          RunDate_text=rundate,GCOrder=GCn)
 
-#TODO find missing chromatogram files (6) and missing metdata (4)
-#otc21 %>% filter(is.na(FileName), is.na(lost))
-
-# Maxfield metadata
+####### 2021 | Maxfield | OTC  #######
+#automatically split filenames. Filename2 accounts for skip
 maxfiles <- read_csv("data/volatiles/filenames_metadata - filenames_metadata.csv") %>% 
   mutate(Is2021 = str_detect(Filename,"_210")) %>% 
   filter(Maxfield==1 & Year=="2021") %>% 
@@ -207,10 +211,12 @@ maxfiles <- read_csv("data/volatiles/filenames_metadata - filenames_metadata.csv
   mutate(date = ymd(date), vial=as.character(vial),
          filament = ifelse(date>ymd("2021-07-21"),"after","before"))
 
+#field metadata, joined with treatments
 GCMS_metadata1 <- read_csv("data/volatiles/2021 Maxfield Volatiles - 2021.csv") %>% mutate(plotid=paste0(plot, subplot)) %>% 
   left_join(read_csv("data/2021 Maxfield Rosettes - 2021OTCs.csv") %>% mutate(plant=as.character(plant)),
             by=c("plotid","plant","plantid"))
 
+#look up plant IDs for each GC tube (vial column also has A/B for multiple samples)
 max21.oldformat <- bind_rows(
   left_join(maxfiles %>% filter(vial %in% c("A","B")), GCMS_metadata1, by=c("plantid","vial","date")),
   left_join(maxfiles %>% filter(!vial %in% c("A","B") & is.na(plantid)), GCMS_metadata1, by=c("vial","date")), #vial numbers only
@@ -219,6 +225,7 @@ max21.oldformat <- bind_rows(
          temp=factor(temp.y), snow=factor(snow),
          plantid= coalesce(plantid, plantid.y)) 
 
+#rename columns to match CWu metadata format
 max21 <- max21.oldformat %>% #put in line with CWu metadata
   rename(Date=date, RunDate_text=rundate,
          Comments=notes, Collector=observer, Bag=bag, Pump=pump,End=end, 
@@ -231,7 +238,7 @@ max21 <- max21.oldformat %>% #put in line with CWu metadata
          Expt="otc",Site="Maxfield",DN="day",
          temp=recode(temp,"OTC"="warmed"))
 
-
+######## Combine all metadata tables #########
 meta <- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id="expt") %>% 
   mutate_if(is.character, as.factor) %>%
   mutate(Equil=Pump-Bag, Duration=End-Pump, Total=End-Bag,
@@ -256,6 +263,7 @@ Tempcol <- set_names(brewer.pal(3, "Set1")[c(2,1)], c("cool", "warm"))#Percivals
 #perc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("perc_nomatch.csv")
 #otc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("otc_nomatch.csv")
 meta %>% filter(is.na(Filename) & nomatch!="NR") %>% select(1:24) %>% kable
+otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:21) %>% kable
 ```
 
 ## Missing metadata
