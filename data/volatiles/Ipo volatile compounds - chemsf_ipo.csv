@@ -4840,9 +4840,9 @@ n,name,shortname,standard,verdict,filters_passed,mean,max,match.var,match,RT.var
 4839,"Benzoic acid, nonadecyl ester",,,,1,0,0,NA,0.79,NA,22.84,1,0.021,0,0.000,0.000,0.000,1,0.02127659574,High,Low,Rare,OK,Low,AmRatioFail,0.0,tTestFail,FALSE
 4840,"Benzoic acid, pentafluorophenyl ester",,,,5,1088,261147,NA,0.90,NA,14.41,0,0.000,1,0.004,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4841,"Benzoic acid, pentyl ester",,,,4,2059,281656,0.0002,0.73,0.00,15.42,0,0.000,2,0.008,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
-4842,"Benzonitrile, 2-methyl-",,,,4,36999,2470118,0.0030,0.91,0.00,10.64,2,0.043,24,0.100,3.000,0.057,2,0.04255319149,OK,OK,OK,OK,Low,AmRatioFail,1.7,tTestFail,FALSE
+4842,"Benzonitrile, 2-methyl-",indole,Indole,new,4,36999,2470118,0.0030,0.91,0.00,10.64,2,0.043,24,0.100,3.000,0.057,2,0.04255319149,OK,OK,OK,OK,Low,AmRatioFail,1.7,tTestFail,FALSE
 4843,Benzoyl-dl-valine,,,,4,413,99043,NA,0.73,NA,14.64,0,0.000,1,0.004,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
-4844,Benzyl nitrile,2-phenylacetonitrile,Benzaldehyde,new,5,17090,1135734,0.0018,0.87,0.00,10.64,0,0.000,11,0.046,2.000,0.038,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
+4844,Benzyl nitrile,indole,Indole,new,5,17090,1135734,0.0018,0.87,0.00,10.64,0,0.000,11,0.046,2.000,0.038,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4845,"Bicyclo[2.1.0]pentane, 1,4-dimethyl-",,,,5,309,74276,NA,0.81,NA,8.75,0,0.000,1,0.004,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4846,"Bicyclo[2.2.1]hept-2-ene, 2,3-dimethyl-",,,,2,0,0,NA,0.71,NA,6.91,1,0.021,0,0.000,0.000,0.000,1,0.02127659574,OK,Low,Rare,OK,Low,AmRatioFail,0.0,tTestFail,FALSE
 4847,"Bicyclo[2.2.1]heptan-2-ol, 1,3,3-trimethyl-, (1R-endo)-",,,,2,0,0,NA,0.74,NA,14.34,0,0.000,0,0.000,1.000,0.019,0,0,OK,Low,Rare,OK,Low,AmRatioFail,0.0,tTestZeros,FALSE

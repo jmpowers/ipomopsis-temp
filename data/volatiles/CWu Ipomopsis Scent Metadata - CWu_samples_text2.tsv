@@ -1,4 +1,4 @@
-n	Filename	Lead	Year	Expt	Site	Temp	PlantType	Type	OI	Sample	Sample2	nomatch	DNLeaf	DN	Tissue	SampleDate_text	SampleDate_format	Date	RunDate_text	RunDate	GCOrder	Drop	Notes
+n	sample	Lead	Year	Expt	Site	Temp	PlantType	Type	OI	Sample	Sample2	nomatch	DNLeaf	DN	Tissue	SampleDate_text	SampleDate_format	Date	RunDate_text	RunDate	GCOrder	Drop	Notes
 37	Air1renamedJuly25_08312018.qgd	Air1renamedJuly25	2018	otc	GNA		agg	Air	air	1	Air1			day	air	July25	Jul 25 2018	2018-07-25	8312018	2018-08-31			
 39	Air2renamedJuly25_08312018.qgd	Air2renamedJuly25	2018	otc	GNA		agg	Air	air	2	Air2			day	air	July25	Jul 25 2018	2018-07-25	8312018	2018-08-31			
 38	Air2July25redo_08312018.qgd	Air2July25redo	2018	otc	GNA		agg	Air	air	2redo	Air2redo			day	air	July25redo	Jul 25 2018	2018-07-25	8312018	2018-08-31			
@@ -12,7 +12,7 @@ n	Filename	Lead	Year	Expt	Site	Temp	PlantType	Type	OI	Sample	Sample2	nomatch	DNL
 118	NatAreaC1DJul25_08302018.qgd	NatAreaC1DJul25	2018	otc	GNA		agg	NatArea	in	C1D	C1		day	day	flower	Jul25	Jul 25 2018	2018-07-25	8302018	2018-08-30			
 119	NatAreaC2DJul25_08302018.qgd	NatAreaC2DJul25	2018	otc	GNA		agg	NatArea	in	C2D	C2		day	day	flower	Jul25	Jul 25 2018	2018-07-25	8302018	2018-08-30			
 120	NatAreaC3DJuly25_08312018.qgd	NatAreaC3DJuly25	2018	otc	GNA		agg	NatArea	in	C3D	C3		day	day	flower	July25	Jul 25 2018	2018-07-25	8312018	2018-08-31		1	redone
-121	redo	NatAreaC3DJuly25redo	2018	otc	GNA		agg	NatArea	in	C3D	C3		day	day	flower	July25redo	Jul 25 2018	2018-07-25	8312018	2018-08-31			redone
+121	NatAreaC3DJuly25redo_08312018.qgd	NatAreaC3DJuly25redo	2018	otc	GNA		agg	NatArea	in	C3D	C3		day	day	flower	July25redo	Jul 25 2018	2018-07-25	8312018	2018-08-31			redo
 122	NatAreaD1DJul25_08302018.qgd	NatAreaD1DJul25	2018	otc	GNA		agg	NatArea	in	D1D	D1		day	day	flower	Jul25	Jul 25 2018	2018-07-25	8302018	2018-08-30			
 123	NatAreaD2DJul25_08302018.qgd	NatAreaD2DJul25	2018	otc	GNA		agg	NatArea	in	D2D	D2		day	day	flower	Jul25	Jul 25 2018	2018-07-25	8302018	2018-08-30			
 124	NatAreaD3DJul25_08302018.qgd	NatAreaD3DJul25	2018	otc	GNA		agg	NatArea	in	D3D	D3		day	day	flower	Jul25	Jul 25 2018	2018-07-25	8302018	2018-08-30			
@@ -122,7 +122,7 @@ n	Filename	Lead	Year	Expt	Site	Temp	PlantType	Type	OI	Sample	Sample2	nomatch	DNL
 272	OTC_C1_leaf_190802_882019_05.qgd	OTC	2019	otc	SC		ten	OTC	in	C1	C1		leaf	day	leaf	190802	08-02-19	2019-08-02	882019	2019-08-08	5		
 275	OTC_C2_leaf_190802_892019_03.qgd	OTC	2019	otc	SC		ten	OTC	in	C2	C2		leaf	day	leaf	190802	08-02-19	2019-08-02	892019	2019-08-09	3		
 280	OTC_D1_leaf_190802_892019_04.qgd	OTC	2019	otc	SC		ten	OTC	in	D1	D1		leaf	day	leaf	190802	08-02-19	2019-08-02	892019	2019-08-09	4		
-284	OTC_E2_leaf_190802_882019_04.qgd	OTC	2019	otc	SC		ten	OTC	in	E2	E1		leaf	day	leaf	190802	08-02-19	2019-08-02	882019	2019-08-08	4		duplicate filename, changed  Sample2 E2 to E1 (matches metadata)
+284	OTC_E2_leaf_190802_882019_04.qgd	OTC	2019	otc	SC		ten	OTC	in	E2	E1		leaf	day	leaf	190802	08-02-19	2019-08-02	882019	2019-08-08	4		duplicate filename, changed Sample2 E2 to E1 (matches metadata)
 285	OTC_E2_leaf_190802_882019_08.qgd	OTC	2019	otc	SC		ten	OTC	in	E2	E2		leaf	day	leaf	190802	08-02-19	2019-08-02	882019	2019-08-08	8		
 288	OTC_E3_leaf_190802_892019_05.qgd	OTC	2019	otc	SC		ten	OTC	in	E3	E3		leaf	day	leaf	190802	08-02-19	2019-08-02	892019	2019-08-09	5		
 314	SC1_day_190802_892019_07.qgd	SC1	2019	otc	SC		ten	SC	out	1	1		day	day	flower	190802	08-02-19	2019-08-02	892019	2019-08-09	7		

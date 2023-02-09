@@ -61,71 +61,16 @@ rownames(ipo.all) <- ipo.all[,1]
 ipo.all[,1] <- NULL
 ```
 
-# Overview - no metadata
-## Inventory
-```{r inventory, eval=FALSE}
-#TODO merge F, G, H, I, J into GNA for 2018
-with(ipos, table(Year, Type))
-with(ipos, table(Type, DNLeaf))
-```
-
-## NMDS
-```{r nmds, eval=FALSE}
-ipo.cut <- ipo.all[,colSums(ipo.all)>1e9]
-set.seed(1)
-nmds.ipo <- metaMDS(decostand(ipo.cut, "hellinger"), dist="bray", autotransform = FALSE, try=5, trymax=5)
-
-par(bg="grey40")
-ordiplot(nmds.ipo, type = "n")
-ipos$rs <- rowSums(ipo.all)
-ipos$nameBlank <- ipos$Type %in% c("Blank","Bake")
-ipos$nameAir <- ipos$Type == "Air"
-thisyear <- ipos$Year == 2019
-#with(ipos, points(nmds.ipo, display="sites", col=viridis(200)[round(200*sqrt(rs/max(rs)))], pch=as.integer(isblank)+1))
-with(ipos, points(nmds.ipo, display="sites", col=rainbow(nlevels(ipos$Type))[ipos$Type], pch=as.integer(nameAir*2+nameBlank)+1))
-#with(ipos, points(nmds.ipo, display="sites", col=rainbow(nlevels(ipos$Type))[ipos$Type], pch=ipos$Year-2017))
-legend("topright", legend=levels(ipos$Type), fill=rainbow(nlevels(ipos$Type)), cex=0.8)
-```
-
-## Kmeans clustering
-```{r kmeans, eval=FALSE}
-k <- 8
-set.seed(1)
-km <- kmeans(decostand(ipo.cut, "log"), k, nstart=3)
-ipos$Cluster <- km$cluster
-ipos$kBlank <- kblank <- km$cluster %in% c(4)
-ipos$Mixup <- ipos$nameBlank != ipos$kBlank
-with(ipos, table(kBlank, nameBlank))
-
-ordiplot(nmds.ipo, type = "n")
-points(nmds.ipo, display="sites", col=ifelse(kblank, "black", rainbow(k)[km$cluster]), pch=with(ipos,as.integer(nameAir*2+nameBlank))+1) 
-text(nmds.ipo, display="species",col="grey80",labels=ifelse(colSums(ipo.cut)>4e8, colnames(ipo.cut), ""))
-text(nmds.ipo, display="sites", col=with(ipos, as.integer(thisyear)*4+as.integer(nameBlank)*2+as.integer(nameAir)+1), labels=as.character(km$cluster))
-```
-
-
-## CAP - blanks and years
-```{r cap_blankyear, eval=FALSE}
-ipo.cap <- capscale(ipo.cut ~ as.factor(ipos$kBlank) * as.factor(thisyear), distance="bray", metaMDSdist = F)
-plot(ipo.cap, type="n")
-points(ipo.cap, display="sites", col=ifelse(ipos$kBlank, "black", rainbow(k)[ipos$Cluster]), pch=as.integer(ipos$nameAir*2+ipos$nameBlank)+1) 
-#View(ipo.cap$CCA$v)
-```
-
-## CAP - DNLeaf
-```{r cap_DNLeaf, eval=FALSE}
-dnl <- ipos$DNLeaf!="" & ipos$Type !="Air"
-ipo.cap.dnl <- capscale(ipo.cut[dnl,] ~ ipos[dnl,"DNLeaf"], distance="bray", metaMDSdist = F)
-plot(ipo.cap.dnl, type="n")
-points(ipo.cap.dnl, display="sites", pch=as.integer(ipos[dnl,"DNLeaf"])-1, col=as.integer(factor(ipos[dnl,"Type"]))) 
-legend("bottomleft", levels(factor(ipos[dnl,"Type"])), fill=1:nlevels(ipos$Type), cex=0.8)
-legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, cex=0.8)
-#View(ipo.cap.dnl$CCA$v)
-```
-
 # Read metadata
 ```{r metadata}
-#TODO I think I still need to account for skips in 2021 SC + GNA file names! Also likely for 2019, don't see any "renamed" files
+#accounts for skips
+verdicts <- read_tsv("data/volatiles/RMBL GC-MS Data Inventory - ipogc181921.tsv") %>% 
+  select(Filename=FileName, sample, verdict, status) %>% 
+  mutate(sample = na_if(sample,"") %>% coalesce(Filename)) %>% #fill in samples with no change
+  drop_na(sample) %>%  # when both Filename and Sample are NA
+  filter(is.na(verdict) | verdict!="mismatched") %>% # fuzzy matching misassigned these to a Markes entry
+  filter(!duplicated(Filename))  # a couple nonunique filenames
+#TODO one verdict = skip-lookup but no qgb to look up last filename: OTC_Z3_190805_8102019_24.qgd
 
 ##### 2018 + 2019 | bb + GNA + SC  | OTC + Perc ######
 # field metadata
@@ -134,7 +79,8 @@ otc <- read_csv("data/volatiles/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv"
   rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control"))
 # manually split filenames and drop chromatograms that were redone
 files <- read_tsv("data/volatiles/CWu Ipomopsis Scent Metadata - CWu_samples_text2.tsv") %>% 
-  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control")) %>% filter(is.na(Drop))
+  rename(temp=OI) %>% mutate(temp = recode(temp,"in"="warmed","out"="control")) %>% filter(is.na(Drop)) %>% 
+  left_join(verdicts)
 # merge metadata and filenames
 perc2 <- left_join(perc,files, by=c("Date","DN","Tissue","Sample2"), suffix=c("",".f"))
 otc2 <-  left_join(otc, files, by=c("Date","Site","temp","DN","Tissue","Sample2"), suffix=c("",".f")) %>% 
@@ -152,11 +98,14 @@ gna21 <- read_tsv("data/volatiles/2021 GNA Volatiles - 2021.tsv") %>%
 #          str_detect(Filename, "SC_|GNA_")) %>%
 #   separate(Filename, into=c("site","vial","sampledate","rundate","GCn"), sep="_", remove=FALSE, convert=TRUE) %>% 
 #   mutate(GCn = str_remove(GCn, ".qgd")) %>% write_tsv("files21_auto.tsv")  
-files21 <- read_tsv("data/volatiles/CWu Ipomopsis Scent Metadata - files21.tsv") %>% filter(is.na(drop))
+files21 <- read_tsv("data/volatiles/CWu Ipomopsis Scent Metadata - files21.tsv") %>% 
+  filter(is.na(drop)) %>% #drop samples that were redone
+  left_join(verdicts)
 #TODO check that the presumed redos in files21 were actually leaks/skips
 #merge metadata and filenames
 otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>% 
   left_join(files21, by=c("vial","site")) %>% 
+  drop_na(plant) %>% # two contaminated traps, not used
   mutate(sampledate = as.character(sampledate),
          Year = 2021, Tissue = if_else(plant == "air", "air", "flower"), Expt="otc",
          location = recode(location,"inside"="warmed","outside"="control"),
@@ -226,8 +175,11 @@ Tempcol <- set_names(brewer.pal(3, "Set1")[c(2,1)], c("cool", "warm"))#Percivals
 ```{r nofile}
 #perc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("perc_nomatch.csv")
 #otc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("otc_nomatch.csv")
-meta %>% filter(is.na(Filename) & nomatch!="NR") %>% select(1:16) %>% kable(caption = "have metadata, no chromatogram")
-otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:18) %>% kable(caption = "have metadata, no chromatogram")
+meta %>% filter(is.na(Filename)) %>% #no filename
+  filter(is.na(lost)) %>% # 2021 samples "lost" (to what?)
+  filter(is.na(nomatch) | nomatch != "NR") %>% # samples not run
+  select(1:16) %>% kable(caption = "have metadata, no chromatogram")# & nomatch!="NR"
+#otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:18) %>% kable(caption = "have metadata, no chromatogram")
 #max21 is not missing any files
 ```
 
@@ -236,6 +188,7 @@ otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:18) %>% kable(captio
 #files %>% filter(!(Filename %in% meta$Filename)) %>% select("n") %>% write.csv("CWu_samples_nomatch.csv")
 files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","temp","DN","Tissue","Sample2")) %>% kable(caption = "have chromatogram, no metadata")
 files21 %>% filter(!(Filename %in% meta$Filename)) %>% kable(caption = "have chromatogram, no metadata")
+# GNA_121 and SC_73 traps contaminated
 #maxfiles is not missing any metadata
 ```
 
@@ -312,6 +265,7 @@ ipo.data.cut <- ipo.data.cut[ipo.data.cut$Name != "", ] #drop unidentified peaks
 ipo.data.cut$Name <- droplevels(ipo.data.cut$Name)
 longdata <- load_longdata(ipo.data.cut, sample="Filename", RT="Ret.Time", name="Name", area="Area", match = "SI", maxmatch=100)
 metadata <- sv %>% as.data.frame() %>% #tibbles break bouquet's add_count_freqs
+  rename(thesample=sample) %>% #name conflict with bouquet
   mutate(Tissue = fct_recode(Tissue, ambient="air", floral="flower", leaf="leaf"),
          PlantType = factor(if_else(Tissue=="leaf",paste0(PlantType,Tissue), as.character(PlantType)))) %>% 
   load_metadata(date="Date", sample="Filename", group="PlantType", type="Tissue")
@@ -324,14 +278,17 @@ chemsf <- chems %>%
   filter_match(0.8) %>% 
   filter_freq(0.1, group = TRUE) %>% #now filter separately for each species
   filter_contaminant(cont.list = c("Hexyl chloroformate", "Disulfide, di-tert-dodecyl",
-                                   "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate")) %>% 
+                                   "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate", 
+                                   "2,4,6-trimethyloctane", 
+                                   "Decane, 3,8-dimethyl-",    "Ethanone, 1-cyclopentyl-", 
+                                   "o-Xylene")) %>% #"Benzonitrile, 2-methyl-"
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   combine_filters() 
 chemsf$filter_final <- with(chemsf, filter_RT == "OK" & filter_match =="OK" & 
                               (filter_freq.agg == "OK" | filter_freq.ten =="OK") & 
                               filter_area == "OK" & filter_contaminant == "OK")
-bouquet::plot_filters(chemsf, option="rarity", yrange=3.5)
+
 
 #now run t-tests after rarity filtering
 #don't filter by ambient ratio first, see paper on problems: https://doi.org/10.1186/1471-2105-11-450
@@ -343,6 +300,7 @@ chemsf <- bind_rows(chemsf %>% filter(filter_final) %>%
          filter_final = filter_final & filter_ambient_ratio =="OK") %>% 
   arrange(match(name, colnames(vol.all)))
 
+bouquet::plot_filters(chemsf, option="rarity", yrange=3.5)
 bouquet::plot_filters(chemsf, option="ambient", yrange=2.5)
 bouquet::plot_filters(chemsf, option="volcano", yrange=2.5, alpha_excluded = 0.5)
 bouquet::plot_filters(chemsf, option="prop")
@@ -358,7 +316,8 @@ chemsf.leaf <- chems.leaf %>%
   filter_RT(2, 17) %>% 
   filter_match(0.8) %>% 
   filter_freq(0.2, group = TRUE) %>%  #now filter separately for each species
-  filter_contaminant(cont.list = c("Hexyl chloroformate","Acetic acid, trifluoro-, undecyl ester")) %>% 
+  filter_contaminant(cont.list = c("Hexyl chloroformate","Acetic acid, trifluoro-, undecyl ester",
+                                   "Hexylene glycol")) %>% 
   filter_area(min_maximum = 5e5) %>% 
   filter_ambient_ratio(vol.all, meta.leaf, ratio = 4) %>%
   combine_filters()
@@ -367,7 +326,6 @@ chemsf.leaf$filter_final <- with(chemsf.leaf, filter_RT == "OK" & filter_match =
                               filter_area == "OK" &
                               filter_contaminant == "OK")
 #TODO bouquet needs to do a one-sided t-test! some compounds lower in blanks got a pass with low p value!
-bouquet::plot_filters(chemsf.leaf, option="rarity")
 
 chemsf.leaf <- bind_rows(chemsf.leaf %>% filter(filter_final) %>% 
   filter_ambient_ttest(prune_sampletable(vol.all, chemsf.leaf, metadata), 
@@ -377,6 +335,7 @@ chemsf.leaf <- bind_rows(chemsf.leaf %>% filter(filter_final) %>%
          filter_final = filter_final & filter_ambient_ratio =="OK")  %>% 
   arrange(match(name, colnames(vol.all)))
 
+bouquet::plot_filters(chemsf.leaf, option="rarity")
 bouquet::plot_filters(chemsf.leaf, option="ambient", yrange=2.5)
 bouquet::plot_filters(chemsf.leaf, option="volcano", yrange=2, alpha_excluded = 0.5)
 bouquet::plot_filters(chemsf.leaf, option="prop")
@@ -401,10 +360,12 @@ vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
 
 colnames(vol)[!colnames(vol) %in% shortnames]
 
-files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd", "OTC_Z3_190805_8102019_24.qgd", "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", #no filtered volatiles
+#"OTC_Z3_190805_8102019_24.qgd" was excluded
+files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" , #no filtered volatiles
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
+#"OTC_Z2_leaf_190805_8102019_23.qgd" was excluded
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", #lack leaf mass
-                        "T164_leaf_190731_882019_18.qgd","OTC_Z2_leaf_190805_8102019_23.qgd") #no filtered volatiles
+                        "T164_leaf_190731_882019_18.qgd") #no filtered volatiles
 
 svf <- metadata[metadata$type == "floral" & !(metadata$sample %in% files_exclude),]
 svl <- metadata[metadata$type == "leaf" & !(metadata$sample %in% files_exclude_leaf),]
@@ -485,7 +446,7 @@ ph  <- pheatmap(as.matrix(t(vol))^(1/3),
 ## Flower NMDS
 ```{r nmds_filtered}
 set.seed(1)
-nmds.vol <- metaMDS(sqrt(vol), dist="bray", autotransform = FALSE, trace=F)
+nmds.vol <- metaMDS(sqrt(vol), dist="bray", autotransform = FALSE, trace=F, trymax=3)
 
 TEY <- with(svf, factor(paste(PlantType,expt,Year)))
 TEYcols <- brewer.pal(9, "Paired")#[c(1:4,8,5:6)]
