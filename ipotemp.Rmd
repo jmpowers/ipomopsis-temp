@@ -36,45 +36,10 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F,
                       fig.path = "plots/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=8, fig.width=8)
 ```
 
-```{r read_shimadzu, eval=F}
-# CWu GC data
-# setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu")
-# source("read_shimadzu.R")
-# setwd("/media/C/GCMSsolution/Data/heather Ipo/")
-# data18 <- read.shimadzu("./Temperature expt CWu 2018/CWu2018.txt")
-# data19 <- read.shimadzu("./Temperature expt CWu 2019/CWu2019.txt")
-# ipo.data <- rbind(data18, data19)
-# 
-# files.2021 <- c("Ihyb_VF_210718.txt", "Ihyb_VF_210719.txt", "Samples_210720.txt", 
-#  "Ihyb_Corydalis_210728.txt", "Ihyb_Corydalis_210729.txt", "Ihyb_Corydalis_210730.txt", "Ihyb_Corydalis_210731.txt", "Maxfield_SC_210802b.txt",  
-# "Maxfield_SC_210803.txt",    "SC_GNA_210804.txt",  "Lupinus20_SC_Lagg21_210814.txt" ,"SC_210817.txt", "SC_210818.txt",     
-# "SC_210818b.txt",     "SC_210818b001.txt",  "SC_210820b.txt",     "SC_Lagg_210821.txt"  )
-# 
-# setwd("~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/RMBL Batches")
-# ipo.data.2021 <- map_dfr(files.2021, read.shimadzu)
-# ipo.data <- rbind(ipo.data, ipo.data.2021)
-# save(ipo.data, file="CWu_181921.Rdata")
-
-# Maxfield GC data
-# setwd("~/Downloads/MaxfieldVols21/batches")
-# source("../read_shimadzu.R")
-# datafiles <- list.files(pattern=".txt") # TODO had to copy over newer Maxfield_210802.txt and add Maxfield_SC_210802b.txt
-# GCMS_output <- map(datafiles, read.shimadzu)
-# filenames <- set_names(GCMS_output,datafiles) %>% bind_rows(.id="Batch") %>% as_tibble %>% 
-#   group_by(Batch, Filename) %>% tally
-# setwd("~/Downloads/MaxfieldVols21/")#"data" folder
-# write_csv(filenames, "filenames.csv")
-#... load in GCMS_metadata 
-#GCMS_Maxfield_21 <- GCMS_output %>% bind_rows() %>% filter(Filename %in% GCMS_metadata$Filename)
-#save(GCMS_Maxfield_21, file="Maxfield_21.Rdata")
-```
-
 ```{r read_scents}
-load("data/volatiles/Maxfield_21.Rdata") #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
-load("data/volatiles/CWu_181921.Rdata")
+load("data/volatiles/ipotemp181921.Rdata") 
 #write(rownames(ipo.all), "data/volatiles/CWu_samples.txt")
 ipos <- read.csv("data/volatiles/CWu_samples.csv", colClasses=list(RunDate="Date")) #TODO this filename split is outdated
-ipo.data <- bind_rows(ipo.data, GCMS_Maxfield_21)
 
 # load short names and standard regessions
 ipochems <- read_csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv") %>% 
@@ -161,7 +126,6 @@ legend("left", levels(ipos[dnl,"DNLeaf"]), pch=1:nlevels(ipos[dnl,"DNLeaf"])-1, 
 # Read metadata
 ```{r metadata}
 #TODO I think I still need to account for skips in 2021 SC + GNA file names! Also likely for 2019, don't see any "renamed" files
-#TODO sc21 row 61 matches multiple rows
 
 ##### 2018 + 2019 | bb + GNA + SC  | OTC + Perc ######
 # field metadata
@@ -262,14 +226,17 @@ Tempcol <- set_names(brewer.pal(3, "Set1")[c(2,1)], c("cool", "warm"))#Percivals
 ```{r nofile}
 #perc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("perc_nomatch.csv")
 #otc2 %>% filter(is.na(Filename)) %>% select("n") %>% write.csv("otc_nomatch.csv")
-meta %>% filter(is.na(Filename) & nomatch!="NR") %>% select(1:24) %>% kable
-otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:21) %>% kable
+meta %>% filter(is.na(Filename) & nomatch!="NR") %>% select(1:16) %>% kable(caption = "have metadata, no chromatogram")
+otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:18) %>% kable(caption = "have metadata, no chromatogram")
+#max21 is not missing any files
 ```
 
 ## Missing metadata
 ```{r nometa}
 #files %>% filter(!(Filename %in% meta$Filename)) %>% select("n") %>% write.csv("CWu_samples_nomatch.csv")
-files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","temp","DN","Tissue","Sample2")) %>% kable
+files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","temp","DN","Tissue","Sample2")) %>% kable(caption = "have chromatogram, no metadata")
+files21 %>% filter(!(Filename %in% meta$Filename)) %>% kable(caption = "have chromatogram, no metadata")
+#maxfiles is not missing any metadata
 ```
 
 ## Times

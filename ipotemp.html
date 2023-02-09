@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-02-01" />
+<meta name="date" content="2023-02-07" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-02-01</h4>
+<h4 class="date">2023-02-07</h4>
 
 </div>
 
@@ -297,7 +297,7 @@ td, th { padding : 6px }
 <pre class="r"><code>load(&quot;data/volatiles/Maxfield_21.Rdata&quot;) #GCMS_Maxfield_21 output from david_gcms_ipomopsis (3).R
 load(&quot;data/volatiles/CWu_181921.Rdata&quot;)
 #write(rownames(ipo.all), &quot;data/volatiles/CWu_samples.txt&quot;)
-ipos &lt;- read.csv(&quot;data/volatiles/CWu_samples.csv&quot;, colClasses=list(RunDate=&quot;Date&quot;))
+ipos &lt;- read.csv(&quot;data/volatiles/CWu_samples.csv&quot;, colClasses=list(RunDate=&quot;Date&quot;)) #TODO this filename split is outdated
 ipo.data &lt;- bind_rows(ipo.data, GCMS_Maxfield_21)
 
 # load short names and standard regessions
@@ -378,33 +378,38 @@ legend(&quot;left&quot;, levels(ipos[dnl,&quot;DNLeaf&quot;]), pch=1:nlevels(ipo
 </div>
 <div id="read-metadata" class="section level1">
 <h1>Read metadata</h1>
-<pre class="r"><code>files &lt;- read_tsv(&quot;data/volatiles/CWu_samples_text2.csv&quot;) %&gt;% 
-  rename(temp=OI) %&gt;% mutate(temp = recode(temp,&quot;in&quot;=&quot;warmed&quot;,&quot;out&quot;=&quot;control&quot;))
+<pre class="r"><code>#TODO I think I still need to account for skips in 2021 SC + GNA file names! Also likely for 2019, don&#39;t see any &quot;renamed&quot; files
+
+##### 2018 + 2019 | bb + GNA + SC  | OTC + Perc ######
+# field metadata
 perc &lt;- read_csv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - Percivals2018_2019.csv&quot;)
 otc &lt;- read_csv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - OTC2018_2019.csv&quot;)  %&gt;%  
   rename(temp=OI) %&gt;% mutate(temp = recode(temp,&quot;in&quot;=&quot;warmed&quot;,&quot;out&quot;=&quot;control&quot;))
+# manually split filenames and drop chromatograms that were redone
+files &lt;- read_tsv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - CWu_samples_text2.tsv&quot;) %&gt;% 
+  rename(temp=OI) %&gt;% mutate(temp = recode(temp,&quot;in&quot;=&quot;warmed&quot;,&quot;out&quot;=&quot;control&quot;)) %&gt;% filter(is.na(Drop))
+# merge metadata and filenames
+perc2 &lt;- left_join(perc,files, by=c(&quot;Date&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;), suffix=c(&quot;&quot;,&quot;.f&quot;))
+otc2 &lt;-  left_join(otc, files, by=c(&quot;Date&quot;,&quot;Site&quot;,&quot;temp&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;), suffix=c(&quot;&quot;,&quot;.f&quot;)) %&gt;% 
+  mutate(PlantType = if_else(temp == &quot;air&quot;, &quot;air&quot;, PlantType))
 
+###### 2021 | GNA + SC | OTC ######
+# field metadata
 sc21 &lt;- read_tsv(&quot;data/volatiles/2021 Spring Creek Volatiles - 2021.tsv&quot;) %&gt;% 
   mutate(PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;ten&quot;))
 gna21 &lt;- read_tsv(&quot;data/volatiles/2021 GNA Volatiles - 2021.tsv&quot;) %&gt;% 
   mutate(time=&quot;day&quot;, PlantType=if_else(plant==&quot;air&quot;, &quot;air&quot;, &quot;agg&quot;))
-
-files21 &lt;- tibble(Filename = rownames(ipo.all)) %&gt;% 
-  filter(str_detect(Filename, &quot;2021&quot;), 
-         str_detect(Filename, &quot;SC_|GNA_&quot;)) %&gt;%
-  separate(Filename, into=c(&quot;site&quot;,&quot;vial&quot;,&quot;sampledate&quot;,&quot;rundate&quot;,&quot;GCn&quot;), sep=&quot;_&quot;, remove=FALSE, convert=TRUE) %&gt;% 
-  mutate(GCn = str_remove(GCn, &quot;.qgd&quot;))
-#write_tsv(files21, &quot;files21.tsv&quot;)  
-files21 &lt;- read_tsv(&quot;data/volatiles/files21.tsv&quot;)
-
-perc2 &lt;- left_join(perc,files, by=c(&quot;Date&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;), suffix=c(&quot;&quot;,&quot;.f&quot;))
-otc2 &lt;- left_join(otc,files, by=c(&quot;Date&quot;,&quot;Site&quot;,&quot;temp&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;), suffix=c(&quot;&quot;,&quot;.f&quot;)) %&gt;% 
-  mutate(PlantType = if_else(temp == &quot;air&quot;, &quot;air&quot;, PlantType))
-
-drop2021 &lt;- c(&quot;SC_126_210727_8182021_04.qgd&quot;, &quot;SC_101_210727_8202021_02.qgd&quot;, &quot;GNA_121_210730_7312021_05.qgd&quot;)#don&#39;t include these
+# automatically split filenames, manually edit, drop chromatograms that were redone, and read back in
+# tibble(Filename = rownames(ipo.all)) %&gt;% 
+#   filter(str_detect(Filename, &quot;2021&quot;), 
+#          str_detect(Filename, &quot;SC_|GNA_&quot;)) %&gt;%
+#   separate(Filename, into=c(&quot;site&quot;,&quot;vial&quot;,&quot;sampledate&quot;,&quot;rundate&quot;,&quot;GCn&quot;), sep=&quot;_&quot;, remove=FALSE, convert=TRUE) %&gt;% 
+#   mutate(GCn = str_remove(GCn, &quot;.qgd&quot;)) %&gt;% write_tsv(&quot;files21_auto.tsv&quot;)  
+files21 &lt;- read_tsv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - files21.tsv&quot;) %&gt;% filter(is.na(drop))
+#TODO check that the presumed redos in files21 were actually leaks/skips
+#merge metadata and filenames
 otc21 &lt;- bind_rows(SC=sc21, GNA=gna21, .id=&quot;site&quot;) %&gt;% 
   left_join(files21, by=c(&quot;vial&quot;,&quot;site&quot;)) %&gt;% 
-  filter(!Filename %in% drop2021 | is.na(Filename)) %&gt;% 
   mutate(sampledate = as.character(sampledate),
          Year = 2021, Tissue = if_else(plant == &quot;air&quot;, &quot;air&quot;, &quot;flower&quot;), Expt=&quot;otc&quot;,
          location = recode(location,&quot;inside&quot;=&quot;warmed&quot;,&quot;outside&quot;=&quot;control&quot;),
@@ -413,10 +418,8 @@ otc21 &lt;- bind_rows(SC=sc21, GNA=gna21, .id=&quot;site&quot;) %&gt;%
          NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate_text=sampledate,
          RunDate_text=rundate,GCOrder=GCn)
 
-#TODO find missing chromatogram files (6) and missing metdata (4)
-#otc21 %&gt;% filter(is.na(FileName), is.na(lost))
-
-# Maxfield metadata
+####### 2021 | Maxfield | OTC  #######
+#automatically split filenames. Filename2 accounts for skip
 maxfiles &lt;- read_csv(&quot;data/volatiles/filenames_metadata - filenames_metadata.csv&quot;) %&gt;% 
   mutate(Is2021 = str_detect(Filename,&quot;_210&quot;)) %&gt;% 
   filter(Maxfield==1 &amp; Year==&quot;2021&quot;) %&gt;% 
@@ -425,10 +428,12 @@ maxfiles &lt;- read_csv(&quot;data/volatiles/filenames_metadata - filenames_meta
   mutate(date = ymd(date), vial=as.character(vial),
          filament = ifelse(date&gt;ymd(&quot;2021-07-21&quot;),&quot;after&quot;,&quot;before&quot;))
 
+#field metadata, joined with treatments
 GCMS_metadata1 &lt;- read_csv(&quot;data/volatiles/2021 Maxfield Volatiles - 2021.csv&quot;) %&gt;% mutate(plotid=paste0(plot, subplot)) %&gt;% 
   left_join(read_csv(&quot;data/2021 Maxfield Rosettes - 2021OTCs.csv&quot;) %&gt;% mutate(plant=as.character(plant)),
             by=c(&quot;plotid&quot;,&quot;plant&quot;,&quot;plantid&quot;))
 
+#look up plant IDs for each GC tube (vial column also has A/B for multiple samples)
 max21.oldformat &lt;- bind_rows(
   left_join(maxfiles %&gt;% filter(vial %in% c(&quot;A&quot;,&quot;B&quot;)), GCMS_metadata1, by=c(&quot;plantid&quot;,&quot;vial&quot;,&quot;date&quot;)),
   left_join(maxfiles %&gt;% filter(!vial %in% c(&quot;A&quot;,&quot;B&quot;) &amp; is.na(plantid)), GCMS_metadata1, by=c(&quot;vial&quot;,&quot;date&quot;)), #vial numbers only
@@ -437,6 +442,7 @@ max21.oldformat &lt;- bind_rows(
          temp=factor(temp.y), snow=factor(snow),
          plantid= coalesce(plantid, plantid.y)) 
 
+#rename columns to match CWu metadata format
 max21 &lt;- max21.oldformat %&gt;% #put in line with CWu metadata
   rename(Date=date, RunDate_text=rundate,
          Comments=notes, Collector=observer, Bag=bag, Pump=pump,End=end, 
@@ -449,7 +455,7 @@ max21 &lt;- max21.oldformat %&gt;% #put in line with CWu metadata
          Expt=&quot;otc&quot;,Site=&quot;Maxfield&quot;,DN=&quot;day&quot;,
          temp=recode(temp,&quot;OTC&quot;=&quot;warmed&quot;))
 
-
+######## Combine all metadata tables #########
 meta &lt;- bind_rows(otc=bind_rows(otc2, otc21, max21), perc=perc2, .id=&quot;expt&quot;) %&gt;% 
   mutate_if(is.character, as.factor) %&gt;%
   mutate(Equil=Pump-Bag, Duration=End-Pump, Total=End-Bag,
@@ -654,7 +660,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">32</td>
+<td align="right">31</td>
 </tr>
 <tr class="odd">
 <td align="right">2018</td>
@@ -929,7 +935,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">18</td>
+<td align="right">16</td>
 </tr>
 <tr class="even">
 <td align="right">2019</td>
@@ -1017,7 +1023,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">12</td>
+<td align="right">11</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
@@ -1138,7 +1144,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">36</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="right">2021</td>
@@ -1171,7 +1177,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">control</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">31</td>
+<td align="right">30</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
@@ -1182,7 +1188,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">control</td>
 <td align="left">night</td>
 <td align="left">otc</td>
-<td align="right">32</td>
+<td align="right">31</td>
 </tr>
 <tr class="odd">
 <td align="right">2021</td>
@@ -1193,7 +1199,7 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">warmed</td>
 <td align="left">day</td>
 <td align="left">otc</td>
-<td align="right">42</td>
+<td align="right">41</td>
 </tr>
 <tr class="even">
 <td align="right">2021</td>
@@ -1206,6 +1212,28 @@ meta %&gt;% count(Year, Temp, Tissue, PlantType, Site, temp, DN, Expt) %&gt;% ka
 <td align="left">otc</td>
 <td align="right">46</td>
 </tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">GNA</td>
+<td align="left">NA</td>
+<td align="left">day</td>
+<td align="left">otc</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2021</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">SC</td>
+<td align="left">NA</td>
+<td align="left">night</td>
+<td align="left">otc</td>
+<td align="right">1</td>
+</tr>
 </tbody>
 </table>
 <pre class="r"><code>tempcol &lt;- set_names(brewer.pal(3, &quot;Set1&quot;)[c(2,1)], c(&quot;control&quot;, &quot;warmed&quot;))#OTCs
@@ -1214,33 +1242,26 @@ Tempcol &lt;- set_names(brewer.pal(3, &quot;Set1&quot;)[c(2,1)], c(&quot;cool&qu
 <h2>Missing files</h2>
 <pre class="r"><code>#perc2 %&gt;% filter(is.na(Filename)) %&gt;% select(&quot;n&quot;) %&gt;% write.csv(&quot;perc_nomatch.csv&quot;)
 #otc2 %&gt;% filter(is.na(Filename)) %&gt;% select(&quot;n&quot;) %&gt;% write.csv(&quot;otc_nomatch.csv&quot;)
-meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(1:24) %&gt;% kable</code></pre>
+meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(1:16) %&gt;% kable(caption = &quot;have metadata, no chromatogram&quot;)</code></pre>
 <table>
+<caption>have metadata, no chromatogram</caption>
 <colgroup>
-<col width="2%" />
-<col width="2%" />
-<col width="2%" />
-<col width="5%" />
-<col width="3%" />
-<col width="2%" />
-<col width="5%" />
+<col width="4%" />
 <col width="3%" />
 <col width="4%" />
+<col width="8%" />
+<col width="4%" />
+<col width="4%" />
+<col width="8%" />
+<col width="5%" />
 <col width="6%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="5%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="3%" />
-<col width="4%" />
-<col width="5%" />
+<col width="9%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1260,14 +1281,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <th align="left">Bag</th>
 <th align="left">Pump</th>
 <th align="left">End</th>
-<th align="left">Equil</th>
-<th align="left">Duration</th>
-<th align="right">NumFlrs</th>
-<th align="right">NumBuds</th>
-<th align="right">NumLeaf</th>
-<th align="left">PumpID</th>
-<th align="right">SoilVWC</th>
-<th align="right">SoilDepth</th>
 </tr>
 </thead>
 <tbody>
@@ -1288,14 +1301,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">10:13:00</td>
 <td align="left">10:43:00</td>
 <td align="left">10:58:00</td>
-<td align="left">1800 secs</td>
-<td align="left">900 secs</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">DRC5</td>
-<td align="right">3.7</td>
-<td align="right">1.171</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
@@ -1314,14 +1319,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">11:53:00</td>
 <td align="left">12:26:00</td>
 <td align="left">12:41:00</td>
-<td align="left">1980 secs</td>
-<td align="left">900 secs</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">CW2</td>
-<td align="right">8.6</td>
-<td align="right">1.258</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
@@ -1340,14 +1337,6 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">12:50:00</td>
 <td align="left">13:20:00</td>
 <td align="left">13:35:00</td>
-<td align="left">1800 secs</td>
-<td align="left">900 secs</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">.</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
@@ -1366,42 +1355,8 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">13:08:00</td>
 <td align="left">13:41:00</td>
 <td align="left">13:56:00</td>
-<td align="left">1980 secs</td>
-<td align="left">900 secs</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">CW2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">otc</td>
-<td align="right">65</td>
-<td align="right">2019</td>
-<td align="left">2019-08-02</td>
-<td align="left">day</td>
-<td align="left">SC</td>
-<td align="left">ten</td>
-<td align="left">leaf</td>
-<td align="left">warmed</td>
-<td align="left">OTC-E1-leaf</td>
-<td align="left">E1</td>
-<td align="left">E1</td>
-<td align="left">0</td>
-<td align="left">09:42:00</td>
-<td align="left">10:12:00</td>
-<td align="left">10:27:00</td>
-<td align="left">1800 secs</td>
-<td align="left">900 secs</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">CW2</td>
-<td align="right">6.1</td>
-<td align="right">1.191</td>
-</tr>
-<tr class="even">
 <td align="left">otc</td>
 <td align="right">5</td>
 <td align="right">2019</td>
@@ -1418,16 +1373,8 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">20:21:00</td>
 <td align="left">20:51:00</td>
 <td align="left">21:06:00</td>
-<td align="left">1800 secs</td>
-<td align="left">900 secs</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">CW2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">perc</td>
 <td align="right">47</td>
 <td align="right">2019</td>
@@ -1444,23 +1391,145 @@ meta %&gt;% filter(is.na(Filename) &amp; nomatch!=&quot;NR&quot;) %&gt;% select(
 <td align="left">21:02:00</td>
 <td align="left">21:35:00</td>
 <td align="left">21:50:00</td>
-<td align="left">1980 secs</td>
-<td align="left">900 secs</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">CW2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>otc21 %&gt;% filter(is.na(Filename), is.na(lost)) %&gt;% select(1:18) %&gt;% kable(caption = &quot;have metadata, no chromatogram&quot;)</code></pre>
+<table>
+<caption>have metadata, no chromatogram</caption>
+<colgroup>
+<col width="3%" />
+<col width="7%" />
+<col width="7%" />
+<col width="4%" />
+<col width="3%" />
+<col width="3%" />
+<col width="5%" />
+<col width="5%" />
+<col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Site</th>
+<th align="left">Collector</th>
+<th align="left">Date</th>
+<th align="left">DN</th>
+<th align="right">vial</th>
+<th align="right">lost</th>
+<th align="left">chamber</th>
+<th align="left">temp</th>
+<th align="left">plant</th>
+<th align="left">Bag</th>
+<th align="left">Pump</th>
+<th align="left">End</th>
+<th align="left">Equil</th>
+<th align="left">Duration</th>
+<th align="right">NumFlrs</th>
+<th align="right">NumBuds</th>
+<th align="left">PumpID</th>
+<th align="right">SoilVWC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="left">JP</td>
+<td align="left">2021-07-15</td>
+<td align="left">night</td>
+<td align="right">51</td>
+<td align="right">NA</td>
+<td align="left">B</td>
+<td align="left">warmed</td>
+<td align="left">238</td>
+<td align="left">19:46:00</td>
+<td align="left">20:20:00</td>
+<td align="left">20:35:00</td>
+<td align="left">00:34:00</td>
+<td align="left">00:15:00</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">DRC1</td>
+<td align="right">7.6</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="left">JP</td>
+<td align="left">2021-07-26</td>
+<td align="left">night</td>
+<td align="right">149</td>
+<td align="right">NA</td>
+<td align="left">XE</td>
+<td align="left">air</td>
+<td align="left">air</td>
+<td align="left">22:10:00</td>
+<td align="left">22:26:00</td>
+<td align="left">22:41:00</td>
+<td align="left">00:16:00</td>
+<td align="left">00:15:00</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">DRC3</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="left">CW</td>
+<td align="left">2021-07-26</td>
+<td align="left">night</td>
+<td align="right">146</td>
+<td align="right">NA</td>
+<td align="left">F</td>
+<td align="left">warmed</td>
+<td align="left">8</td>
+<td align="left">21:47:00</td>
+<td align="left">22:17:00</td>
+<td align="left">22:32:00</td>
+<td align="left">00:30:00</td>
+<td align="left">00:15:00</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">DRC7</td>
+<td align="right">12.8</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="left">DH</td>
+<td align="left">2021-07-16</td>
+<td align="left">day</td>
+<td align="right">20</td>
+<td align="right">NA</td>
+<td align="left">XL</td>
+<td align="left">control</td>
+<td align="left">360</td>
+<td align="left">09:04:00</td>
+<td align="left">09:35:00</td>
+<td align="left">09:50:00</td>
+<td align="left">00:31:00</td>
+<td align="left">00:15:00</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">CW2</td>
+<td align="right">12.1</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#max21 is not missing any files</code></pre>
 </div>
 <div id="missing-metadata" class="section level2">
 <h2>Missing metadata</h2>
 <pre class="r"><code>#files %&gt;% filter(!(Filename %in% meta$Filename)) %&gt;% select(&quot;n&quot;) %&gt;% write.csv(&quot;CWu_samples_nomatch.csv&quot;)
-files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&gt;% select(c(&quot;Filename&quot;, &quot;Date&quot;,&quot;Site&quot;,&quot;temp&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;)) %&gt;% kable</code></pre>
+files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&gt;% select(c(&quot;Filename&quot;, &quot;Date&quot;,&quot;Site&quot;,&quot;temp&quot;,&quot;DN&quot;,&quot;Tissue&quot;,&quot;Sample2&quot;)) %&gt;% kable(caption = &quot;have chromatogram, no metadata&quot;)</code></pre>
 <table>
+<caption>have chromatogram, no metadata</caption>
 <colgroup>
 <col width="45%" />
 <col width="13%" />
@@ -1547,6 +1616,75 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>files21 %&gt;% filter(!(Filename %in% meta$Filename)) %&gt;% kable(caption = &quot;have chromatogram, no metadata&quot;)</code></pre>
+<table style="width:100%;">
+<caption>have chromatogram, no metadata</caption>
+<colgroup>
+<col width="39%" />
+<col width="6%" />
+<col width="6%" />
+<col width="15%" />
+<col width="10%" />
+<col width="5%" />
+<col width="6%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Filename</th>
+<th align="left">site</th>
+<th align="right">vial</th>
+<th align="right">sampledate</th>
+<th align="right">rundate</th>
+<th align="right">GCn</th>
+<th align="right">drop</th>
+<th align="left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SC_25_210713_8172021_08.qgd</td>
+<td align="left">SC</td>
+<td align="right">25</td>
+<td align="right">210713</td>
+<td align="right">8172021</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">SC_105_210727_8202021_08.qgd</td>
+<td align="left">SC</td>
+<td align="right">105</td>
+<td align="right">210727</td>
+<td align="right">8202021</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">SC_140_210727_8202021_05.qgd</td>
+<td align="left">SC</td>
+<td align="right">140</td>
+<td align="right">210727</td>
+<td align="right">8202021</td>
+<td align="right">5</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">SC_73_210715_8202021_06.qgd</td>
+<td align="left">SC</td>
+<td align="right">73</td>
+<td align="right">210715</td>
+<td align="right">8202021</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#maxfiles is not missing any metadata</code></pre>
 </div>
 <div id="times" class="section level2">
 <h2>Times</h2>
