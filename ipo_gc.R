@@ -64,6 +64,50 @@ ipogc <- sequ.summary %>% filter(id %in% ipo.batchids | is.na(id)) %>%  #keep in
 ipogc <- read_tsv("data/volatiles/RMBL GC-MS Data Inventory - ipogc181921.tsv")
 
 
+
+# Shimadzu Quantitative Table ---------------------------------------------
+source("read_shimadzu.R")
+quantpath <- "~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu/"
+bfiles <-  c("temp_expt_quant_CWu_1819_1.txt", "temp_expt_quant_Ipo2020_1.txt", "temp_expt_quant_Max2020_1.txt")
+quant <- map_dfr(set_names(paste0(quantpath, bfiles), bfiles), read.shimadzu.quant, .id="batch") %>% 
+  mutate(Name = trimws(Name), 
+         Area=replace_na(Area, 0))  
+quant %>% select(batch, Filename, Name, Area) %>% 
+  write_tsv("data/volatiles/quant.tsv")
+
+#### Plots #### 
+shortnames <- read_csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv") %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
+contam <- c("Caprolactam", "Decanal", "Nonanoic acid", "trans-Geranylgeraniol")#last one is likely floral
+quant <- quant %>% filter(!Name %in% contam) %>% 
+  mutate(Name = fct_relabel(Name, ~shortnames[.x]))#trailing space
+
+noxtheme <- theme_minimal() + theme(legend.position ="top", axis.text.x = element_blank(), axis.title.x=element_blank())
+quant %>% ggplot(aes(x=batch, color=batch, y=Ret.Time)) + geom_hline(aes(yintercept=Std.Ret.Time)) +
+  facet_wrap(vars(Name), scales="free_y") + geom_violin(draw_quantiles = 0.5) + noxtheme
+quant %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion1.Ratio)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2) + 
+  geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio+30)) +
+  facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
+quant %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion2.Ratio)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio), linetype=2) + 
+  geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio+30)) +
+  facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
+
+quant.wide <- quant %>% select(batch, Filename, Name, Area) %>%  
+  pivot_wider(names_from = "Name", values_from="Area") %>% 
+  as.data.frame()
+rownames(quant.wide) <- quant.wide$Filename
+quant.wide[,1:2] <- NULL
+VM_Samples <- str_detect(rownames(quant.wide), "Corydalis|Sterile|Yeast|^M[0-9]")
+quant.wide.cut <- decostand(quant.wide[rowSums(quant.wide)>0 & !VM_Samples,], method="tot", MARGIN=2)
+
+ph  <- pheatmap(as.matrix(t(quant.wide.cut)^(1/3)), 
+                cluster_cols=T, show_colnames=F,
+                clustering_method="mcquitty", clustering_distance_rows="correlation",
+                clustering_distance_cols=vegdist(quant.wide.cut, method = "bray"),
+                clustering_callback = function(hc, ...){dendsort(hc, type="average")},
+                scale="none", color=inferno(512),
+                fontsize = 10, border_color = NA, legend=F, cutree_rows=8
+)
+
 # # Overview - no metadata
 # ## Inventory
 # ```{r inventory, eval=FALSE}

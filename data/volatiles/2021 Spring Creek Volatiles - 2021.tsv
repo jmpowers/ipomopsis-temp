@@ -10,7 +10,7 @@ CW	2021-07-13	day	21		XB	outside	172	10:50	11:20	11:35	0:30	0:15	1	0	CW2	2.1	tra
 CW	2021-07-13	day	22		G	inside	99	11:07	11:37	11:52	0:30	0:15	1	0	CW1	3.5		inside_day
 CW	2021-07-13	day	23		XF	outside	184	11:10	11:40	11:55	0:30	0:15	1	1	DRC7	3		outside_day
 CW	2021-07-13	day	24		G	inside	93	11:24	11:54	12:09	0:30	0:15	1	0	CW2	4.4		inside_day
-CW	2021-07-13	day	35		F	inside	220	11:42	12:12	12:27	0:30	0:15	1	0	DRC7	3.2		inside_day
+CW	2021-07-13	day	25		F	inside	220	11:42	12:12	12:27	0:30	0:15	1	0	DRC7	3.2	JP: changed vial 35 > 25 (duplicate, proximity, file with no metadata)	inside_day
 CW	2021-07-13	day	26		F	inside	208	11:49	12:20	12:35	0:31	0:15	1	0	CW1	2.5		inside_day
 CW	2021-07-13	day	27		XF	outside	221	11:58	12:28	12:43	0:30	0:15	1	0	CW2	3.6		outside_day
 CW	2021-07-13	day	28		D	inside	12	12:02	12:32	12:47	0:30	0:15	1	0	DRC7	6.3		inside_day
@@ -54,7 +54,7 @@ CW	2021-07-15	night	61	1	G	inside	99	20:29	20:59	21:14	0:30	0:15	1	0	DRC3	4		ins
 CW	2021-07-15	night	63	1	I		air	20:36	21:06	21:21	0:30	0:15			CW2			air_night
 CW	2021-07-15	night	64		F	inside	220	20:44	21:14	21:29	0:30	0:15	1	0	DRC4			inside_night
 CW	2021-07-15	night	65		G	inside	93	20:52	21:22	21:37	0:30	0:15	1	0	DRC3	5.5		inside_night
-CW	2021-07-15	night	72		XF	outside	221	21:10	21:40	21:55	0:30	0:15	1	0	DRC8	7.3		outside_night
+CW	2021-07-15	night	73		XF	outside	221	21:10	21:40	21:55	0:30	0:15	1	0	DRC8	7.3	JP: changed vial 72 > 73 (duplicate, proximity, file with no metadata)	outside_night
 CW	2021-07-15	night	79		XF	outside	184	21:26	21:56	22:11	0:30	0:15	1	0	CW2	8.2		outside_night
 JP	2021-07-15	night	50	1	B	inside	294	19:44	20:18	20:33	0:34	0:15	1	0	CW1	4.6		inside_night
 JP	2021-07-15	night	51		B	inside	238	19:46	20:20	20:35	0:34	0:15	1	0	DRC1	7.6		inside_night
@@ -114,7 +114,7 @@ DH	2021-07-28	day	185		XA	outside	186	10:40	11:10	11:26	0:30	0:16	1	0	DRC4	15	fl
 DH	2021-07-28	day	186		XA	outside	191	10:54	11:24	11:39	0:30	0:15	1	0	DRC1	15.5		
 DH	2021-07-28	day	187		A	inside	170	11:10	11:40	11:55	0:30	0:15	1	0	DRC9	10.2		
 DH	2021-07-28	day	188		XA	air	air	11:18	11:48	12:03	0:30	0:15	1	0	JMP2			
-DH	2021-07-26	night	106		H	inside	200	19:47	20:21	20:36	0:34	0:15	1	0	DRC10	8.8	flower pulled off fixing pump	
+DH	2021-07-26	night	105		H	inside	200	19:47	20:21	20:36	0:34	0:15	1	0	DRC10	8.8	flower pulled off fixing pump. JP: changed vial 106 > 105 (duplicate, proximity, file with no metadata)	
 DH	2021-07-26	night	103		XH	outside	188	19:49	20:19	20:35	0:30	0:16	1	0	DRC1	20.1		
 DH	2021-07-26	night	104		H	inside	743	19:51	20:21	20:36	0:30	0:15	1	0	DRC5	6.8		
 DH	2021-07-26	night	102		H	inside	557	19:52	20:17	20:32	0:25	0:15	1	0	DRC4	12.5	old, dried flower also in bag; pump started tooo early	

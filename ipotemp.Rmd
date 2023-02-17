@@ -55,17 +55,52 @@ class_pal <- set_names(c("#BC0060","#027B8C","#E56E00","#86D400"), levels(ipoche
 shortnames <- ipochems %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
 #shortnames[shortnames %in% shortnames[duplicated(shortnames)]]
 ipo.data$Name <- recode(ipo.data$Name, !!!shortnames)
+```
 
+# Check quant vs. qual integrations
+```{r quant}
 ipo.all <- dcast(ipo.data, Filename~Name, sum, value.var="Area")
 rownames(ipo.all) <- ipo.all[,1]
 ipo.all[,1] <- NULL
+
+#load quantitative integrations
+quant.all <- read_tsv("data/volatiles/quant.tsv") %>%
+  mutate(Name = recode(Name, !!!shortnames)) %>% 
+  pivot_wider(names_from = "Name", values_from="Area") %>% as.data.frame()
+rownames(quant.all) <- quant.all$Filename
+quant.all[,1:2] <- NULL
+quant.all <- quant.all[rownames(ipo.all),]#TODO 64 missing files, tho might be filtered out later anyway
+
+par(mfrow=c(4,6))
+quant.slopes <- set_names(rep(0,ncol(quant.all)), colnames(quant.all))
+for(compvol in colnames(quant.all)) {
+  quant_wins <- sum(ipo.all[,compvol] == 0 & quant.all[,compvol] > 0, na.rm=T)
+  qual_wins <-  sum(quant.all[,compvol] == 0 & ipo.all[,compvol] > 0, na.rm=T)
+  nozeros <- bind_cols(select(ipo.all,qual=compvol), select(quant.all,quant=compvol)) %>% 
+    filter(!(qual==0 | quant == 0))
+  quant.slopes[compvol] = coef(lm(quant ~ qual, data=nozeros))["qual"]
+  plot(x=sqrt(ipo.all[,compvol]), y=sqrt(quant.all[,compvol]),
+       main=compvol, sub = paste0("quant:qual ",quant_wins,":",qual_wins,
+                                  " slope ",round(quant.slopes[compvol],3)),
+       xlab="qual",ylab="quant")
+}
+par(mfrow=c(1,1))
+quant_betterthan_qual <- c("b-myrcene", "(Z)-b-ocimene","(E)-b-ocimene", "g-terpinene","methyl benzoate", "(3E)-4,8-dimethylnona-1,3,7-triene", "2-methylbenzonitrile", "indole", "petasitene", 
+ "trans-a-bergamotene","b-caryophyllene" ,"bergamotene","a-farnesene","pseudoionone")
+
+ggplot(tibble(quant=quant.all$indole, qual=ipo.all$indole), aes(x=qual, y=quant/0.325)) + 
+  geom_point(alpha=0.2) + scale_x_sqrt(limits=c(0,3e7)) + scale_y_sqrt() + 
+  geom_abline(slope=1, intercept=0) + labs(title="Indole integrations",x="Qualitative",y="Quantitative")
+
+quant.scaled <- sweep(quant.all, 2, quant.slopes, FUN = '/')
 ```
 
 # Read metadata
 ```{r metadata}
 #accounts for skips
 verdicts <- read_tsv("data/volatiles/RMBL GC-MS Data Inventory - ipogc181921.tsv") %>% 
-  select(Filename=FileName, sample, verdict, status) %>% 
+  select(Filename=FileName, sample, verdict, status, FullName) %>% 
+  mutate(Folder = str_remove(dirname(FullName),"C:/GCMSsolution/Data/Project1/"), .keep="unused") %>% 
   mutate(sample = na_if(sample,"") %>% coalesce(Filename)) %>% #fill in samples with no change
   drop_na(sample) %>%  # when both Filename and Sample are NA
   filter(is.na(verdict) | verdict!="mismatched") %>% # fuzzy matching misassigned these to a Markes entry
@@ -117,6 +152,7 @@ otc21 <- bind_rows(SC=sc21, GNA=gna21, .id="site") %>%
 ####### 2021 | Maxfield | OTC  #######
 #automatically split filenames. Filename2 accounts for skip
 maxfiles <- read_csv("data/volatiles/filenames_metadata - filenames_metadata.csv") %>% 
+  left_join(verdicts) %>% # checked that sample matches up with old Filename2
   mutate(Is2021 = str_detect(Filename,"_210")) %>% 
   filter(Maxfield==1 & Year=="2021") %>% 
   separate(Filename2, into=c("plantid","vial","date","rundate","sequence","ext"),remove=F) %>% 
@@ -181,6 +217,7 @@ meta %>% filter(is.na(Filename)) %>% #no filename
   select(1:16) %>% kable(caption = "have metadata, no chromatogram")# & nomatch!="NR"
 #otc21 %>% filter(is.na(Filename), is.na(lost)) %>% select(1:18) %>% kable(caption = "have metadata, no chromatogram")
 #max21 is not missing any files
+meta %>% filter(!is.na(lost)) %>% select(1:16) %>% kable(caption = "have metadata, samples lost")
 ```
 
 ## Missing metadata
@@ -188,10 +225,8 @@ meta %>% filter(is.na(Filename)) %>% #no filename
 #files %>% filter(!(Filename %in% meta$Filename)) %>% select("n") %>% write.csv("CWu_samples_nomatch.csv")
 files %>% filter(!(Filename %in% meta$Filename) & Expt!="") %>% select(c("Filename", "Date","Site","temp","DN","Tissue","Sample2")) %>% kable(caption = "have chromatogram, no metadata")
 files21 %>% filter(!(Filename %in% meta$Filename)) %>% kable(caption = "have chromatogram, no metadata")
-# GNA_121 and SC_73 traps contaminated
-#maxfiles is not missing any metadata
 ```
-
+GNA_121 and SC_101 traps contaminated, no metadata for SC_140. maxfiles is not missing any metadata.
 ## Times
 ```{r times}
 ggplot(meta, aes(x=paste(Expt, DN,Year), y=Pump, color=DN)) + 
@@ -285,9 +320,10 @@ chemsf <- chems %>%
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   combine_filters() 
-chemsf$filter_final <- with(chemsf, filter_RT == "OK" & filter_match =="OK" & 
+chemsf$filter_final <- with(chemsf, (filter_RT == "OK" & filter_match =="OK" & 
                               (filter_freq.agg == "OK" | filter_freq.ten =="OK") & 
-                              filter_area == "OK" & filter_contaminant == "OK")
+                              filter_area == "OK" & filter_contaminant == "OK") | 
+                              name %in% quant_betterthan_qual)
 
 
 #now run t-tests after rarity filtering
@@ -361,7 +397,7 @@ vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
 colnames(vol)[!colnames(vol) %in% shortnames]
 
 #"OTC_Z3_190805_8102019_24.qgd" was excluded
-files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" , #no filtered volatiles
+files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" ,"T145DWarmAug10_08292018.qgd", #no filtered volatiles
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
 #"OTC_Z2_leaf_190805_8102019_23.qgd" was excluded
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", #lack leaf mass
@@ -381,6 +417,14 @@ svl <- svl %>% mutate_if(is.factor, droplevels) %>%
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
 
+#swap in quantitative integrations (scaled up to match qual integrations)
+quant.scaled.vol <- quant.scaled[rownames(vol), 
+                                 colnames(quant.scaled) %in% 
+                                   intersect(quant_betterthan_qual, colnames(vol))] 
+#plot(x=unlist(sqrt(vol[,colnames(quant.scaled.vol)])), y=sqrt(unlist(quant.scaled.vol)), xlab="qual", ylab="quant")
+vol[,colnames(quant.scaled.vol)] <- quant.scaled.vol
+
+#Normalize emissions by equilibration and pumping time and sample
 vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
 vol.leaf <- vol.leaf / as.numeric(svl$Total, units="hours") / svl$LeafDryWtGrams #area per hour per dry gram leaf
 ```
@@ -431,10 +475,10 @@ points(nmds.vol, display="sites", col=metadata$type, pch=as.integer(factor(metad
 ## Flower heatmap
 ```{r heatmap, dev="png", dev.args=list(), fig.height=12, fig.width=12}
 #cairo_pdf("ipo_heatmap.pdf", width=12, height=12)
-ph  <- pheatmap(as.matrix(t(vol))^(1/3), 
+ph  <- pheatmap(as.matrix(t(decostand(vol, method="max")))^(1/3), 
          cluster_cols=T, show_colnames=F,
          clustering_method="mcquitty", clustering_distance_rows="correlation",
-         clustering_distance_cols=vegdist(vol, method = "bray"),
+         clustering_distance_cols=vegdist(decostand(vol, method="max"), method = "bray"),
          clustering_callback = function(hc, ...){dendsort(hc, type="average")},
          scale="none", color=inferno(512),
          annotation_col = data.frame(svf %>% select("Year", "PlantType", "expt", "Treat","DN","Site"), row.names=rownames(vol)), 
@@ -877,8 +921,9 @@ svf.perc.ten <- plot.perc.comb(svf %>% filter(expt=="perc", PlantType=="ten"))
 # Individual volatiles
 
 ## Treatment effects
-```{r barplots, fig.width=12, fig.height=8}
-vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character
+```{r barplots, fig.width=14, fig.height=12}
+vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.3) %>% pull("name") %>% as.character %>%
+  union(colnames(quant.scaled.vol))
 #vols.plot[vols.plot=="b-caryophyllene"] <- "b-caryophyllene.1"#c("b-ocimene","a-pinene","a-farnesene","b-caryophyllene.1","petasitene","b-myrcene","longifolene","tridec-1-ene  ","benzophenone")
 vol.long <- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key="chem",value="area", 2:(length(vols.plot)+2), factor_key=T)
 vol.plot <- left_join(vol.long, svf)
@@ -898,10 +943,10 @@ ggplot(vol.plot %>% drop_na(PlantType, expt) %>% filter(expt=="otc", Site!="bb")
 ```
 
 ## Actual temperature effects
-```{r temptrend, fig.width=12, fig.height=8}
+```{r temptrend, fig.width=14, fig.height=12}
 ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=mean_temp_C_treatment, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
-  geom_point() + geom_smooth(se=F, method="lm")+
+  geom_point() + geom_smooth(se=F, method="lm")+ 
   facet_wrap(vars(chem), scales="free_y") + 
   scale_y_sqrt("Emissions (ng/flower/hr)") + 
   scale_x_continuous("Mean temperature in controls or OTCs (\u00B0C)")+
@@ -911,7 +956,7 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#T
 ```
 
 ## Soil moisture effects
-```{r VWCtrend, fig.width=12, fig.height=8}
+```{r VWCtrend, fig.width=14, fig.height=12}
 ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=SoilVWC, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
   geom_point() + geom_smooth(se=F, method="lm")+

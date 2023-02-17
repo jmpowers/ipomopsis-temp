@@ -1518,7 +1518,7 @@ n,name,shortname,standard,verdict,filters_passed,mean,max,match.var,match,RT.var
 1517,"6-Heptenoic acid, 4-methylene-5-methyl-, methyl ester",,,,4,193,46321,NA,0.72,NA,10.03,0,0.000,1,0.004,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 1518,"6-Hydroxy-2,6-dihydropyran-3-one",,,,4,734,83416,0.0009,0.73,2.18,4.36,0,0.000,3,0.013,1.000,0.019,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 1519,6-Hydroxy-9-oxa-bicyclo[3.3.1]nonan-3-one,,,,2,265,63696,0.0002,0.72,0.00,7.47,1,0.021,1,0.004,0.000,0.000,1,0.02127659574,OK,Low,Rare,OK,Low,AmRatioFail,0.4,tTestFail,FALSE
-25,.beta.-Ocimene,b-ocimene,alpha_Pinene,merge,7,1707786,22110747,0.0035,0.93,0.00,9.16,11,0.234,152,0.633,7.000,0.132,11,0.2340425532,OK,OK,OK,OK,OK,OK,7.6,OK,TRUE
+25,.beta.-Ocimene,(E)-b-ocimene,alpha_Pinene,fvoc,7,1707786,22110747,0.0035,0.93,0.00,9.16,11,0.234,152,0.633,7.000,0.132,11,0.2340425532,OK,OK,OK,OK,OK,OK,7.6,OK,TRUE
 1521,"6-Methyl-2-heptanol, methyl ether",,,,4,589,66481,0.0009,0.72,0.00,8.63,0,0.000,3,0.013,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 1522,"6-Methyl-2-heptanol, trifluoroacetate",,,,4,194,30287,0.0006,0.75,0.00,8.97,0,0.000,2,0.008,1.000,0.019,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 1523,6-Methyl-3-heptyne,,,,4,165,39716,NA,0.71,NA,5.47,0,0.000,1,0.004,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
@@ -1681,7 +1681,7 @@ n,name,shortname,standard,verdict,filters_passed,mean,max,match.var,match,RT.var
 1680,"Acetic acid, ethoxy-, 1-methylethyl ester",,,,3,437,104989,0.0044,0.81,3.99,5.57,1,0.021,1,0.004,1.000,0.019,1,0.02127659574,OK,OK,Rare,OK,Low,AmRatioFail,1.3,tTestFail,FALSE
 1681,"Acetic acid, hexyl ester",,,,3,14540,665224,0.0035,0.83,2.54,5.10,2,0.043,17,0.071,9.000,0.170,2,0.04255319149,OK,OK,Rare,OK,Low,AmRatioFail,2.1,tTestFail,FALSE
 1682,"Acetic acid, methyl ester",,,,3,1002,127749,0.0001,0.79,0.00,1.81,0,0.000,3,0.013,0.000,0.000,0,0,Low,Low,Rare,OK,Low,OK,Inf,OK,FALSE
-3578,trans-.beta.-Ocimene,b-ocimene,alpha_Pinene,merge,6,133306,2480998,0.0001,0.94,0.00,9.00,0,0.000,45,0.188,0.000,0.000,0,0,OK,OK,OK,OK,Low,OK,Inf,OK,TRUE
+3578,trans-.beta.-Ocimene,(Z)-b-ocimene,alpha_Pinene,merge,6,133306,2480998,0.0001,0.94,0.00,9.00,0,0.000,45,0.188,0.000,0.000,0,0,OK,OK,OK,OK,Low,OK,Inf,OK,TRUE
 1684,"Acetic acid, trichloro-, nonyl ester",,,,5,510,50388,0.0011,0.81,0.00,10.47,0,0.000,4,0.017,2.000,0.038,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 1685,"Acetic acid, trichloro-, octyl ester",,,,2,34,8181,0.0019,0.78,0.14,9.73,3,0.064,1,0.004,0.000,0.000,3,0.06382978723,OK,Low,Rare,OK,Low,AmRatioFail,0.0,tTestFail,FALSE
 1686,"Acetic acid, trifluoro-, dodecyl ester",,,,2,13189,422665,0.001731,0.88,3.4263,17.75,3,0.064,13,0.054,4.000,0.075,3,0.06382978723,High,OK,Rare,OK,Low,AmRatioFail,0.4,tTestFail,FALSE
@@ -4840,9 +4840,9 @@ n,name,shortname,standard,verdict,filters_passed,mean,max,match.var,match,RT.var
 4839,"Benzoic acid, nonadecyl ester",,,,1,0,0,NA,0.79,NA,22.84,1,0.021,0,0.000,0.000,0.000,1,0.02127659574,High,Low,Rare,OK,Low,AmRatioFail,0.0,tTestFail,FALSE
 4840,"Benzoic acid, pentafluorophenyl ester",,,,5,1088,261147,NA,0.90,NA,14.41,0,0.000,1,0.004,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4841,"Benzoic acid, pentyl ester",,,,4,2059,281656,0.0002,0.73,0.00,15.42,0,0.000,2,0.008,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
-4842,"Benzonitrile, 2-methyl-",indole,Indole,new,4,36999,2470118,0.0030,0.91,0.00,10.64,2,0.043,24,0.100,3.000,0.057,2,0.04255319149,OK,OK,OK,OK,Low,AmRatioFail,1.7,tTestFail,FALSE
+4842,"Benzonitrile, 2-methyl-",2-methylbenzonitrile,Indole,merge,4,36999,2470118,0.0030,0.91,0.00,10.64,2,0.043,24,0.100,3.000,0.057,2,0.04255319149,OK,OK,OK,OK,Low,AmRatioFail,1.7,tTestFail,FALSE
 4843,Benzoyl-dl-valine,,,,4,413,99043,NA,0.73,NA,14.64,0,0.000,1,0.004,0.000,0.000,0,0,OK,Low,Rare,OK,Low,OK,Inf,OK,FALSE
-4844,Benzyl nitrile,indole,Indole,new,5,17090,1135734,0.0018,0.87,0.00,10.64,0,0.000,11,0.046,2.000,0.038,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
+4844,Benzyl nitrile,2-methylbenzonitrile,Indole,merge,5,17090,1135734,0.0018,0.87,0.00,10.64,0,0.000,11,0.046,2.000,0.038,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4845,"Bicyclo[2.1.0]pentane, 1,4-dimethyl-",,,,5,309,74276,NA,0.81,NA,8.75,0,0.000,1,0.004,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 4846,"Bicyclo[2.2.1]hept-2-ene, 2,3-dimethyl-",,,,2,0,0,NA,0.71,NA,6.91,1,0.021,0,0.000,0.000,0.000,1,0.02127659574,OK,Low,Rare,OK,Low,AmRatioFail,0.0,tTestFail,FALSE
 4847,"Bicyclo[2.2.1]heptan-2-ol, 1,3,3-trimethyl-, (1R-endo)-",,,,2,0,0,NA,0.74,NA,14.34,0,0.000,0,0.000,1.000,0.019,0,0,OK,Low,Rare,OK,Low,AmRatioFail,0.0,tTestZeros,FALSE
@@ -5337,7 +5337,7 @@ n,name,shortname,standard,verdict,filters_passed,mean,max,match.var,match,RT.var
 5336,Hydroxy-.alpha.-terpenyl acetate,,,,3,13205,3169304,NA,0.79,NA,18.02,0,0.000,1,0.004,0.000,0.000,0,0,High,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 5337,i-Propyl 12-methyltetradecanoate,,,,3,245,58842,NA,0.71,NA,19.35,0,0.000,1,0.004,0.000,0.000,0,0,High,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 1203,"3-Hexen-1-ol, acetate, (E)-",[(E)-hex-3-enyl] acetate,Hexenol,keep_leaf,4,57283,1030730,0.0026,0.91,0.00,8.43,7,0.149,72,0.300,42.000,0.792,7,0.1489361702,OK,OK,OK,OK,Low,AmRatioFail,3.3,tTestFail,FALSE
-5339,Indolizine,,,,5,3798,681806,0.0004,0.82,0.00,13.00,0,0.000,2,0.008,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
+5339,Indolizine,indole,Indole,new,5,3798,681806,0.0004,0.82,0.00,13.00,0,0.000,2,0.008,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE
 5340,Isoamyl laurate,,,,3,261,62570,NA,0.71,NA,18.12,0,0.000,1,0.004,0.000,0.000,0,0,High,Low,Rare,OK,Low,OK,Inf,OK,FALSE
 5341,Isobornyl caprate,,,,4,19629,4711032,NA,0.71,NA,18.29,0,0.000,1,0.004,0.000,0.000,0,0,High,Low,Rare,OK,OK,OK,Inf,OK,FALSE
 5342,Isobutyl-propyl-amine,,,,5,1348,323454,NA,0.81,NA,3.28,0,0.000,1,0.004,0.000,0.000,0,0,OK,OK,Rare,OK,Low,OK,Inf,OK,FALSE

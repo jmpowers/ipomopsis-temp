@@ -50,3 +50,40 @@ read.shimadzu = function(filepath) {
   peaktable <- bind_rows(mergedtable, .id = "Filename") %>% mutate_if(is.character, as.factor)
   return(peaktable)
 }
+
+
+read.shimadzu.quant = function(filepath) {
+  library(dplyr)
+  con = file(filepath, "r")
+  quanttable = list()
+  filelist = list()
+  f = 0
+  alreadyonheader = FALSE
+  while ( TRUE ) {
+    if(!alreadyonheader){
+      line = readLines(con, n = 1)
+      if ( length(line) == 0 ) { break } 
+    }
+    if(line=="[Header]") {
+      alreadyonheader=FALSE
+      f = f + 1
+      line = readLines(con, n = 1)
+      filelist[[f]] <- basename(gsub("\\\\", "/", strsplit(line, "\t")[[1]][2]) )
+    } 
+    if(line=="[MS Quantitative Results]") {
+      line = readLines(con, n = 1) # # of IDs
+      npeaks <- as.integer(strsplit(line[[1]], "\t", fixed=T)[[1]][[2]])
+      line = readLines(con, n = npeaks+1)#include the table header
+      quanttable[[f]] = read.delim(text=line, na.strings="Not Identified")
+      colnames(quanttable[[f]]) <- c(colnames(quanttable[[f]])[-1], "emptycol") #read.delim screws up row names
+      quanttable[[f]]$emptycol <- NULL
+      rownames(quanttable[[f]]) <- NULL
+      line = readLines(con, n = 1) #empty line after table
+    }
+
+  }
+  close(con)
+  names(quanttable) <- unlist(filelist)
+  peaktable <- bind_rows(quanttable, .id = "Filename") %>% mutate_if(is.character, as.factor)
+  return(peaktable)
+}

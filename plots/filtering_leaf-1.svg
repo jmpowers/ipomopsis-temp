@@ -1555,7 +1555,7 @@
 <text x='92.45' y='724.15' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>17×</text>
 <text x='203.12' y='601.64' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>b-myrcene</text>
 <text x='203.12' y='611.89' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>2.1×</text>
-<text x='147.79' y='671.01' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>b-ocimene</text>
+<text x='147.79' y='671.01' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>(E)-b-ocimene</text>
 <text x='147.79' y='681.25' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>0.6×</text>
 <text x='92.45' y='671.04' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>.beta.-Panasinsene</text>
 <text x='92.45' y='681.28' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Inf×</text>
@@ -4590,6 +4590,6 @@
 <text x='713.23' y='519.89' style='font-size: 8.80px; font-family: "Arial";'>Excluded - pass area &amp; freq. filters</text>
 <text x='713.23' y='537.17' style='font-size: 8.80px; font-family: "Arial";'>Included in final table</text>
 <text x='53.16' y='31.46' style='font-size: 11.00px; font-family: "Arial";'>Bottom label: relative amount in floral vs. ambient, Inf = not in ambients</text>
-<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 20/7933 compounds included</text>
+<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 20/7949 compounds included</text>
 </g>
 </svg>
