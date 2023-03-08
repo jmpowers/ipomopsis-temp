@@ -68,7 +68,7 @@ read.shimadzu.quant = function(filepath) {
       alreadyonheader=FALSE
       f = f + 1
       line = readLines(con, n = 1)
-      filelist[[f]] <- basename(gsub("\\\\", "/", strsplit(line, "\t")[[1]][2]) )
+      filelist[[f]] <- gsub("\\\\", "/", strsplit(line, "\t")[[1]][2]) 
     } 
     if(line=="[MS Quantitative Results]") {
       line = readLines(con, n = 1) # # of IDs
@@ -84,6 +84,8 @@ read.shimadzu.quant = function(filepath) {
   }
   close(con)
   names(quanttable) <- unlist(filelist)
-  peaktable <- bind_rows(quanttable, .id = "Filename") %>% mutate_if(is.character, as.factor)
+  peaktable <- bind_rows(quanttable, .id = "Filename") %>% 
+    mutate(Dirname=dirname(Filename), Filename=basename(Filename)) %>% 
+    mutate_if(is.character, as.factor)
   return(peaktable)
 }

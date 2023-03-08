@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-02-16" />
+<meta name="date" content="2023-03-07" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-02-16</h4>
+<h4 class="date">2023-03-07</h4>
 
 </div>
 
@@ -289,12 +289,20 @@ rownames(ipo.all) &lt;- ipo.all[,1]
 ipo.all[,1] &lt;- NULL
 
 #load quantitative integrations
-quant.all &lt;- read_tsv(&quot;data/volatiles/quant.tsv&quot;) %&gt;%
+quant &lt;- read_tsv(&quot;data/volatiles/quant.tsv&quot;) %&gt;%
   mutate(Name = recode(Name, !!!shortnames)) %&gt;% 
   pivot_wider(names_from = &quot;Name&quot;, values_from=&quot;Area&quot;) %&gt;% as.data.frame()
-rownames(quant.all) &lt;- quant.all$Filename
-quant.all[,1:2] &lt;- NULL
-quant.all &lt;- quant.all[rownames(ipo.all),]#TODO 64 missing files, tho might be filtered out later anyway
+
+quant.meta &lt;- quant %&gt;% select(batch, Dirname, Filename) %&gt;% 
+  mutate(isblank = str_detect(Filename, &quot;lank&quot;),
+         Year = as.integer(str_match(Filename, &quot;(201[7-9]|202[1-2])[_.]&quot;)[,2]),
+         GCOrder = as.integer(str_match(Filename, &quot;_([0-9][0-9]).qgd&quot;)[,2]),
+         RunDate = str_remove(str_extract(Filename, paste0(&quot;_[0-9]{2,4}&quot;,Year)), &quot;_[0]*&quot;),
+         RunDate = ymd(paste(str_sub(RunDate, -4,-1), str_sub(RunDate,1,1), str_sub(RunDate, 2, -5))))
+
+rownames(quant) &lt;- quant$Filename
+quant[,c(&quot;batch&quot;,&quot;Dirname&quot;,&quot;Filename&quot;)] &lt;- NULL
+quant.all &lt;- quant[rownames(ipo.all),]#TODO 64 missing files, tho might be filtered out later anyway
 
 par(mfrow=c(4,6))
 quant.slopes &lt;- set_names(rep(0,ncol(quant.all)), colnames(quant.all))
@@ -303,22 +311,37 @@ for(compvol in colnames(quant.all)) {
   qual_wins &lt;-  sum(quant.all[,compvol] == 0 &amp; ipo.all[,compvol] &gt; 0, na.rm=T)
   nozeros &lt;- bind_cols(select(ipo.all,qual=compvol), select(quant.all,quant=compvol)) %&gt;% 
     filter(!(qual==0 | quant == 0))
-  quant.slopes[compvol] = coef(lm(quant ~ qual, data=nozeros))[&quot;qual&quot;]
-  plot(x=sqrt(ipo.all[,compvol]), y=sqrt(quant.all[,compvol]),
-       main=compvol, sub = paste0(&quot;quant:qual &quot;,quant_wins,&quot;:&quot;,qual_wins,
-                                  &quot; slope &quot;,round(quant.slopes[compvol],3)),
-       xlab=&quot;qual&quot;,ylab=&quot;quant&quot;)
-}</code></pre>
-<p><img src="plots/quant-1.svg" width="768" /></p>
-<pre class="r"><code>par(mfrow=c(1,1))
+  quant.slopes[compvol] = coef(lm(quant ~ 0 + qual, data=nozeros))[&quot;qual&quot;]
+  # plot(x=sqrt(ipo.all[,compvol]), y=sqrt(quant.all[,compvol]),
+  #      main=compvol, sub = paste0(&quot;quant:qual &quot;,quant_wins,&quot;:&quot;,qual_wins,
+  #                                 &quot; slope &quot;,round(quant.slopes[compvol],3)),
+  #      xlab=&quot;qual&quot;,ylab=&quot;quant&quot;)
+  # abline(a=0, b=sqrt(quant.slopes[compvol]))
+}
+par(mfrow=c(1,1))
+
 quant_betterthan_qual &lt;- c(&quot;b-myrcene&quot;, &quot;(Z)-b-ocimene&quot;,&quot;(E)-b-ocimene&quot;, &quot;g-terpinene&quot;,&quot;methyl benzoate&quot;, &quot;(3E)-4,8-dimethylnona-1,3,7-triene&quot;, &quot;2-methylbenzonitrile&quot;, &quot;indole&quot;, &quot;petasitene&quot;, 
  &quot;trans-a-bergamotene&quot;,&quot;b-caryophyllene&quot; ,&quot;bergamotene&quot;,&quot;a-farnesene&quot;,&quot;pseudoionone&quot;)
+write_tsv(enframe(quant.slopes) %&gt;% left_join(enframe(shortnames, name=&quot;Name&quot;, value=&quot;name&quot;)),
+          &quot;data/volatiles/quant_slopes.tsv&quot;)
 
-ggplot(tibble(quant=quant.all$indole, qual=ipo.all$indole), aes(x=qual, y=quant/0.325)) + 
+quant.scaled &lt;- sweep(quant.all, 2, quant.slopes, FUN = &#39;/&#39;)
+
+ggplot(tibble(quant=quant.scaled$indole, qual=ipo.all$indole), aes(x=qual, y=quant)) + 
   geom_point(alpha=0.2) + scale_x_sqrt(limits=c(0,3e7)) + scale_y_sqrt() + 
   geom_abline(slope=1, intercept=0) + labs(title=&quot;Indole integrations&quot;,x=&quot;Qualitative&quot;,y=&quot;Quantitative&quot;)</code></pre>
-<p><img src="plots/quant-2.svg" width="768" /></p>
-<pre class="r"><code>quant.scaled &lt;- sweep(quant.all, 2, quant.slopes, FUN = &#39;/&#39;)</code></pre>
+<p><img src="plots/quant-1.svg" width="1152" /></p>
+<pre class="r"><code>quant.meta &lt;- quant.meta %&gt;% mutate(indole_quant = quant$indole/quant.slopes[&quot;indole&quot;])
+
+ggplot(quant.meta %&gt;% drop_na(RunDate) %&gt;% arrange(isblank), aes(y=indole_quant, x=RunDate, color=isblank)) +  
+  facet_wrap(vars(Year), scales=&quot;free_x&quot;, nrow=1)+ 
+  geom_point(size=0.5, alpha=0.5) + stat_summary(geom=&quot;line&quot;, fun=&quot;mean&quot;, size=1)+ scale_y_sqrt()+ theme_bw()+ theme(legend.position=&quot;top&quot;)+
+  labs(x=&quot;GC run date&quot;, y=&quot;Quantitative indole integration&quot;, color=&quot;Markes blank?&quot;)</code></pre>
+<p><img src="plots/quant-2.svg" width="1152" /></p>
+<pre class="r"><code>ggplot(tibble(quant=quant.scaled$indole, qual=ipo.all$indole), aes(x=qual, y=quant)) + 
+  geom_point(alpha=0.2) + scale_x_sqrt(limits=c(0,3e7)) + scale_y_sqrt() + 
+  geom_abline(slope=1, intercept=0) + labs(title=&quot;Indole integrations&quot;,x=&quot;Qualitative&quot;,y=&quot;Quantitative&quot;)</code></pre>
+<p><img src="plots/quant-3.svg" width="1152" /></p>
 </div>
 <div id="read-metadata" class="section level1">
 <h1>Read metadata</h1>
@@ -359,6 +382,8 @@ gna21 &lt;- read_tsv(&quot;data/volatiles/2021 GNA Volatiles - 2021.tsv&quot;) %
 #   separate(Filename, into=c(&quot;site&quot;,&quot;vial&quot;,&quot;sampledate&quot;,&quot;rundate&quot;,&quot;GCn&quot;), sep=&quot;_&quot;, remove=FALSE, convert=TRUE) %&gt;% 
 #   mutate(GCn = str_remove(GCn, &quot;.qgd&quot;)) %&gt;% write_tsv(&quot;files21_auto.tsv&quot;)  
 files21 &lt;- read_tsv(&quot;data/volatiles/CWu Ipomopsis Scent Metadata - files21.tsv&quot;) %&gt;% 
+  mutate(rundate = ymd(paste(&quot;2021&quot;, str_sub(rundate,1,1), str_sub(rundate, 2, -5))),
+         sampledate = ymd(sampledate)) %&gt;% 
   filter(is.na(drop)) %&gt;% #drop samples that were redone
   left_join(verdicts)
 #TODO check that the presumed redos in files21 were actually leaks/skips
@@ -371,8 +396,8 @@ otc21 &lt;- bind_rows(SC=sc21, GNA=gna21, .id=&quot;site&quot;) %&gt;%
          location = recode(location,&quot;inside&quot;=&quot;warmed&quot;,&quot;outside&quot;=&quot;control&quot;),
          PlantID = paste0(chamber, plant)) %&gt;% 
   rename(Site=site, Collector=observer, Date=date, DN=time, temp=location, Bag=bag, Pump=pump, End=end, Equil=equil, Duration=pumping,
-         NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate_text=sampledate,
-         RunDate_text=rundate,GCOrder=GCn)
+         NumFlrs = flowers, NumBuds=buds, PumpID = pump_id, SoilVWC = VWC, Comments = notes, SampleDate=sampledate,
+         RunDate=rundate,GCOrder=GCn)
 
 ####### 2021 | Maxfield | OTC  #######
 #automatically split filenames. Filename2 accounts for skip
@@ -1911,12 +1936,12 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <col width="3%" />
 <col width="3%" />
 <col width="6%" />
-<col width="5%" />
+<col width="6%" />
 <col width="2%" />
 <col width="3%" />
 <col width="3%" />
 <col width="18%" />
-<col width="5%" />
+<col width="4%" />
 <col width="7%" />
 <col width="21%" />
 </colgroup>
@@ -1925,8 +1950,8 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <th align="left">sample</th>
 <th align="left">site</th>
 <th align="right">vial</th>
-<th align="right">sampledate</th>
-<th align="right">rundate</th>
+<th align="left">sampledate</th>
+<th align="left">rundate</th>
 <th align="right">GCn</th>
 <th align="right">drop</th>
 <th align="left">Notes</th>
@@ -1941,8 +1966,8 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <td align="left">GNA_121_210730_7312021_05.qgd</td>
 <td align="left">GNA</td>
 <td align="right">121</td>
-<td align="right">210730</td>
-<td align="right">7312021</td>
+<td align="left">2021-07-30</td>
+<td align="left">2021-07-31</td>
 <td align="right">5</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
@@ -1955,8 +1980,8 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <td align="left">SC_140_210727_8202021_05.qgd</td>
 <td align="left">SC</td>
 <td align="right">140</td>
-<td align="right">210727</td>
-<td align="right">8202021</td>
+<td align="left">2021-07-27</td>
+<td align="left">2021-08-20</td>
 <td align="right">5</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
@@ -1969,8 +1994,8 @@ files %&gt;% filter(!(Filename %in% meta$Filename) &amp; Expt!=&quot;&quot;) %&g
 <td align="left">SC_101_210727_8202021_02.qgd</td>
 <td align="left">SC</td>
 <td align="right">101</td>
-<td align="right">210727</td>
-<td align="right">8202021</td>
+<td align="left">2021-07-27</td>
+<td align="left">2021-08-20</td>
 <td align="right">2</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
@@ -2300,6 +2325,144 @@ bouquet::plot_filters(chemsf, option=&quot;rarity&quot;, yrange=3.5)</code></pre
 <p><img src="plots/filtering-3.svg" width="1152" /></p>
 <pre class="r"><code>bouquet::plot_filters(chemsf, option=&quot;prop&quot;)</code></pre>
 <p><img src="plots/filtering-4.svg" width="1152" /></p>
+<div id="quant-filtering" class="section level3">
+<h3>Quant filtering</h3>
+<pre class="r"><code>indole_quantqual &lt;- left_join(quant.meta, 
+                              bind_cols(metadata %&gt;% select(Year, Folder, type, Expt, PlantType, DN, RunDate, Filename=sample),
+                              indole_quant=quant.scaled[as.character(metadata$sample),&quot;indole&quot;], 
+                              indole_qual=vol.all[as.character(metadata$sample),&quot;indole&quot;]) %&gt;%
+  mutate(GCOrder = as.integer(str_match(Filename, &quot;_([0-9][0-9]).qgd&quot;)[,2]),
+         Folder=str_remove(Folder,&quot;Campbell RMBL Data/&quot;))) %&gt;% 
+  mutate(type=coalesce(type, c(&quot;other&quot;,&quot;blank&quot;)[isblank+1]) %&gt;% fct_relevel(&quot;other&quot;,&quot;blank&quot;))
+  
+indole_quantqual %&gt;% arrange(RunDate, GCOrder) %&gt;%
+  select(Year, Folder, type, Expt, PlantType, DN, Filename, 
+         RunDate, GCOrder, indole_quant, indole_qual) %&gt;% 
+  write_tsv(&quot;~/Downloads/indole_quant_qual.tsv&quot;, na=&quot;&quot;)
+
+typecols &lt;- c(other=&quot;orange&quot;, blank=&quot;grey&quot;, ambient=&quot;blue&quot;,floral=&quot;red&quot;,leaf=&quot;limegreen&quot;)
+ggplot(filter(indole_quantqual, type!=&quot;leaf&quot;), aes(color=type, fill=type, x=indole_quant)) + 
+  facet_wrap(vars(Year), ncol=1) + geom_density(alpha=0.1, size=0.7) + 
+  geom_point(aes(y=0.07-as.integer(factor(type))/100), size=3, shape=&quot;|&quot;) +
+  scale_x_sqrt() + coord_cartesian(ylim=c(0,0.06)) + theme_minimal() + theme(legend.position=&quot;top&quot;) +
+  scale_color_manual(values=typecols) +  scale_fill_manual(values=typecols) + 
+  labs(x=&quot;Quantitative indole integration&quot;, y=&quot;Density&quot;) </code></pre>
+<p><img src="plots/filtering_quant-1.svg" width="1152" /></p>
+<pre class="r"><code>ggplot(filter(indole_quantqual, type!=&quot;leaf&quot;), aes(color=type, y=indole_quant, x=RunDate)) + 
+  facet_wrap(vars(Year), nrow=1, scales=&quot;free_x&quot;) + geom_hline(yintercept=0) + geom_point(alpha=0.5) + 
+  stat_summary(geom=&quot;line&quot;, fun=&quot;mean&quot;, size=1)+
+  scale_y_sqrt()  + theme_bw()+ scale_x_date(guide = guide_axis(angle=90))+
+  scale_color_manual(values=typecols) +
+  labs(y=&quot;Quantitative indole integration&quot;, &quot;Date of GC run&quot;) </code></pre>
+<p><img src="plots/filtering_quant-2.svg" width="1152" /></p>
+<pre class="r"><code>ggplot(indole_quantqual %&gt;% filter(type!=&quot;leaf&quot;, Year!=2018), aes(color=type, y=indole_quant, x=GCOrder)) + 
+  facet_wrap(vars(Year), nrow=1, scales=&quot;free_x&quot;) + geom_hline(yintercept=0) + geom_point(alpha=0.5) + 
+  stat_summary(aes(group=paste(type)), geom=&quot;line&quot;, fun=&quot;mean&quot;, size=1.5)+
+  scale_y_sqrt()  + theme_bw()+ 
+  scale_color_manual(values=typecols)+
+  labs(y=&quot;Quantitative indole integration&quot;, x=&quot;Order in GC run&quot;)</code></pre>
+<p><img src="plots/filtering_quant-3.svg" width="1152" /></p>
+<pre class="r"><code>indole_quantqual %&gt;% group_by(Year, type) %&gt;% summarize(indole_quant=mean(indole_quant)) %&gt;%
+  pivot_wider(names_from=&quot;type&quot;,values_from=indole_quant) %&gt;% 
+  kable(caption=&quot;means&quot;, digits=0)</code></pre>
+<table>
+<caption>means</caption>
+<thead>
+<tr class="header">
+<th align="right">Year</th>
+<th align="right">other</th>
+<th align="right">blank</th>
+<th align="right">ambient</th>
+<th align="right">floral</th>
+<th align="right">leaf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2018</td>
+<td align="right">2507</td>
+<td align="right">0</td>
+<td align="right">261</td>
+<td align="right">207</td>
+<td align="right">1742</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="right">13091</td>
+<td align="right">2051</td>
+<td align="right">10403</td>
+<td align="right">22814</td>
+<td align="right">12894</td>
+</tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="right">284522</td>
+<td align="right">33046</td>
+<td align="right">75690</td>
+<td align="right">81676</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2022</td>
+<td align="right">15761</td>
+<td align="right">1221</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>indole_quantqual %&gt;% group_by(Year, type) %&gt;% summarize(nonzero=mean(indole_quant&gt;0)) %&gt;%
+  pivot_wider(names_from=&quot;type&quot;,values_from=nonzero) %&gt;% 
+  kable(caption=&quot;proportion indole detection (nonzero)&quot;, digits=3)</code></pre>
+<table>
+<caption>proportion indole detection (nonzero)</caption>
+<thead>
+<tr class="header">
+<th align="right">Year</th>
+<th align="right">other</th>
+<th align="right">blank</th>
+<th align="right">ambient</th>
+<th align="right">floral</th>
+<th align="right">leaf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2018</td>
+<td align="right">0.500</td>
+<td align="right">0.000</td>
+<td align="right">0.077</td>
+<td align="right">0.094</td>
+<td align="right">0.500</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="right">0.750</td>
+<td align="right">0.889</td>
+<td align="right">0.905</td>
+<td align="right">1.000</td>
+<td align="right">0.959</td>
+</tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="right">0.921</td>
+<td align="right">0.806</td>
+<td align="right">1.000</td>
+<td align="right">0.986</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2022</td>
+<td align="right">0.867</td>
+<td align="right">0.182</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="leaves" class="section level2">
 <h2>Leaves</h2>
@@ -2380,7 +2543,15 @@ vol.leaf &lt;- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
 quant.scaled.vol &lt;- quant.scaled[rownames(vol), 
                                  colnames(quant.scaled) %in% 
                                    intersect(quant_betterthan_qual, colnames(vol))] 
+
 #plot(x=unlist(sqrt(vol[,colnames(quant.scaled.vol)])), y=sqrt(unlist(quant.scaled.vol)), xlab=&quot;qual&quot;, ylab=&quot;quant&quot;)
+# svf %&gt;% as_tibble() %&gt;% select(sample, Year, PlantType, Expt, DN) %&gt;% 
+#   bind_cols(indole_qual = vol$indole, indole_quant = quant.all[rownames(vol),]$indole) %&gt;% 
+#   filter(PlantType==&quot;ten&quot;) %&gt;% drop_na(PlantType) %&gt;% 
+#   arrange(Year, Expt, DN) %&gt;% View()
+#   write_tsv(&quot;~/Downloads/indole_quant_qual_comparison.tsv&quot;) %&gt;% 
+#   ggplot(aes(x=indole_qual, y=indole_quant/0.325))+geom_point() + geom_abline(slope=1, intercept = 0)
+
 vol[,colnames(quant.scaled.vol)] &lt;- quant.scaled.vol
 
 #Normalize emissions by equilibration and pumping time and sample

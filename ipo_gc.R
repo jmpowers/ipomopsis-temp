@@ -67,38 +67,48 @@ ipogc <- read_tsv("data/volatiles/RMBL GC-MS Data Inventory - ipogc181921.tsv")
 
 # Shimadzu Quantitative Table ---------------------------------------------
 source("read_shimadzu.R")
-quantpath <- "~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/CWu/"
-bfiles <-  c("temp_expt_quant_CWu_1819_1.txt", "temp_expt_quant_Ipo2020_1.txt", "temp_expt_quant_Max2020_1.txt")
-quant <- map_dfr(set_names(paste0(quantpath, bfiles), bfiles), read.shimadzu.quant, .id="batch") %>% 
-  mutate(Name = trimws(Name), 
-         Area=replace_na(Area, 0))  
-quant %>% select(batch, Filename, Name, Area) %>% 
+quantpath <- "~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/RMBL Batches/quant/"
+bfiles <-  list.files(quantpath)
+quant.full <- map_dfr(set_names(paste0(quantpath, bfiles), bfiles), read.shimadzu.quant, .id="batch") %>% 
+  mutate(Name = trimws(Name), Area=replace_na(Area, 0)) %>% 
+  distinct(Filename, Name, .keep_all=T)
+quant.full %>% select(batch, Dirname, Filename, Name, Area) %>% 
+  mutate(Dirname = fct_relabel(Dirname, str_remove, "C:/GCMSsolution/Data/Project1_190815/")) %>% 
   write_tsv("data/volatiles/quant.tsv")
 
 #### Plots #### 
 shortnames <- read_csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv") %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
 contam <- c("Caprolactam", "Decanal", "Nonanoic acid", "trans-Geranylgeraniol")#last one is likely floral
-quant <- quant %>% filter(!Name %in% contam) %>% 
+quant.full <- quant.full %>% filter(!Name %in% contam) %>% 
   mutate(Name = fct_relabel(Name, ~shortnames[.x]))#trailing space
 
 noxtheme <- theme_minimal() + theme(legend.position ="top", axis.text.x = element_blank(), axis.title.x=element_blank())
-quant %>% ggplot(aes(x=batch, color=batch, y=Ret.Time)) + geom_hline(aes(yintercept=Std.Ret.Time)) +
+quant.full %>% ggplot(aes(x=batch, color=batch, y=Ret.Time)) + geom_hline(aes(yintercept=Std.Ret.Time)) +
   facet_wrap(vars(Name), scales="free_y") + geom_violin(draw_quantiles = 0.5) + noxtheme
-quant %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion1.Ratio)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2) + 
+quant.full %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion1.Ratio)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2) + 
   geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio+30)) +
   facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
-quant %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion2.Ratio)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio), linetype=2) + 
+quant.full %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion2.Ratio)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio), linetype=2) + 
   geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio+30)) +
   facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
 
-quant.wide <- quant %>% select(batch, Filename, Name, Area) %>%  
-  pivot_wider(names_from = "Name", values_from="Area") %>% 
+quant.full %>% ggplot(aes(x=Area, y=Ret.Time, color=batch)) + geom_point() + facet_wrap(vars(Name), scales="free_y") + scale_x_sqrt()
+quant.full %>% ggplot(aes(x=Area, y=Ref.Ion1.Ratio, color=batch)) + geom_point() + facet_wrap(vars(Name)) + scale_x_sqrt()
+quant.full %>% ggplot(aes(x=Area, y=Ref.Ion2.Ratio, color=batch)) + geom_point() + facet_wrap(vars(Name)) + scale_x_sqrt()
+#TODO adjust quant parameters for linalool: Ret Time 9.965 > 10.00 and Ref.Ion1 92.92 > 75, Ref.Ion2 (m/z 55) 71.38 > 60
+
+quant.wide <- quant.full %>% select(batch, Filename, Name, Area) %>%  
+  pivot_wider(names_from = "Name", values_from="Area", values_fn=mean) %>% #5 duplicate filenames
   as.data.frame()
-rownames(quant.wide) <- quant.wide$Filename
+rownames(quant.wide) <- paste(quant.wide$batch, quant.wide$Filename)
 quant.wide[,1:2] <- NULL
 VM_Samples <- str_detect(rownames(quant.wide), "Corydalis|Sterile|Yeast|^M[0-9]")
-quant.wide.cut <- decostand(quant.wide[rowSums(quant.wide)>0 & !VM_Samples,], method="tot", MARGIN=2)
 
+library(vegan)
+library(pheatmap)
+library(dendsort)
+library(viridis)
+quant.wide.cut <- decostand(quant.wide[rowSums(quant.wide)>0 & !VM_Samples,], method="tot", MARGIN=2)
 ph  <- pheatmap(as.matrix(t(quant.wide.cut)^(1/3)), 
                 cluster_cols=T, show_colnames=F,
                 clustering_method="mcquitty", clustering_distance_rows="correlation",
