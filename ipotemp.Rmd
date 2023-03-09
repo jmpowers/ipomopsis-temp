@@ -79,7 +79,7 @@ rownames(quant) <- quant$Filename
 quant[,c("batch","Dirname","Filename")] <- NULL
 quant.all <- quant[rownames(ipo.all),]#TODO 64 missing files, tho might be filtered out later anyway
 
-par(mfrow=c(4,6))
+par(mfrow=c(4,8))
 quant.slopes <- set_names(rep(0,ncol(quant.all)), colnames(quant.all))
 for(compvol in colnames(quant.all)) {
   quant_wins <- sum(ipo.all[,compvol] == 0 & quant.all[,compvol] > 0, na.rm=T)
@@ -87,16 +87,17 @@ for(compvol in colnames(quant.all)) {
   nozeros <- bind_cols(select(ipo.all,qual=compvol), select(quant.all,quant=compvol)) %>% 
     filter(!(qual==0 | quant == 0))
   quant.slopes[compvol] = coef(lm(quant ~ 0 + qual, data=nozeros))["qual"]
-  # plot(x=sqrt(ipo.all[,compvol]), y=sqrt(quant.all[,compvol]),
-  #      main=compvol, sub = paste0("quant:qual ",quant_wins,":",qual_wins,
-  #                                 " slope ",round(quant.slopes[compvol],3)),
-  #      xlab="qual",ylab="quant")
-  # abline(a=0, b=sqrt(quant.slopes[compvol]))
+  plot(x=sqrt(ipo.all[,compvol]), y=sqrt(quant.all[,compvol]),
+       main=compvol, sub = paste0("quant:qual ",quant_wins,":",qual_wins,
+                                  " slope ",round(quant.slopes[compvol],3)),
+       xlab="qual",ylab="quant")
+  abline(a=0, b=sqrt(quant.slopes[compvol]))
 }
 par(mfrow=c(1,1))
 
-quant_betterthan_qual <- c("b-myrcene", "(Z)-b-ocimene","(E)-b-ocimene", "g-terpinene","methyl benzoate", "(3E)-4,8-dimethylnona-1,3,7-triene", "2-methylbenzonitrile", "indole", "petasitene", 
- "trans-a-bergamotene","b-caryophyllene" ,"bergamotene","a-farnesene","pseudoionone")
+quant_betterthan_qual <- colnames(quant.all) #TODO may want to exclude some of these from bouquet filtering (used below)
+ #  c("b-myrcene", "(Z)-b-ocimene","(E)-b-ocimene", "g-terpinene","methyl benzoate", "(3E)-4,8-dimethylnona-1,3,7-triene", "2-methylbenzonitrile", "indole", "petasitene", 
+ # "trans-a-bergamotene","b-caryophyllene" ,"bergamotene","a-farnesene","pseudoionone")
 write_tsv(enframe(quant.slopes) %>% left_join(enframe(shortnames, name="Name", value="name")),
           "data/volatiles/quant_slopes.tsv")
 
@@ -112,10 +113,6 @@ ggplot(quant.meta %>% drop_na(RunDate) %>% arrange(isblank), aes(y=indole_quant,
   facet_wrap(vars(Year), scales="free_x", nrow=1)+ 
   geom_point(size=0.5, alpha=0.5) + stat_summary(geom="line", fun="mean", size=1)+ scale_y_sqrt()+ theme_bw()+ theme(legend.position="top")+
   labs(x="GC run date", y="Quantitative indole integration", color="Markes blank?")
-
-ggplot(tibble(quant=quant.scaled$indole, qual=ipo.all$indole), aes(x=qual, y=quant)) + 
-  geom_point(alpha=0.2) + scale_x_sqrt(limits=c(0,3e7)) + scale_y_sqrt() + 
-  geom_abline(slope=1, intercept=0) + labs(title="Indole integrations",x="Qualitative",y="Quantitative")
 ```
 
 # Read metadata
@@ -341,7 +338,9 @@ chemsf <- chems %>%
                                    "2,2,4-Trimethyl-1,3-pentanediol diisobutyrate", 
                                    "2,4,6-trimethyloctane", 
                                    "Decane, 3,8-dimethyl-",    "Ethanone, 1-cyclopentyl-", 
-                                   "o-Xylene")) %>% #"Benzonitrile, 2-methyl-"
+                                   "o-Xylene",
+                                   "3,5-dimethyloctane","2-hexyldecan-1-ol",
+                                   "nonylcyclopropane","nonyl prop-1-en-2-yl carbonate")) %>% 
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   combine_filters() 
@@ -367,7 +366,46 @@ bouquet::plot_filters(chemsf, option="volcano", yrange=2.5, alpha_excluded = 0.5
 bouquet::plot_filters(chemsf, option="prop")
 ```
 
+### Retention times
+```{r retention, fig.width=12}
+longdata.RT <- longdata %>% filter(name %in% chemsf$name[chemsf$filter_final]) %>% 
+  left_join(select(metadata, sample, Year)) %>%
+  group_by(name) %>%  mutate(n=n(), RT.sd=sd(RT)) %>% ungroup() %>% 
+  mutate(name=fct_reorder(name, RT))
+
+RT.year <- longdata.RT %>% group_by(name, Year) %>% summarize(RT=median(RT)) %>% pivot_wider(names_from=Year, values_from=RT) %>% 
+  mutate(mean1821 = (`2018`+`2021`)/2, diff1819=`2018`-`2019`, diff1921=`2019`-`2021`,
+         mean1821 = replace_na(mean1821, `2019`))
+
+RT.tol <- 0.17  # 10 seconds before or after in quantitative params
+ggplot(longdata.RT, aes(x=RT, y=name,color=RT.sd)) + geom_point(position=position_jitter(width=0, height=0.5)) + 
+  scale_color_viridis_c(option="magma") + theme_dark()+
+  geom_text(aes(x=4.5, label=n), color="grey80") +
+  stat_summary(fun="median", fun.max=~median(.x)+RT.tol, fun.min=~median(.x)-RT.tol, geom="pointrange", color="white", size=0.5, shape=15)
+
+ggplot(longdata.RT,  aes(y=RT, x=factor(Year), color=RT.sd)) + 
+  facet_wrap(vars(name), scales="free_y") + geom_boxplot() + scale_color_viridis_c(option="magma") + theme_dark() +
+  geom_pointrange(data=RT.year, aes(y=mean1821, ymin=mean1821-0.1, ymax=mean1821+0.1, x="2019"), color="blue")
+
+#RT fixes
+longdata.bergamotene <- longdata %>% filter(str_detect(name , "bergamotene")) %>% 
+    left_join(select(metadata, sample, Year)) 
+ggplot(longdata.bergamotene, aes(x=RT, fill=factor(Year))) + geom_histogram(binwidth=0.02) + 
+  facet_wrap(vars(name), ncol=1) + scale_x_continuous(limits=c(NA,16))
+longdata.bergamotene %>% filter(RT < 15) %>%  group_by(Year) %>% summarize(RT=median(RT)) %>% kable(digits=2)
+
+
+longdata.butanoate <- longdata %>% filter(str_detect(name , "\\)-hex-3-enyl\\] butanoate")) %>% 
+    left_join(select(metadata, sample, Year)) 
+ggplot(longdata.butanoate, aes(x=RT, fill=factor(Year))) + geom_histogram(binwidth=0.02) + 
+  facet_wrap(vars(name), ncol=1) + scale_x_continuous(limits=c(NA,NA))
+longdata.butanoate %>% mutate(EZ=ifelse(RT>11, "Z","E")) %>% group_by(EZ, Year) %>% 
+  summarize(RT=median(RT)) %>% kable(digits=2)
+```
+
+
 ### Quant filtering
+
 ```{r filtering_quant, fig.width=12}
 indole_quantqual <- left_join(quant.meta, 
                               bind_cols(metadata %>% select(Year, Folder, type, Expt, PlantType, DN, RunDate, Filename=sample),
@@ -390,7 +428,7 @@ ggplot(filter(indole_quantqual, type!="leaf"), aes(color=type, fill=type, x=indo
   scale_color_manual(values=typecols) +  scale_fill_manual(values=typecols) + 
   labs(x="Quantitative indole integration", y="Density") 
 
-ggplot(filter(indole_quantqual, type!="leaf"), aes(color=type, y=indole_quant, x=RunDate)) + 
+ggplot(filter(indole_quantqual, type!="leaf") %>% drop_na(Year), aes(color=type, y=indole_quant, x=RunDate)) + 
   facet_wrap(vars(Year), nrow=1, scales="free_x") + geom_hline(yintercept=0) + geom_point(alpha=0.5) + 
   stat_summary(geom="line", fun="mean", size=1)+
   scale_y_sqrt()  + theme_bw()+ scale_x_date(guide = guide_axis(angle=90))+
@@ -413,6 +451,45 @@ indole_quantqual %>% group_by(Year, type) %>% summarize(nonzero=mean(indole_quan
   kable(caption="proportion indole detection (nonzero)", digits=3)
 ```
 
+```{r calc_LoA, fig.width=11}
+quant.scaled.meta <- left_join(quant.meta,  
+                       bind_cols(metadata %>% select(Year, Folder, type, Expt, PlantType, DN, RunDate, Filename=sample),
+                                 quant.scaled[as.character(metadata$sample),])) %>% 
+  drop_na(type) %>% 
+  pivot_longer(all_of(colnames(quant.scaled))) 
+
+LoA.cutoff <- 0.8
+quant.loa <- quant.scaled.meta %>%
+  group_by(Year, type, name) %>% summarize(value=quantile(value, LoA.cutoff), .groups="drop")
+
+ggplot(quant.loa, aes(y=name, color=type, x=value, shape=factor(Year), group=factor(Year))) +
+  geom_point(position=position_dodge(width=0.5)) + theme_minimal() +
+  scale_x_sqrt() +  scale_color_manual(values=c("blue","red","green"))
+
+prop.above <- left_join(quant.scaled.meta %>% filter(type=="floral"),
+          quant.loa %>% filter(type=="ambient") %>% rename(LoA=value) %>% select(-type)) %>% 
+  group_by(Year, name) %>% summarize(above_LoA = mean(value > LoA),
+                                     above_zero = mean(value > 0)) %>% 
+  mutate(name=fct_reorder(name, above_LoA, max))
+
+ggplot(prop.above %>%   pivot_longer(starts_with("above_"), names_to="limit"), 
+       aes(y=name, x=value, color=limit, shape=factor(Year), group=limit)) + 
+  geom_point(size=2, position=position_dodge(width=0.5)) + theme_minimal()
+
+ggplot(prop.above, aes(x=above_zero, y=above_LoA, color=factor(Year))) + 
+  geom_path(aes(group=name), color="grey90") + geom_text(aes(label=name)) +theme_minimal()
+```
+
+```{r checkpinene, eval=F}
+ggplot(quant.scaled.meta %>% filter(name=="a-pinene"), aes(x=factor(Year), color=type, y=value)) + geom_boxplot() + scale_y_sqrt()  + scale_color_manual(values=c("blue","red","green")) + labs(title="quant")
+ggplot(metadata, aes(x=factor(Year), color=type, y=vol.all$`a-pinene`)) + geom_boxplot() + scale_y_sqrt() + scale_color_manual(values=c("blue","red","green")) + labs(title="qual")
+#ggplot(svf, aes(x=Year, y=vol$`a-pinene`)) + geom_boxplot(color="red") + scale_y_sqrt() + labs(title="qual or quant")
+pinene_quantqual <- left_join(quant.meta, 
+                              bind_cols(metadata %>% select(Year, Folder, type, Expt, PlantType, DN, RunDate, Filename=sample),
+                              pinene_quant=quant.scaled[as.character(metadata$sample),"a-pinene"], 
+                              pinene_qual=vol.all[as.character(metadata$sample),"a-pinene"]) )
+ggplot(pinene_quantqual %>% filter(Year %in% c(2018, 2019,2021)), aes(x=pinene_qual, y=pinene_quant)) + geom_point() + facet_wrap(vars(Year))
+```
 
 ## Leaves
 
@@ -462,6 +539,8 @@ ggplot(chemsf[kept_either,], aes(x=mean.floral, y= chemsf.leaf[kept_either,"mean
   labs(x="Mean area in flowers", y= "Mean area in leaves", color="Kept in dataset")
 ```
 
+## Pruning 
+
 ```{r pruning}
 vol <- prune_sampletable(vol.all, chemsf, metadata)
 vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
@@ -469,7 +548,9 @@ vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
 colnames(vol)[!colnames(vol) %in% shortnames]
 
 #"OTC_Z3_190805_8102019_24.qgd" was excluded
-files_exclude <- c("T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" ,"T145DWarmAug10_08292018.qgd", #no filtered volatiles
+# "T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" ,"T145DWarmAug10_08292018.qgd",
+files_exclude <- c("1C948_210708_782021_04.qgd"  ,     "4C120_22_210709_792021_10.qgd"   , "A188DAug16_09012018.qgd"   ,      
+ "GNA_17_210716_7202021_18.qgd" ,    "OTC_W1_day_190805_8102019_07.qgd" ,"SC_55_210715_8202021_11.qgd"  ,#no filtered volatiles
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
 #"OTC_Z2_leaf_190805_8102019_23.qgd" was excluded
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", #lack leaf mass
@@ -489,10 +570,22 @@ svl <- svl %>% mutate_if(is.factor, droplevels) %>%
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
 
-#swap in quantitative integrations (scaled up to match qual integrations)
+#quantitative integrations (scaled up to match qual integrations)
+#this method only replaces compounds where the quant method did better than the qual method
 quant.scaled.vol <- quant.scaled[rownames(vol), 
                                  colnames(quant.scaled) %in% 
                                    intersect(quant_betterthan_qual, colnames(vol))] 
+
+# Subtract limit of ambient (LoA) from each compound/year
+quant.loa.use <- left_join(tibble(name= colnames(quant.scaled.vol)),
+                           quant.loa %>% filter(type=="ambient", name %in% quant_betterthan_qual) %>% 
+                             pivot_wider(names_from=Year, values_from=value))
+for(yr in levels(svf$Year)) {
+  thisyr <- svf$Year==yr
+  quant.scaled.vol[thisyr,] <- sweep(quant.scaled.vol[thisyr,], 2, pull(quant.loa.use, yr), FUN = '-')
+}
+#Set resulting negative values to zero
+quant.scaled.vol[quant.scaled.vol<0] <- 0 
 
 #plot(x=unlist(sqrt(vol[,colnames(quant.scaled.vol)])), y=sqrt(unlist(quant.scaled.vol)), xlab="qual", ylab="quant")
 # svf %>% as_tibble() %>% select(sample, Year, PlantType, Expt, DN) %>% 
@@ -502,6 +595,7 @@ quant.scaled.vol <- quant.scaled[rownames(vol),
 #   write_tsv("~/Downloads/indole_quant_qual_comparison.tsv") %>% 
 #   ggplot(aes(x=indole_qual, y=indole_quant/0.325))+geom_point() + geom_abline(slope=1, intercept = 0)
 
+#swap in scaled and subtracted quant integrations
 vol[,colnames(quant.scaled.vol)] <- quant.scaled.vol
 
 #Normalize emissions by equilibration and pumping time and sample
@@ -549,6 +643,24 @@ ordiplot(nmds.vol, type = "n")
 text(nmds.vol, display="species", cex=0.7, col="grey20")
 points(nmds.vol, display="sites", col=metadata$type, pch=as.integer(factor(metadata$Year)))
 ```
+
+```{r diverse, eval=FALSE}
+best <- list()
+i <- 1
+vol.left <- vol^(1/4) # halfway between areas and presence-absence
+while(ncol(vol.left)>0) {
+  print(dim(vol.left))
+  best[[i]] <- which.max(rowSums(vol.left))
+  vol.left <- vol.left[ , !decostand(vol.left[best[[i]],], method="pa"), drop=FALSE]
+  i <- i+1
+}
+best.vol <- as.data.frame(t(vol[unlist(best),])) %>% rownames_to_column("name")
+
+#get quant.ratios from ipo_gc.R
+full_join(quant.ratios %>% mutate(name = shortnames[Name]), full_join(RT.year, best.vol)) %>% relocate(name) %>% 
+  write_tsv("data/volatiles/quant_RT_ratios.tsv")
+```
+
 
 # All filtered samples
 

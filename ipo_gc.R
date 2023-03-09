@@ -67,35 +67,66 @@ ipogc <- read_tsv("data/volatiles/RMBL GC-MS Data Inventory - ipogc181921.tsv")
 
 # Shimadzu Quantitative Table ---------------------------------------------
 source("read_shimadzu.R")
-quantpath <- "~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/RMBL Batches/quant/"
+quantpath <- "~/MyDocs/MEGA/UCI/Schiedea/Analysis/scent/rmbl/RMBL Batches/quant_round2/"
 bfiles <-  list.files(quantpath)
 quant.full <- map_dfr(set_names(paste0(quantpath, bfiles), bfiles), read.shimadzu.quant, .id="batch") %>% 
   mutate(Name = trimws(Name), Area=replace_na(Area, 0)) %>% 
   distinct(Filename, Name, .keep_all=T)
 quant.full %>% select(batch, Dirname, Filename, Name, Area) %>% 
   mutate(Dirname = fct_relabel(Dirname, str_remove, "C:/GCMSsolution/Data/Project1_190815/")) %>% 
+  filter(Name != "1,6,10-Dodecatrien-3-ol, 3,7,11-trimethyl-") %>% 
   write_tsv("data/volatiles/quant.tsv")
 
 #### Plots #### 
 shortnames <- read_csv("data/volatiles/Ipo volatile compounds - chemsf_ipo.csv") %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
-contam <- c("Caprolactam", "Decanal", "Nonanoic acid", "trans-Geranylgeraniol")#last one is likely floral
+contam <- c("Caprolactam", "Decanal", "Nonanoic acid", "trans-Geranylgeraniol","1,6,10-Dodecatrien-3-ol, 3,7,11-trimethyl-")#geraniol is likely floral, last one is farnesol
+#setdiff(unique(quant.full$Name), names(shortnames))
 quant.full <- quant.full %>% filter(!Name %in% contam) %>% 
   mutate(Name = fct_relabel(Name, ~shortnames[.x]))#trailing space
 
+#Retention time
 noxtheme <- theme_minimal() + theme(legend.position ="top", axis.text.x = element_blank(), axis.title.x=element_blank())
 quant.full %>% ggplot(aes(x=batch, color=batch, y=Ret.Time)) + geom_hline(aes(yintercept=Std.Ret.Time)) +
   facet_wrap(vars(Name), scales="free_y") + geom_violin(draw_quantiles = 0.5) + noxtheme
+
+#Ion ratios
 quant.full %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion1.Ratio)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2) + 
-  geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio+30)) +
+  geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio-40)) + geom_hline(aes(yintercept=Ref.Ion1.Set.Ratio+40)) +
   facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
 quant.full %>% ggplot(aes(x=batch, color=batch, y=Ref.Ion2.Ratio)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio), linetype=2) + 
-  geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio-30)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio+30)) +
+  geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio-40)) + geom_hline(aes(yintercept=Ref.Ion2.Set.Ratio+40)) +
   facet_wrap(vars(Name)) + geom_violin(draw_quantiles = 0.5) + noxtheme
+#TODO check on (Z)-b-ocimene (RT), cis-a-bergamotene (Ion1) and some of the other new ones
 
-quant.full %>% ggplot(aes(x=Area, y=Ret.Time, color=batch)) + geom_point() + facet_wrap(vars(Name), scales="free_y") + scale_x_sqrt()
-quant.full %>% ggplot(aes(x=Area, y=Ref.Ion1.Ratio, color=batch)) + geom_point() + facet_wrap(vars(Name)) + scale_x_sqrt()
-quant.full %>% ggplot(aes(x=Area, y=Ref.Ion2.Ratio, color=batch)) + geom_point() + facet_wrap(vars(Name)) + scale_x_sqrt()
-#TODO adjust quant parameters for linalool: Ret Time 9.965 > 10.00 and Ref.Ion1 92.92 > 75, Ref.Ion2 (m/z 55) 71.38 > 60
+quant.ratios <- quant.full %>% group_by(Name, Ref.Ion1.m.z, Ref.Ion2.m.z) %>% 
+  filter(Area>quantile(Area, 0.95, na.rm=T)) %>% #get the biggest peaks for each compound - less noise!
+  summarize(across(matches("Ref.Ion[12].(Set.)?Ratio"), median),
+            Area.cutoff = min(Area, na.rm=T)) %>% 
+  drop_na(Ref.Ion1.Ratio) %>% #peak not found
+  mutate(Ion1.diff = Ref.Ion1.Ratio - Ref.Ion1.Set.Ratio, Ion2diff = Ref.Ion2.Ratio - Ref.Ion2.Set.Ratio) %>% 
+  write_tsv("data/volatiles/quant_ratios.tsv")
+
+#Changes with peak size
+quant.full %>% ggplot(aes(x=Area, y=Ret.Time, color=batch)) + facet_wrap(vars(Name), scales="free_y") + scale_x_sqrt() +
+  geom_point(size=0.5, alpha=0.5) + geom_smooth(se=F, span=1)
+
+quant.full %>% ggplot(aes(x=Area, y=Ref.Ion1.Ratio, color=batch)) + facet_wrap(vars(Name), scales="free_y") + scale_x_sqrt() +
+  geom_point(size=0.5, alpha=0.5) + geom_smooth(se=F, span=1)+
+  geom_vline(data=quant.ratios, aes(xintercept=Area.cutoff))+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Ratio), color="blue")+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2)
+quant.full %>% ggplot(aes(x=Area, y=Ref.Ion2.Ratio, color=batch)) + facet_wrap(vars(Name), scales="free_y") + scale_x_sqrt() +
+  geom_point(size=0.5, alpha=0.5) + geom_smooth(se=F, span=1)+
+  geom_vline(data=quant.ratios, aes(xintercept=Area.cutoff))+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion2.Ratio), color="blue")+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion2.Set.Ratio), linetype=2)
+
+quant.full %>% ggplot(aes(x=Ret.Time, y=Ref.Ion1.Ratio, color=batch)) + facet_wrap(vars(Name), scales="free") + scale_x_sqrt() +
+  geom_point(size=0.5, alpha=0.5) +
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Ratio), color="blue")+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Ratio+40), color="red")+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Ratio-40), color="red")+
+  geom_hline(data=quant.ratios, aes(yintercept=Ref.Ion1.Set.Ratio), linetype=2)
 
 quant.wide <- quant.full %>% select(batch, Filename, Name, Area) %>%  
   pivot_wider(names_from = "Name", values_from="Area", values_fn=mean) %>% #5 duplicate filenames
