@@ -327,7 +327,7 @@
 <circle cx='53.16' cy='786.33' r='2.48' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='398.16' cy='743.70' r='3.03' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='511.39' cy='503.64' r='2.89' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='53.16' cy='710.91' r='2.70' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
+<circle cx='53.16' cy='710.91' r='2.70' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='487.45' cy='514.96' r='4.80' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='505.01' cy='791.95' r='2.11' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='517.16' cy='492.34' r='3.47' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1070,7 +1070,7 @@
 <text x='53.16' y='790.35' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>Caryophylla-4(12),8(13)-dien-5.alpha.-ol</text>
 <text x='398.16' y='747.72' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>Caryophyllene oxide</text>
 <text x='511.39' y='507.66' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>Chol-9(11)-en-24-oic acid, 3-(acetyloxy)-12-oxo-, methyl ester, (3.alpha.,5.beta.)-</text>
-<text x='53.16' y='714.93' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";'>cis-a-bergamotene</text>
+<text x='53.16' y='714.93' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>cis-a-bergamotene</text>
 <text x='487.45' y='518.98' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>cis-1-Chloro-9-octadecene</text>
 <text x='505.01' y='795.97' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>cis-10-Heptadecenoic acid</text>
 <text x='517.16' y='496.36' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>cis-9-Hexadecenal</text>
@@ -1558,6 +1558,6 @@
 <text x='741.42' y='507.70' style='font-size: 8.80px; font-family: "Arial";'>Excluded</text>
 <text x='741.42' y='524.98' style='font-size: 8.80px; font-family: "Arial";'>Excluded - pass t-test</text>
 <text x='741.42' y='542.26' style='font-size: 8.80px; font-family: "Arial";'>Included in final table</text>
-<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 28/7948 compounds included</text>
+<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 26/7948 compounds included</text>
 </g>
 </svg>

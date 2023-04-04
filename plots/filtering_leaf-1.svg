@@ -47,7 +47,7 @@
 <circle cx='103.52' cy='566.56' r='2.89' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='610.88' r='2.38' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='715.92' r='1.73' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='603.66' r='1.92' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='603.66' r='1.92' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='147.79' cy='673.02' r='1.40' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='673.05' r='2.05' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='525.25' r='3.79' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -100,7 +100,7 @@
 <circle cx='92.45' cy='706.14' r='1.80' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='591.54' r='2.86' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='236.32' cy='521.09' r='3.13' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
-<circle cx='203.12' cy='473.71' r='3.43' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='473.71' r='3.43' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='192.05' cy='670.39' r='1.65' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='169.92' cy='314.81' r='6.23' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='519.04' r='3.60' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -130,7 +130,7 @@
 <circle cx='103.52' cy='703.93' r='1.45' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='214.19' cy='499.03' r='2.95' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
 <circle cx='479.80' cy='559.32' r='1.71' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
-<circle cx='203.12' cy='552.79' r='2.37' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='552.79' r='2.37' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='773.86' r='1.31' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='169.92' cy='743.49' r='1.32' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='794.16' r='1.18' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -139,7 +139,7 @@
 <circle cx='291.66' cy='531.26' r='2.40' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='114.58' cy='777.43' r='1.19' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='737.69' r='1.55' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='402.20' r='3.63' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='402.20' r='3.63' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='769.93' r='1.42' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='169.92' cy='696.18' r='1.50' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='794.69' r='1.12' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -265,7 +265,7 @@
 <circle cx='92.45' cy='561.20' r='3.25' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='622.91' r='2.51' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='469.55' r='3.99' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='625.97' r='1.43' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='625.97' r='1.43' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='369.13' cy='689.79' r='1.38' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='764.25' r='1.27' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='640.05' r='2.30' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -350,7 +350,7 @@
 <circle cx='114.58' cy='505.66' r='3.39' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='147.79' cy='649.95' r='1.82' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='616.72' r='2.18' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='180.99' cy='489.21' r='2.22' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
+<circle cx='180.99' cy='489.21' r='2.22' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='380.20' cy='445.45' r='2.45' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
 <circle cx='92.45' cy='693.29' r='1.89' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='775.84' r='1.39' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -445,7 +445,7 @@
 <circle cx='103.52' cy='733.87' r='1.46' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='672.44' r='2.05' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='698.27' r='1.86' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='407.22' r='3.54' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='407.22' r='3.54' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='658.18' r='2.17' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='626.86' r='1.81' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='594.51' r='2.82' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -601,7 +601,7 @@
 <circle cx='169.92' cy='252.07' r='8.14' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='136.72' cy='538.93' r='2.30' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='756.69' r='1.28' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='180.99' cy='447.58' r='3.48' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
+<circle cx='180.99' cy='447.58' r='3.48' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='793.55' r='1.11' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='192.05' cy='627.88' r='1.72' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='643.18' r='2.31' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -627,7 +627,7 @@
 <circle cx='92.45' cy='742.96' r='1.57' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='684.21' r='1.75' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='428.39' r='4.09' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='576.50' r='2.17' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='576.50' r='2.17' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='158.85' cy='634.88' r='1.83' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='514.70' r='3.23' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='714.61' r='1.60' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -743,7 +743,7 @@
 <circle cx='92.45' cy='781.78' r='1.36' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='147.79' cy='674.30' r='1.58' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='411.88' r='6.28' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='508.39' r='3.42' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='508.39' r='3.42' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='335.93' cy='530.40' r='2.31' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='335.93' cy='466.91' r='2.25' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='114.58' cy='789.78' r='1.04' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -822,7 +822,7 @@
 <circle cx='92.45' cy='500.09' r='4.24' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='629.21' r='1.66' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='180.99' cy='250.73' r='7.33' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='192.05' cy='270.24' r='4.40' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
+<circle cx='192.05' cy='270.24' r='4.40' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='269.52' cy='255.36' r='5.06' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='103.52' cy='660.80' r='1.74' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='480.24' r='4.62' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -846,7 +846,7 @@
 <circle cx='92.45' cy='662.44' r='2.14' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='147.79' cy='432.80' r='3.32' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='654.58' r='1.76' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='286.10' r='7.14' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='286.10' r='7.14' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='514.68' r='2.99' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='180.99' cy='485.02' r='2.54' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='402.06' r='5.31' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -872,7 +872,7 @@
 <circle cx='180.99' cy='457.09' r='3.47' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='775.05' r='1.39' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='612.61' cy='263.07' r='3.43' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
-<circle cx='203.12' cy='410.07' r='2.61' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='410.07' r='2.61' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='665.67' r='2.11' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='596.04' r='2.55' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='549.24' r='2.74' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -937,7 +937,7 @@
 <circle cx='125.65' cy='517.22' r='2.84' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='508.66' r='3.37' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='399.78' r='6.63' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='566.14' r='2.27' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='566.14' r='2.27' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='557.27' cy='584.34' r='1.73' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='103.52' cy='613.29' r='2.12' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='754.15' r='1.34' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -973,7 +973,7 @@
 <circle cx='103.52' cy='535.07' r='3.39' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='753.66' r='1.30' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='571.28' r='2.45' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='379.38' r='4.72' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='379.38' r='4.72' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='537.51' r='3.12' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='236.32' cy='497.53' r='3.75' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='103.52' cy='490.08' r='4.19' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1000,7 +1000,7 @@
 <circle cx='114.58' cy='466.83' r='3.62' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='759.93' r='1.47' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='169.92' cy='629.45' r='1.90' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
-<circle cx='214.19' cy='574.70' r='1.81' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='574.70' r='1.81' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='158.85' cy='402.80' r='4.04' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='762.53' r='1.46' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='114.58' cy='518.47' r='2.85' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1038,7 +1038,7 @@
 <circle cx='92.45' cy='713.69' r='1.75' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='779.57' r='1.37' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='673.25' r='2.05' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='433.62' r='5.30' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='433.62' r='5.30' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='658.75' r='2.17' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='553.18' r='3.36' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='546.55' r='3.46' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1099,7 +1099,7 @@
 <circle cx='92.45' cy='793.48' r='1.31' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='698.37' r='1.85' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='588.92' r='2.71' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='350.49' r='5.85' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='350.49' r='5.85' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='519.08' r='3.90' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='611.09' r='2.63' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='690.21' r='1.91' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1451,7 +1451,7 @@
 <circle cx='103.52' cy='501.76' r='3.21' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='663.78' r='1.76' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='180.99' cy='385.97' r='4.64' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='203.12' cy='398.19' r='4.10' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='203.12' cy='398.19' r='4.10' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='398.29' r='6.29' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='136.72' cy='722.78' r='1.40' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='562.49' r='2.97' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -1483,7 +1483,7 @@
 <circle cx='214.19' cy='682.50' r='1.26' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='623.83' r='1.69' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='745.05' r='1.55' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='214.19' cy='596.27' r='1.72' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<circle cx='214.19' cy='596.27' r='1.72' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='125.65' cy='658.83' r='1.89' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='103.52' cy='728.80' r='1.42' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='92.45' cy='738.78' r='1.59' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -2159,8 +2159,8 @@
 <text x='147.79' y='658.18' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>1.5×</text>
 <text x='103.52' y='614.70' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>3,5-Dimethyldodecane</text>
 <text x='103.52' y='624.95' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>48.4×</text>
-<text x='180.99' y='487.19' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>2,2,4,7-tetramethyloctane-3,5-dione</text>
-<text x='180.99' y='497.44' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>8.2×</text>
+<text x='180.99' y='487.19' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>2,2,4,7-tetramethyloctane-3,5-dione</text>
+<text x='180.99' y='497.44' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>8.2×</text>
 <text x='380.20' y='443.44' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>pseudoionone</text>
 <text x='380.20' y='453.68' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>5.8×</text>
 <text x='92.45' y='691.28' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>3,7-Nonadien-2-ol, 4,8-dimethyl-</text>
@@ -2661,8 +2661,8 @@
 <text x='136.72' y='547.16' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>0.9×</text>
 <text x='125.65' y='754.68' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Decane, 3,6-dimethyl-</text>
 <text x='125.65' y='764.92' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>0.5×</text>
-<text x='180.99' y='445.57' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>3,7-dimethyldecane</text>
-<text x='180.99' y='455.82' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>4×</text>
+<text x='180.99' y='445.57' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>3,7-dimethyldecane</text>
+<text x='180.99' y='455.82' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>4×</text>
 <text x='103.52' y='791.53' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Decane, 5-ethyl-5-methyl-</text>
 <text x='103.52' y='801.78' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>0.3×</text>
 <text x='192.05' y='625.87' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Decane, 5-propyl-</text>
@@ -3103,8 +3103,8 @@
 <text x='125.65' y='637.44' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>1.8×</text>
 <text x='180.99' y='248.72' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Nonane, 5-(2-methylpropyl)-</text>
 <text x='180.99' y='258.96' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>2.9×</text>
-<text x='192.05' y='268.23' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>5-butylnonane</text>
-<text x='192.05' y='278.47' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";'>55.8×</text>
+<text x='192.05' y='268.23' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>5-butylnonane</text>
+<text x='192.05' y='278.47' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>55.8×</text>
 <text x='269.52' y='253.35' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Nonane, 5-methyl-5-propyl-</text>
 <text x='269.52' y='263.59' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>2.9×</text>
 <text x='103.52' y='658.79' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Nonane, 5-propyl-</text>
@@ -4554,7 +4554,7 @@
 <text x='103.52' y='728.04' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>Z-9-Pentadecenol</text>
 <text x='103.52' y='738.28' text-anchor='middle' style='font-size: 8.54px;fill: none; font-family: "Arial";'>7.6×</text>
 <line x1='53.16' y1='630.28' x2='674.03' y2='630.28' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
-<line x1='194.27' y1='832.01' x2='194.27' y2='39.36' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='222.49' y1='832.01' x2='222.49' y2='39.36' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
 </g>
 <g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw4NjQuMDA=)'>
 <text x='48.23' y='801.38' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";'>1e+05</text>
@@ -4590,6 +4590,6 @@
 <text x='713.23' y='519.89' style='font-size: 8.80px; font-family: "Arial";'>Excluded - pass area &amp; freq. filters</text>
 <text x='713.23' y='537.17' style='font-size: 8.80px; font-family: "Arial";'>Included in final table</text>
 <text x='53.16' y='31.46' style='font-size: 11.00px; font-family: "Arial";'>Bottom label: relative amount in floral vs. ambient, Inf = not in ambients</text>
-<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 20/7948 compounds included</text>
+<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 17/7948 compounds included</text>
 </g>
 </svg>
