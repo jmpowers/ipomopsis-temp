@@ -26,6 +26,8 @@ library(tidyverse)
 library(lubridate)
 library(bouquet)
 library(vegan)
+library(ggvegan)
+library(ggrepel)
 library(lme4)
 library(lmerTest)
 library(broom)
@@ -469,9 +471,15 @@ LoA.cutoff <- 0.8
 quant.loa <- quant.scaled.meta %>%
   group_by(Year, type, name) %>% summarize(value=quantile(value, LoA.cutoff), .groups="drop")
 
-ggplot(quant.loa, aes(y=name, color=type, x=value, shape=factor(Year), group=factor(Year))) +
+ggplot(quant.loa, aes(y=fct_reorder(name, value, max), color=type, x=value, shape=factor(Year), group=factor(Year))) +
   geom_point(position=position_dodge(width=0.5)) + theme_minimal() +
   scale_x_sqrt() +  scale_color_manual(values=c("blue","red","green"))
+
+quant.loa %>% pivot_wider(names_from=type, values_from=value) %>%
+  ggplot(aes(x=floral/ambient, y=fct_reorder(name, floral/ambient, min)))  + 
+  geom_point(aes(color=factor(Year), shape=name %in% (chemsf %>% filter(filter_final) %>% pull(name))), size=2) + 
+  scale_x_log10() + scale_shape_manual(values=c(1, 19))+
+  labs(x=paste0("Ratio of ",round(LoA.cutoff*100,0),"th percentile floral/ambient"), y="", color="Year", shape="Keep")
 
 prop.above <- left_join(quant.scaled.meta %>% filter(type=="floral"),
           quant.loa %>% filter(type=="ambient") %>% rename(LoA=value) %>% select(-type)) %>% 
@@ -554,10 +562,9 @@ vol.leaf <- prune_sampletable(vol.all, chemsf.leaf, meta.leaf)
 
 colnames(vol)[!colnames(vol) %in% shortnames]
 
-#"OTC_Z3_190805_8102019_24.qgd" was excluded
-# "T196DAug16_09012018.qgd", "A188DAug16_09012018.qgd",  "T139_day_190725_862019_06.qgd", "GNA_17_210716_7202021_18.qgd","Maxfield_27_210723_822021_03.qgd", "Maxfield_9_210723_822021_05.qgd" ,"T145DWarmAug10_08292018.qgd",
-files_exclude <- c("1C948_210708_782021_04.qgd"  ,     "4C120_22_210709_792021_10.qgd"   , "A188DAug16_09012018.qgd"   ,      
- "GNA_17_210716_7202021_18.qgd" ,    "OTC_W1_day_190805_8102019_07.qgd" ,"SC_55_210715_8202021_11.qgd"  ,#no filtered volatiles
+names(head(sort(rowSums(vol>0)), 5))
+files_exclude <- c("GNA_17_210716_7202021_18.qgd", "A188DAug16_09012018.qgd", "T196DAug16_09012018.qgd",
+                   "T145DWarmAug10_08292018.qgd", "Maxfield_27_210723_822021_03.qgd", #filtered volatiles near zero
                    "SC_91_210715_8202021_10.qgd") #Artemisia leaves
 #"OTC_Z2_leaf_190805_8102019_23.qgd" was excluded
 files_exclude_leaf <- c("CWH1LeafJuly27_09022018.qgd","NatArea69leafrenamedJuly25_08312018.qgd", #lack leaf mass
@@ -576,7 +583,9 @@ svl <- svl %>% mutate_if(is.factor, droplevels) %>%
 
 vol <- vol[!(rownames(vol) %in% files_exclude) ,]
 vol.leaf <- vol.leaf[!(rownames(vol.leaf) %in% files_exclude_leaf) ,]
+```
 
+```{r swapquant}
 #TODO quant integrate these leaf volatiles: setdiff(colnames(vol.leaf), quant_betterthan_qual)
 
 #quantitative integrations (scaled up to match qual integrations)
@@ -585,16 +594,23 @@ quant.scaled.vol <- quant.scaled[rownames(vol),
                                  colnames(quant.scaled) %in% 
                                    intersect(quant_betterthan_qual, colnames(vol))] 
 
+#TODO found that E/Z isomers of b-ocimene were accurate underneath LoA, dropping this step for all but indole (the manual addition to the auto filtering)
 # Subtract limit of ambient (LoA) from each compound/year
 quant.loa.use <- left_join(tibble(name= colnames(quant.scaled.vol)),
-                           quant.loa %>% filter(type=="ambient", name %in% quant_betterthan_qual) %>% 
+                           quant.loa %>% filter(type=="ambient", name %in% quant_betterthan_qual) %>%
                              pivot_wider(names_from=Year, values_from=value))
+# for(yr in levels(svf$Year)) {
+#   thisyr <- svf$Year==yr
+#   quant.scaled.vol[thisyr,] <- sweep(quant.scaled.vol[thisyr,], 2, pull(quant.loa.use, yr), FUN = '-')
+# }
+
 for(yr in levels(svf$Year)) {
   thisyr <- svf$Year==yr
-  quant.scaled.vol[thisyr,] <- sweep(quant.scaled.vol[thisyr,], 2, pull(quant.loa.use, yr), FUN = '-')
+  quant.scaled.vol[thisyr,"indole"] <- quant.scaled.vol[thisyr,"indole"] - (quant.loa.use %>% filter(name=="indole") %>% pull(yr))
 }
+
 #Set resulting negative values to zero
-quant.scaled.vol[quant.scaled.vol<0] <- 0 
+quant.scaled.vol[quant.scaled.vol<0] <- 0
 
 #plot(x=unlist(sqrt(vol[,colnames(quant.scaled.vol)])), y=sqrt(unlist(quant.scaled.vol)), xlab="qual", ylab="quant")
 # svf %>% as_tibble() %>% select(sample, Year, PlantType, Expt, DN) %>% 
@@ -607,18 +623,43 @@ quant.scaled.vol[quant.scaled.vol<0] <- 0
 #swap in scaled and subtracted quant integrations
 vol[,colnames(quant.scaled.vol)] <- quant.scaled.vol
 
+# ggplot(bind_cols(vol, svf), aes(y=`indole`, x=`methyl benzoate`, col=Year)) + 
+#   geom_point() + geom_smooth(se=F) + scale_x_sqrt(limits=c(0,1.1e6)) + scale_y_sqrt(limits=c(0,6e5)) + geom_rug() + 
+#   geom_hline(data=quant.loa %>% filter(name=="indole", type=="ambient"), aes(yintercept=value, color=as.character(Year))) +
+#   geom_vline(data=quant.loa %>% filter(name=="methyl benzoate", type=="ambient"), aes(xintercept=value, color=as.character(Year))) 
+
+ggplot(bind_cols(vol, svf), aes(y=`(Z)-b-ocimene`, x=`(E)-b-ocimene`, color=Year)) + 
+  geom_point() + geom_smooth(se=F) + scale_x_sqrt() + scale_y_sqrt() + geom_rug() + 
+  geom_hline(data=quant.loa %>% filter(name=="(Z)-b-ocimene", type=="ambient"), aes(yintercept=value, color=as.factor(Year))) +
+  geom_vline(data=quant.loa %>% filter(name=="(E)-b-ocimene", type=="ambient"), aes(xintercept=value, color=as.factor(Year)))
+
+ggplot(bind_cols(vol, svf), aes(y=`trans-a-bergamotene`, x=`a-farnesene`, color=Year, shape=PlantType)) + 
+  geom_point() + geom_smooth(aes(linetype=PlantType), se=F, span=1) + scale_x_sqrt() + scale_y_sqrt() + geom_rug()
+
+ggplot(bind_cols(vol, svf), aes(y=`(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene`, x=`b-caryophyllene`, color=Year)) + 
+  geom_point() + geom_smooth(se=F, span=1) + scale_x_sqrt() + scale_y_sqrt() + geom_rug() +
+  geom_hline(data=quant.loa %>% filter(name=="(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene", type=="ambient"), aes(yintercept=value, color=as.factor(Year))) +
+  geom_vline(data=quant.loa %>% filter(name=="b-caryophyllene", type=="ambient"), aes(xintercept=value, color=as.factor(Year)))
+```
+
+
+## Convert areas to mass
+
+```{r convert_areas}
 #Normalize emissions by equilibration and pumping time and sample
 vol <- vol / as.numeric(svf$Total, units="hours") / svf$NumFlrs #30 min of equilibration plus 15 minpumping, one flower 
 vol.leaf <- vol.leaf / as.numeric(svl$Total, units="hours") / svl$LeafDryWtGrams #area per hour per dry gram leaf
-```
 
-```{r convert_areas}
+regressions <- read_csv("data/volatiles/regressions_181921_filtered_slopes.csv")
+ggplot(regressions, aes(x=year, y=standard, fill=area_per_ng))+ geom_tile() + scale_fill_viridis_c() + geom_text(aes(label=paste0(round(area_per_ng/1000),"k"))) + labs(x="Year, filament",y="Standard",fill="Area per ng") + theme_minimal()
+
 # convert peak areas to nanograms using standards run in each year
 ipochemsf <- ipochems[match(colnames(vol), ipochems$shortname),]
 svf$YearFilament <- coalesce(svf$YearFilament, svf$Year) #if_else(svf$Year=="2021" & date>ymd("2021-07-21"), "2021fil2", as.character(svf$Year))
 for(yr in levels(svf$YearFilament)) {
   thisyr <- svf$YearFilament==yr
-  vol[thisyr,] <- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0("area_per_ng",yr)), FUN = '/')
+  #TODO these slopes are leading to most of the year effects. try using one year for now. 
+  vol[thisyr,] <- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0("area_per_ng","2019")), FUN = '/')
 }
 svf$Total <- rowSums(vol)
 
@@ -629,7 +670,7 @@ svl$Total <- rowSums(vol.leaf)
 
 ## Ambient heatmap and NMDS
 
-```{r heatmap_air, dev="png", dev.args=list(), fig.height=12, fig.width=12}
+```{r heatmap_air, dev="png", dev.args=list(), fig.height=9, fig.width=12}
 vol.pruned <- vol.all[,chemsf$filter_final]
 metadata$zeroSum <- rowSums(vol.pruned)==0
 vol.pruned <- vol.pruned[!metadata$zeroSum,]
@@ -674,7 +715,7 @@ full_join(quant.ratios %>% mutate(name = shortnames[Name]), full_join(RT.year, b
 
 ## Flower heatmap
 
-```{r heatmap, dev="png", dev.args=list(), fig.height=12, fig.width=12}
+```{r heatmap, dev="png", dev.args=list(), fig.height=9, fig.width=12}
 #cairo_pdf("ipo_heatmap.pdf", width=12, height=12)
 ph  <- pheatmap(as.matrix(t(decostand(vol, method="max")))^(1/3), 
          cluster_cols=T, show_colnames=F,
@@ -814,25 +855,27 @@ cap.yr.agg %>% select(-c(meta,cap)) %>% unnest(anova) %>%
 ```{r otc_comb_temp}
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg", Site!="bb") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
-(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year+Site+mean_temp_C_treatment+temp, distance="bray", data=svf.otc))
-(anova.cap <- anova(cap.otc.comb, by="margin"))
-summ.cap <- summary(cap.otc.comb)
-prop.expl <- summ.cap$cont$importance
-ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp + Site, distance="bray", data=svf.otc))
 
-yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
-plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("OTC warming: I. agg at all sites, all years", "n =", nrow(svf.otc)))
-temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
-legend("bottomright",  title=paste("Site","\nP =",anova.cap["Site","Pr(>F)"]), legend=unique(svf.otc$Site))
-legend("bottomleft",  title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
-ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col="grey80")
-points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2])+1)[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display="cn")
-text(cap.otc.comb, display="species", cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
+anova(cap.otc.comb, by="margin") %>% kable(caption="CAP")
+prop.expl <- summary(cap.otc.comb)$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+cap.df <- fortify(cap.otc.comb) 
+arrowvars <- c(Temp="mean_temp_C_treatment", Warming="tempwarmed")
+ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
+  geom_path(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(group=paste(Year, Site, temp, PlantID)), color="grey60")+
+  geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(shape=Year, color=mean_temp_C_treatment), size=3)+
+  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*3.5, yend=CAP2*3.5), 
+               arrow=arrow(length=unit(0.5, "lines")), color="white")+
+  geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars)%>% mutate(Label=names(arrowvars)),
+            aes(x=CAP1*3.6, y=CAP2*3.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=5) +
+  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2018","2019","2021","","","GNA","Maxfield")),
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1*1.5, y=CAP2*1.5), size=4, color="black", point.size=NA, box.padding=0)+ 
+  scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
+  scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
+  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
 
 lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
@@ -861,23 +904,24 @@ cap.yr.ten %>% select(-c(meta,cap)) %>% unnest(anova) %>%
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="ten", DN=="day") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp, distance="bray", data=svf.otc))
-(anova.cap <- anova(cap.otc.comb, by="margin"))
-summ.cap <- summary(cap.otc.comb)
-prop.expl <- summ.cap$cont$importance
+anova(cap.otc.comb, by="margin") %>% kable(caption="CAP")
+prop.expl <- summary(cap.otc.comb)$cont$importance
 ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
-
-yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
-plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("OTC warming: I. ten, 2019/2021 day","n =", nrow(svf.otc)))
-temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
-legend("left",  title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
-ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col="grey80")
-points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2])+1)[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display="cn")
-text(cap.otc.comb, display="species", cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
+cap.df <- fortify(cap.otc.comb) 
+ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
+  geom_path(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(group=paste(Year, Site, temp, PlantID)), color="grey60")+
+  geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(shape=Year, color=mean_temp_C_treatment), size=3)+
+  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*2.5, yend=CAP2*2.5), 
+               arrow=arrow(length=unit(0.5, "lines")), color="white")+
+  geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars) %>% mutate(Label=names(arrowvars)),
+            aes(x=CAP1*2.6, y=CAP2*2.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=5) +
+  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2019","2021","","")),
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1*4, y=CAP2*4), size=4, color="black", point.size=NA, box.padding=0)+ 
+  scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
+  scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
+  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
 
 lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
@@ -888,23 +932,24 @@ lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kabl
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="ten", DN=="night") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp, distance="bray", data=svf.otc))
-(anova.cap <- anova(cap.otc.comb, by="margin"))
-summ.cap <- summary(cap.otc.comb)
-prop.expl <- summ.cap$cont$importance
+anova(cap.otc.comb, by="margin") %>% kable(caption="CAP")
+prop.expl <- summary(cap.otc.comb)$cont$importance
 ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
-
-yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
-plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("OTC warming: I. ten, 2019/2021 night","n =", nrow(svf.otc)))
-temprange <- round(c(max(svf.otc$mean_temp_C_treatment), min(svf.otc$mean_temp_C_treatment)))
-legend("topleft",  title=paste("Temperature","\nP =",anova.cap["mean_temp_C_treatment","Pr(>F)"]), legend=paste(temprange, " C"), fill=rev(viridis(2)))
-legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), legend=unique(svf.otc$Year), pch=yearpch[unique(svf.otc$Year)])
-legend("left",  title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svf.otc$temp))
-ordispider(cap.otc.comb, with(svf.otc, paste(Year, Site, temp, PlantID)), col="grey80")
-points(cap.otc.comb, display="sites", col=inferno(round(temprange[1]-temprange[2])+1)[round(svf.otc$mean_temp_C_treatment-temprange[2])+1], pch=yearpch[svf.otc$Year]) 
-text(cap.otc.comb, display="cn")
-text(cap.otc.comb, display="species", cex=0.7, srt=45,
-                     col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
+cap.df <- fortify(cap.otc.comb) 
+ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
+  geom_path(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(group=paste(Year, Site, temp, PlantID)), color="grey60")+
+  geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(shape=Year, color=mean_temp_C_treatment), size=3)+
+  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*3, yend=CAP2*3), 
+               arrow=arrow(length=unit(0.5, "lines")), color="white")+
+  geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars) %>% mutate(Label=names(arrowvars)),
+            aes(x=CAP1*3.1, y=CAP2*3.1, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,0)), fontface="bold", color="white", size=5) +
+  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2019","2021","","")),
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1*3, y=CAP2*3), size=4, color="black", point.size=NA, box.padding=0)+ 
+  scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
+  scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
+  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
 
 lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
@@ -917,6 +962,32 @@ vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ temp + SoilVWC, distance="bray", data=svf.otc))
 (anova.cap <- anova(cap.otc.comb, by="margin"))
 ```
+
+### All years, day and night
+
+```{r otc_comb_ten}
+svf.otc <- svf %>% filter(expt=="otc", PlantType=="ten")
+vol.otc <- vol[svf.otc$sample,]
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year * DN + temp, distance="bray", data=svf.otc))
+anova(cap.otc.comb, by="term") %>% kable(caption="CAP")
+prop.expl <- summary(cap.otc.comb)$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+cap.df <- fortify(cap.otc.comb) 
+ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
+  geom_path(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(group=paste(Year, Site, temp, PlantID, week(date)), color=temp))+
+  geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(shape=paste(Year,DN), color=temp), size=3)+
+  geom_segment(data=cap.df %>% filter(Score=="biplot"), aes(x=0,y=0,xend=CAP1*1.8, yend=CAP2*1.8), 
+               arrow=arrow(length=unit(0.5, "lines")), color="white")+
+  geom_text(data=cap.df %>% filter(Score=="biplot") %>% mutate(Label=c("2021","Night","Warming","2021:night")),
+            aes(x=CAP1*1.9, y=CAP2*1.9, angle=atan(CAP2/CAP1)*180/pi, hjust=0), fontface="bold", color="white", size=5) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.28), 
+            aes(x=CAP1*0.8, y=CAP2*0.8), size=4, color="black", point.size=NA, box.padding=0)+  labs(x=ax.labs[1], y=ax.labs[2])+
+  scale_color_manual("Treatment", values=tempcol)+ scale_shape_manual("Year, time", values=c(0,15,1,19))+
+  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
+
+lmer(sqrt(Total) ~ Year * DN + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+```
+
 
 ## Both species, day
 
@@ -986,7 +1057,7 @@ ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% 
 
 yearpch <- c(`2018`=15,`2019`=19,`2021`=17)
 plot(cap.otc.comb, type="n", xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("Soil moisture + temperature: I. agg & ten at all sites, all years, day","n =", nrow(svf.otc)))
+title(paste("Soil moisture + temperature: I. agg & ten at all sites, all years","n =", nrow(svf.otc)))
 VWCrange <- round(c(max(svf.otc$SoilVWC), min(svf.otc$SoilVWC)))
 legend("left",  title=paste("VWC","\nP =",anova.cap["SoilVWC","Pr(>F)"]), legend=paste(VWCrange, "%"), fill=rev(viridis(2)))
 legend("topright",  title=paste("Year","\nP =",anova.cap["Year","Pr(>F)"]), levels(svf.otc$Year), pch=yearpch)
@@ -1135,7 +1206,7 @@ svf.perc.ten <- plot.perc.comb(svf %>% filter(expt=="perc", PlantType=="ten"))
 
 ## Treatment effects
 
-```{r barplots, fig.width=14, fig.height=12}
+```{r barplots, fig.width=10, fig.height=9}
 vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.18) %>% arrange(desc(freq.floral)) %>% pull("name") %>% as.character 
 #%>%union(colnames(quant.scaled.vol))
 #vols.plot[vols.plot=="b-caryophyllene"] <- "b-caryophyllene.1"#c("b-ocimene","a-pinene","a-farnesene","b-caryophyllene.1","petasitene","b-myrcene","longifolene","tridec-1-ene  ","benzophenone")
@@ -1148,7 +1219,7 @@ DNcols <- c("grey90","grey20")
 ggplot(vol.plot %>% drop_na(PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=paste(Site, Year),y=area,  fill=DN, color=paste(Treat))) +
   geom_boxplot(size=0.7, outlier.size=0.7, position=position_dodge2(preserve="total")) + 
-  facet_wrap(vars(chem), scales="free") + 
+  facet_wrap(vars(chem), scales="free_y") + 
   scale_y_sqrt("Emissions (ng/flower/hr)") + 
   scale_color_brewer("Treatment", palette = "Set1", direction=-1)+
   scale_x_discrete("Site, year")+
@@ -1158,7 +1229,7 @@ ggplot(vol.plot %>% drop_na(PlantType, expt) %>% filter(expt=="otc", Site!="bb")
 
 ## Actual temperature effects
 
-```{r temptrend, fig.width=14, fig.height=12}
+```{r temptrend, fig.width=10, fig.height=9}
 ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=mean_temp_C_treatment, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
   geom_point() + geom_smooth(se=F, method="loess", span=1)+ 
@@ -1168,11 +1239,18 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#T
   scale_color_brewer("Species, site, year", palette = "Dark2", direction=-1)+#scale_color_manual("Species", values=spcols) + 
   scale_shape_manual("Time of day",values=c(1,19)) + 
   theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))
+
+vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
+  group_by(chem, PlantType, Site, Year, DN) %>% select(mean_temp_C_treatment, area) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~poly(mean_temp_C_treatment, 2), data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  filter(term=="poly(mean_temp_C_treatment, 2)2", p.value < 0.05) %>% select(-term, -std.error, -statistic) %>% 
+  arrange(p.value) %>%  kable(caption="Temperature curves with a significant quadratic term")
 ```
 
 ## Soil moisture effects
 
-```{r VWCtrend, fig.width=14, fig.height=12}
+```{r VWCtrend, fig.width=10, fig.height=9}
 ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=SoilVWC, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
   geom_point() + geom_smooth(se=F, method="loess", span=1)+
@@ -1182,6 +1260,13 @@ ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#T
   scale_color_brewer("Species, site, year", palette = "Dark2", direction=-1)+#scale_color_manual("Species", values=spcols) + 
   scale_shape_manual("Time of day",values=c(1,19)) + 
   theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))
+
+vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(SoilVWC) %>% 
+  group_by(chem, PlantType, Site, Year, DN) %>% select(SoilVWC, area) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~poly(SoilVWC, 2), data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  filter(term=="poly(SoilVWC, 2)2", p.value < 0.05) %>% select(-term, -std.error, -statistic) %>% 
+  arrange(p.value) %>%  kable(caption="Soil moisture curves with a significant quadratic term")
 ```
 
 # Leaf volatiles
@@ -1230,20 +1315,29 @@ text(nmds.vol_leaf, display="species", cex=0.7, col="grey20")
 ## CAP - OTCs
 
 ```{r cap_leaf_otc}
-svl.otc <- svl %>% filter(expt=="otc")
-cap.leaf <- capscale(sqrt(vol.leaf[svl$expt=="otc",]) ~ PlantType+temp, distance="bray", data=svl.otc)
-summ.cap <- summary(cap.leaf)
-prop.expl <- summ.cap$cont$importance[2,c("CAP1","CAP2")]
-ax.labs <- paste0("CAP", 1:2, " (",round(100*prop.expl),"% explained)")
-(anova.cap <- anova(cap.leaf, by="margin"))
+svf.otc <- svl %>% filter(expt=="otc")
+vol.otc <- vol.leaf[svl$expt=="otc",]
+(cap.otc.comb <- capscale(sqrt(vol.otc) ~ PlantType + temp, distance="bray", data=svf.otc)) #can't test temp, missing data
+anova(cap.otc.comb, by="margin") %>% kable(caption="CAP")
+prop.expl <- summary(cap.otc.comb)$cont$importance
+ax.labs <- paste0(colnames(prop.expl)[1:2], " (",round(100*prop.expl[2,1:2]),"% explained)")
+cap.df <- fortify(cap.otc.comb) 
+ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
+  geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(color=temp, shape=PlantType), size=3)+
+  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*1.2, yend=CAP2*1.2), 
+               arrow=arrow(length=unit(0.5, "lines")), color="white")+
+  geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars[2]) %>% mutate(Label=names(arrowvars[2])),
+            aes(x=CAP1*1.3, y=CAP2*1.3, angle=atan(CAP2/CAP1)*180/pi, hjust=1), fontface="bold", color="white", size=5) +
+  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("aggregata","tenuituba","","")),
+            aes(x=CAP1, y=CAP2), fontface=4, color="white", size=5) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1*3.2, y=CAP2*3.2), size=4, color="black", point.size=NA, box.padding=0)+ 
+  scale_color_manual("Treatment", values=tempcol) +  
+  scale_shape_manual("Species", values=c(19,15), labels=c(expression(italic("I. aggregata")),expression(italic("I. tenuituba")))) + 
+  labs(x=ax.labs[1], y=ax.labs[2])+
+  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
 
-plot(cap.leaf, type="n", xlim=range(cap.leaf$CCA$wa[,1]), xlab=ax.labs[1], ylab=ax.labs[2])
-title(paste("OTCs: I. agg and I. ten leaves 2019","n =", nrow(svl.otc)))
-legend("bottomleft", title=paste("Treatment","\nP =",anova.cap["temp","Pr(>F)"]), levels(svl.otc$temp), fill=tempcol)
-legend("bottomright", title=paste("Species","\nP =",anova.cap["PlantType","Pr(>F)"]), levels(svl.otc$PlantType), pch=c(19,15))
-points(cap.leaf, display="sites", col=tempcol[svl.otc$temp], pch=c(19,15)[svl.otc$PlantType]) 
-text(cap.leaf, display="cn")
-text(cap.leaf, display="species", cex=0.7, col=ifelse(sqrt(cap.leaf$CCA$v[,1]^2 + cap.leaf$CCA$v[,2]^2)>0.2, alpha("purple",1),alpha("purple",0)))
+lmer(sqrt(Total) ~ PlantType + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ## CAP - Percivals
