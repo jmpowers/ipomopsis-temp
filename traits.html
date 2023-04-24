@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-04-19" />
+<meta name="date" content="2023-04-20" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-04-19</h4>
+<h4 class="date">2023-04-20</h4>
 
 </div>
 
@@ -750,6 +750,50 @@ timings.otc %&gt;% filter(site!=&quot;bb&quot;, !variable %in% c(&quot;meltdates
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>morph %&gt;% drop_na(corolla_width) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;%
+  kable(caption=&quot;corolla_width&quot;)</code></pre>
+<table>
+<caption>corolla_width</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="right">n_per_plant</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2</td>
+<td align="right">63</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">4</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">1</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2</td>
+<td align="right">27</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2</td>
+<td align="right">31</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>nectar %&gt;% drop_na(nectar_volume) %&gt;% count(site, plantid, name=&quot;n_per_plant&quot;) %&gt;% count(site, n_per_plant) %&gt;% 
   kable(caption=&quot;nectar_volume&quot;)</code></pre>
 <table>
@@ -880,6 +924,49 @@ timings.otc %&gt;% filter(site!=&quot;bb&quot;, !variable %in% c(&quot;meltdates
 <td align="left">Maxfield</td>
 <td align="left">warmed</td>
 <td align="right">30</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="left">control</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="left">warmed</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>morph %&gt;% drop_na(corolla_width) %&gt;% count(site, temp, plantid) %&gt;% count(site, temp) %&gt;% kable(caption=&quot;corolla_width&quot;)</code></pre>
+<table>
+<caption>corolla_width</caption>
+<thead>
+<tr class="header">
+<th align="left">site</th>
+<th align="left">temp</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="left">control</td>
+<td align="right">26</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="left">warmed</td>
+<td align="right">41</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="left">control</td>
+<td align="right">28</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="left">warmed</td>
+<td align="right">25</td>
 </tr>
 <tr class="odd">
 <td align="left">SC</td>

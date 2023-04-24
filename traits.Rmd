@@ -287,6 +287,8 @@ timings.otc %>% filter(site!="bb", !variable %in% c("meltdates","sds","hobo","ot
 ```{r n_per_plant}
 morph %>% drop_na(corolla_length) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>%
   kable(caption="corolla_length")
+morph %>% drop_na(corolla_width) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>%
+  kable(caption="corolla_width")
 nectar %>% drop_na(nectar_volume) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
   kable(caption="nectar_volume")
 phen %>% drop_na(height_cm) %>% count(site, plantid, name="n_per_plant") %>% count(site, n_per_plant) %>% 
@@ -298,6 +300,7 @@ flrcol %>% drop_na(redness) %>% count(site, plantid, name="n_per_plant") %>% cou
 ## Number of plants
 ```{r n_total}
 morph %>% drop_na(corolla_length) %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="corolla_length")
+morph %>% drop_na(corolla_width) %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="corolla_width")
 nectar%>% drop_na(nectar_volume)  %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="nectar_volume")
 phen  %>% drop_na(height_cm, temp)  %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="height_cm")
 flrcol%>% drop_na(redness, temp)    %>% count(site, temp, plantid) %>% count(site, temp) %>% kable(caption="redness")
