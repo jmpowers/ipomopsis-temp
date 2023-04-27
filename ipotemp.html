@@ -5577,6 +5577,120 @@ PlantType  1  0.07756 0.2629  0.961
 Temp       1  0.18173 0.6159  0.635
 Residual  10  2.95071              </code></pre>
 </div>
+<div id="composition" class="section level2">
+<h2>Composition</h2>
+<pre class="r"><code>absamounts.leaf &lt;- svl %&gt;% select(expt, PlantType, DN) %&gt;% 
+  bind_cols(vol.leaf) %&gt;% pivot_longer(all_of(colnames(vol.leaf))) %&gt;%
+  group_by(PlantType, name) %&gt;% 
+  summarize(mean=mean(value), se=sd(value)/sqrt(n())) %&gt;% arrange(PlantType, desc(mean))
+
+ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=PlantType))+ 
+  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
+  labs(x=&quot;Mean nanograms per g dry mass per hour&quot;,y=&quot;&quot;,color=&quot;Species&quot;)</code></pre>
+<p><img src="plots/compleaf-1.svg" width="768" /></p>
+<pre class="r"><code>absamounts.leaf %&gt;% mutate(across(all_of(c(&quot;mean&quot;, &quot;se&quot;)), ~format(round(.x/1000, 2), nsmall = 2))) %&gt;%
+  mutate(meanse = paste(mean,&quot;\U00B1&quot;, se), .keep=&quot;unused&quot;) %&gt;% 
+  pivot_wider(names_from=PlantType, values_from=meanse) %&gt;% 
+  kable(caption=&quot;Leaf volatiles, mean \U00B1 se milligrams per g dry mass per hour&quot;, digits=2)</code></pre>
+<table>
+<caption>Leaf volatiles, mean ± se milligrams per g dry mass per
+hour</caption>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="left">aggleaf</th>
+<th align="left">tenleaf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(E)-hex-3-en-1-ol</td>
+<td align="left">7.33 ± 1.69</td>
+<td align="left">3.14 ± 1.13</td>
+</tr>
+<tr class="even">
+<td align="left">a-pinene</td>
+<td align="left">5.10 ± 1.54</td>
+<td align="left">6.23 ± 1.98</td>
+</tr>
+<tr class="odd">
+<td align="left">(E)-hex-2-enal</td>
+<td align="left">1.93 ± 0.56</td>
+<td align="left">0.77 ± 0.20</td>
+</tr>
+<tr class="even">
+<td align="left">[(E)-hex-3-enyl] acetate</td>
+<td align="left">1.86 ± 0.43</td>
+<td align="left">2.10 ± 0.72</td>
+</tr>
+<tr class="odd">
+<td align="left">(E)-4-oxohex-2-enal</td>
+<td align="left">0.50 ± 0.11</td>
+<td align="left">0.27 ± 0.08</td>
+</tr>
+<tr class="even">
+<td align="left">4-methylpentan-1-ol</td>
+<td align="left">0.42 ± 0.16</td>
+<td align="left">0.15 ± 0.08</td>
+</tr>
+<tr class="odd">
+<td align="left">hex-2-enal</td>
+<td align="left">0.33 ± 0.14</td>
+<td align="left">0.04 ± 0.02</td>
+</tr>
+<tr class="even">
+<td align="left">1-penten-3-ol</td>
+<td align="left">0.28 ± 0.06</td>
+<td align="left">0.14 ± 0.04</td>
+</tr>
+<tr class="odd">
+<td align="left">(Z)-hex-2-en-1-ol</td>
+<td align="left">0.24 ± 0.07</td>
+<td align="left">0.10 ± 0.04</td>
+</tr>
+<tr class="even">
+<td align="left">(E)-12-cyclopropyldodec-11-en-1-ol</td>
+<td align="left">0.21 ± 0.07</td>
+<td align="left">0.07 ± 0.04</td>
+</tr>
+<tr class="odd">
+<td align="left">petasitene</td>
+<td align="left">0.17 ± 0.06</td>
+<td align="left">0.35 ± 0.13</td>
+</tr>
+<tr class="even">
+<td align="left">b-caryophyllene</td>
+<td align="left">0.17 ± 0.05</td>
+<td align="left">0.40 ± 0.21</td>
+</tr>
+<tr class="odd">
+<td align="left">a-campholenal</td>
+<td align="left">0.13 ± 0.08</td>
+<td align="left">0.52 ± 0.26</td>
+</tr>
+<tr class="even">
+<td align="left">hexan-1-ol</td>
+<td align="left">0.11 ± 0.05</td>
+<td align="left">0.07 ± 0.03</td>
+</tr>
+<tr class="odd">
+<td align="left">pseudoionone</td>
+<td align="left">0.07 ± 0.03</td>
+<td align="left">0.31 ± 0.09</td>
+</tr>
+<tr class="even">
+<td align="left">[(Z)-hex-3-enyl] pentanoate</td>
+<td align="left">0.05 ± 0.05</td>
+<td align="left">0.30 ± 0.11</td>
+</tr>
+<tr class="odd">
+<td align="left">undecanal</td>
+<td align="left">0.02 ± 0.01</td>
+<td align="left">0.11 ± 0.04</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 

@@ -1508,3 +1508,21 @@ prop.expl <- summ.cap$cont$importance[2,c("CAP1","CAP2")]
 ax.labs <- paste0("CAP", 1:2, " (",round(100*prop.expl),"% explained)")
 (anova.cap <- anova(cap.leaf.perc, by="margin"))
 ```
+
+## Composition
+```{r compleaf}
+absamounts.leaf <- svl %>% select(expt, PlantType, DN) %>% 
+  bind_cols(vol.leaf) %>% pivot_longer(all_of(colnames(vol.leaf))) %>%
+  group_by(PlantType, name) %>% 
+  summarize(mean=mean(value), se=sd(value)/sqrt(n())) %>% arrange(PlantType, desc(mean))
+
+ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=PlantType))+ 
+  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
+  labs(x="Mean nanograms per g dry mass per hour",y="",color="Species")
+
+absamounts.leaf %>% mutate(across(all_of(c("mean", "se")), ~format(round(.x/1000, 2), nsmall = 2))) %>%
+  mutate(meanse = paste(mean,"\U00B1", se), .keep="unused") %>% 
+  pivot_wider(names_from=PlantType, values_from=meanse) %>% 
+  kable(caption="Leaf volatiles, mean \U00B1 se milligrams per g dry mass per hour", digits=2)
+```
+
