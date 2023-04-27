@@ -3065,6 +3065,17 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
   geom_path(aes(group=name), color=&quot;grey&quot;) + geom_text(aes(label=name, color=paste(expt, PlantType))) +
   scale_x_log10() + scale_y_log10() + geom_abline(slope=1, intercept=0) + scale_color_manual(values=c(NA,&quot;cornflowerblue&quot;,&quot;red&quot;,&quot;blue&quot;))</code></pre>
 <p><img src="plots/comp-3.svg" width="1344" /></p>
+<pre class="r"><code>freqamounts &lt;- svf %&gt;% select(expt, PlantType, DN) %&gt;% 
+  bind_cols(decostand(vol, method=&quot;pa&quot;)) %&gt;% pivot_longer(all_of(colnames(vol))) %&gt;%
+  group_by(expt, PlantType, DN, name) %&gt;% 
+  summarize(mean=mean(value), se=sd(value)/sqrt(n())) %&gt;% arrange(expt, PlantType, DN, desc(mean))
+
+ggplot(freqamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=paste(PlantType, expt), shape=DN))+ 
+  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + 
+  scale_shape_manual(values=c(1,19)) +   scale_x_continuous(expand=c(0,0))+ 
+  labs(x=&quot;Frequency of detection&quot;,y=&quot;&quot;,color=&quot;Species, experiment&quot;, shape=&quot;Time&quot;)+
+  scale_color_manual(values=c(&quot;orange&quot;,&quot;red&quot;,&quot;cyan&quot;,&quot;blue&quot;)) + theme_dark()</code></pre>
+<p><img src="plots/comp-4.svg" width="1344" /></p>
 </div>
 <div id="compare-to-bischoff-et-al.-2014" class="section level2">
 <h2>Compare to Bischoff et al. 2014</h2>
@@ -5021,7 +5032,7 @@ svf.perc.agg &lt;- plot.perc.comb(svf %&gt;% filter(expt==&quot;perc&quot;, Plan
 <h1>Individual volatiles</h1>
 <div id="treatment-effects" class="section level2">
 <h2>Treatment effects</h2>
-<pre class="r"><code>vols.plot &lt;- chemsf %&gt;% filter(filter_final, freq.floral&gt;0.18) %&gt;% arrange(desc(freq.floral)) %&gt;% pull(&quot;name&quot;) %&gt;% as.character 
+<pre class="r"><code>vols.plot &lt;- chemsf %&gt;% filter(filter_final, freq.floral&gt;0.18) %&gt;% arrange(desc(freq.floral)) %&gt;% pull(&quot;name&quot;) %&gt;% as.character
 #%&gt;%union(colnames(quant.scaled.vol))
 #vols.plot[vols.plot==&quot;b-caryophyllene&quot;] &lt;- &quot;b-caryophyllene.1&quot;#c(&quot;b-ocimene&quot;,&quot;a-pinene&quot;,&quot;a-farnesene&quot;,&quot;b-caryophyllene.1&quot;,&quot;petasitene&quot;,&quot;b-myrcene&quot;,&quot;longifolene&quot;,&quot;tridec-1-ene  &quot;,&quot;benzophenone&quot;)
 vol.long &lt;- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key=&quot;chem&quot;,value=&quot;area&quot;, 2:(length(vols.plot)+2), factor_key=T)
@@ -5057,6 +5068,60 @@ ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType==&quot;agg&quot;,Site,
   theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face=&quot;italic&quot;),
                           axis.text=element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/treatmentmap-1.svg" width="672" /></p>
+<pre class="r"><code>lmer(indole~temp+(1|PlantID), data = filter(cbind(vol,svf), expt==&quot;otc&quot;, PlantType==&quot;ten&quot;, DN==&quot;day&quot;)) %&gt;% anova() %&gt;% 
+  kable(caption=&quot;indole tenuituba day&quot;)</code></pre>
+<table>
+<caption>indole tenuituba day</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">temp</td>
+<td align="right">0.0676582</td>
+<td align="right">0.0676582</td>
+<td align="right">1</td>
+<td align="right">90</td>
+<td align="right">0.5801704</td>
+<td align="right">0.4482369</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>lmer(indole~temp+(1|PlantID), data = filter(cbind(vol,svf), expt==&quot;otc&quot;, PlantType==&quot;ten&quot;, DN==&quot;night&quot;)) %&gt;% anova() %&gt;% 
+    kable(caption=&quot;indole tenuituba night&quot;)</code></pre>
+<table>
+<caption>indole tenuituba night</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F value</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">temp</td>
+<td align="right">0.0926084</td>
+<td align="right">0.0926084</td>
+<td align="right">1</td>
+<td align="right">55.92978</td>
+<td align="right">1.016913</td>
+<td align="right">0.3175954</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="actual-temperature-effects" class="section level2">
 <h2>Actual temperature effects</h2>
@@ -5179,7 +5244,6 @@ ggplot(vol.plot.temp, aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as.char
    lm(nobars(formula), data=data) #else drop the random effects and run an lm
  }
 }
-library(emmeans)
 library(broom.mixed)
 vol.plot.temptreat &lt;- vol.plot %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(mean_temp_C_treatment) %&gt;% 
   group_by(chem, PlantType, Site, Year, DN) %&gt;% select(temp, mean_temp_C_treatment, area, PlantID) %&gt;% 

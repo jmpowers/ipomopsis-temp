@@ -781,6 +781,17 @@ absamounts %>% pivot_wider(names_from=DN, values_from=c(mean, se)) %>%
   ggplot(aes(x=mean_day, y=mean_night)) +  
   geom_path(aes(group=name), color="grey") + geom_text(aes(label=name, color=paste(expt, PlantType))) +
   scale_x_log10() + scale_y_log10() + geom_abline(slope=1, intercept=0) + scale_color_manual(values=c(NA,"cornflowerblue","red","blue"))
+
+freqamounts <- svf %>% select(expt, PlantType, DN) %>% 
+  bind_cols(decostand(vol, method="pa")) %>% pivot_longer(all_of(colnames(vol))) %>%
+  group_by(expt, PlantType, DN, name) %>% 
+  summarize(mean=mean(value), se=sd(value)/sqrt(n())) %>% arrange(expt, PlantType, DN, desc(mean))
+
+ggplot(freqamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=paste(PlantType, expt), shape=DN))+ 
+  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + 
+  scale_shape_manual(values=c(1,19)) +   scale_x_continuous(expand=c(0,0))+ 
+  labs(x="Frequency of detection",y="",color="Species, experiment", shape="Time")+
+  scale_color_manual(values=c("orange","red","cyan","blue")) + theme_dark()
 ```
 
 ## Compare to Bischoff et al. 2014
@@ -1275,7 +1286,7 @@ svf.perc.ten <- plot.perc.comb(svf %>% filter(expt=="perc", PlantType=="ten"))
 ## Treatment effects
 
 ```{r barplots, fig.width=10, fig.height=9}
-vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.18) %>% arrange(desc(freq.floral)) %>% pull("name") %>% as.character 
+vols.plot <- chemsf %>% filter(filter_final, freq.floral>0.18) %>% arrange(desc(freq.floral)) %>% pull("name") %>% as.character
 #%>%union(colnames(quant.scaled.vol))
 #vols.plot[vols.plot=="b-caryophyllene"] <- "b-caryophyllene.1"#c("b-ocimene","a-pinene","a-farnesene","b-caryophyllene.1","petasitene","b-myrcene","longifolene","tridec-1-ene  ","benzophenone")
 vol.long <- gather(cbind(sample=rownames(vol[,vols.plot]), total=rowSums(vol), vol[,vols.plot]), key="chem",value="area", 2:(length(vols.plot)+2), factor_key=T)
@@ -1312,6 +1323,11 @@ ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType=="agg",Site,as.charact
   geom_text(aes(label=scales::percent(relchange, accuracy=1), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
   theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face="italic"),
                           axis.text=element_text(color="black"))
+
+lmer(indole~temp+(1|PlantID), data = filter(cbind(vol,svf), expt=="otc", PlantType=="ten", DN=="day")) %>% anova() %>% 
+  kable(caption="indole tenuituba day")
+lmer(indole~temp+(1|PlantID), data = filter(cbind(vol,svf), expt=="otc", PlantType=="ten", DN=="night")) %>% anova() %>% 
+    kable(caption="indole tenuituba night")
 ```
 
 
@@ -1364,7 +1380,6 @@ safe_lmer <- function(formula, data) {
    lm(nobars(formula), data=data) #else drop the random effects and run an lm
  }
 }
-library(emmeans)
 library(broom.mixed)
 vol.plot.temptreat <- vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
   group_by(chem, PlantType, Site, Year, DN) %>% select(temp, mean_temp_C_treatment, area, PlantID) %>% 
@@ -1388,7 +1403,6 @@ vol.plot %>% filter(expt=="otc", Site!="bb", chem=="total") %>%
 #TODO most of the temp variation in among sampling days, confounded if scent changes with season
 #TODO no sqrt transformation, so outliers have more influence on lms
 ```
-
 
 ```{r tempvtreat}
 bind_rows(treat=vol.plot.treat %>% rename(value=relchange), 
