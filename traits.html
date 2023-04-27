@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-04-20" />
+<meta name="date" content="2023-04-27" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-04-20</h4>
+<h4 class="date">2023-04-27</h4>
 
 </div>
 
@@ -1157,8 +1157,8 @@ print(paste(&quot;Mean difference in VWC across dates and sites (mean +-SD):&quo
 ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep=&quot;\n&quot;)
   facet_grid(name~site, scales=&quot;free_y&quot;, labeller = as_labeller(c(traitnames.units, speciessitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
-              map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
+  #geom_signif(comparisons = list(c(1,2)), test=&quot;t.test&quot;,
+  #            map_signif_level=TRUE, color=&quot;black&quot;,size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
   labs(x=&quot;&quot;, y=&quot;&quot;, color=&quot;Temperature&quot;) + 
   scale_y_continuous(limits=c(0,NA))+
@@ -1542,219 +1542,101 @@ ggplot(aes(x=temp, y=value, color=temp)) +
 </div>
 <div id="effect-of-temperature" class="section level1">
 <h1>Effect of temperature</h1>
-<pre class="r"><code>lmer(corolla_length~temp*species+(1|plantid),data=morph) %&gt;% anova %&gt;% kable(caption=&quot;corolla_length&quot;)</code></pre>
+<pre class="r"><code>temp.mod &lt;- tribble(
+  ~trait,          ~species,         ~model,
+  &quot;corolla_length&quot;, &quot;agg&quot;, lmer(corolla_length~temp+site+(1|plantid), data=filter(morph, species==&quot;agg&quot;)),
+  &quot;corolla_length&quot;, &quot;ten&quot;, lmer(corolla_length~temp+(1|plantid), data=filter(morph, species==&quot;ten&quot;)),
+  &quot;corolla_width&quot;,  &quot;agg&quot;, lmer(corolla_width ~temp+site+(1|plantid), data=filter(morph, species==&quot;agg&quot;)),
+  &quot;corolla_width&quot;,  &quot;ten&quot;, lmer(corolla_width ~temp+(1|plantid), data=filter(morph, species==&quot;ten&quot;)),
+  &quot;nectar_volume&quot;,  &quot;agg&quot;, lmer(nectar_volume ~temp+(1|plantid),data=nectar),
+  &quot;nectar_conc&quot;,    &quot;agg&quot;, lmer(nectar_conc   ~temp+(1|plantid),data=nectar),
+  &quot;redness&quot;,        &quot;agg&quot;, lmer(redness       ~temp+(1|plantid), data=flrcol),
+  &quot;height_cm&quot;,      &quot;agg&quot;, lm(height_cm       ~temp, data=phen.max)) %&gt;% 
+  mutate(test = map(model, ~tidy(anova(.x))), 
+         emm = map(model, ~tidy(emmeans(.x, ~ temp))))
+
+temp.mod %&gt;% select(trait, species, emm) %&gt;% unnest(emm) %&gt;% 
+  pivot_wider(names_from = temp, values_from=estimate, id_cols=c(trait, species)) %&gt;% 
+  mutate(change=(warmed-control)/control) %&gt;% 
+  left_join(temp.mod %&gt;% select(trait, species, test) %&gt;% unnest(test) %&gt;% filter(term==&quot;temp&quot;)) %&gt;% 
+  select(species, trait, control, warmed, change, p.value) %&gt;% 
+  kable(caption=&quot;treatment effects, accounting for aggregata site&quot;, digits=3)</code></pre>
 <table>
-<caption>corolla_length</caption>
-<colgroup>
-<col width="18%" />
-<col width="14%" />
-<col width="14%" />
-<col width="8%" />
-<col width="13%" />
-<col width="15%" />
-<col width="14%" />
-</colgroup>
+<caption>treatment effects, accounting for aggregata site</caption>
 <thead>
 <tr class="header">
-<th align="left"></th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
+<th align="left">species</th>
+<th align="left">trait</th>
+<th align="right">control</th>
+<th align="right">warmed</th>
+<th align="right">change</th>
+<th align="right">p.value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">temp</td>
-<td align="right">2.72977</td>
-<td align="right">2.72977</td>
-<td align="right">1</td>
-<td align="right">186.2849</td>
-<td align="right">0.3947111</td>
-<td align="right">0.5306029</td>
+<td align="left">agg</td>
+<td align="left">corolla_length</td>
+<td align="right">25.560</td>
+<td align="right">26.451</td>
+<td align="right">0.035</td>
+<td align="right">0.035</td>
 </tr>
 <tr class="even">
-<td align="left">species</td>
-<td align="right">661.88844</td>
-<td align="right">661.88844</td>
-<td align="right">1</td>
-<td align="right">186.2849</td>
-<td align="right">95.7057893</td>
-<td align="right">0.0000000</td>
+<td align="left">ten</td>
+<td align="left">corolla_length</td>
+<td align="right">30.932</td>
+<td align="right">30.632</td>
+<td align="right">-0.010</td>
+<td align="right">0.692</td>
 </tr>
 <tr class="odd">
-<td align="left">temp:species</td>
-<td align="right">10.63747</td>
-<td align="right">10.63747</td>
-<td align="right">1</td>
-<td align="right">186.2849</td>
-<td align="right">1.5381260</td>
-<td align="right">0.2164568</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>lmer(corolla_width ~temp*species+(1|plantid),data=morph) %&gt;% anova %&gt;% kable(caption=&quot;corolla_width&quot;)</code></pre>
-<table>
-<caption>corolla_width</caption>
-<colgroup>
-<col width="18%" />
-<col width="15%" />
-<col width="15%" />
-<col width="8%" />
-<col width="12%" />
-<col width="15%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">temp</td>
-<td align="right">0.2427111</td>
-<td align="right">0.2427111</td>
-<td align="right">1</td>
-<td align="right">138.4017</td>
-<td align="right">5.126515</td>
-<td align="right">0.0251177</td>
+<td align="left">agg</td>
+<td align="left">corolla_width</td>
+<td align="right">3.355</td>
+<td align="right">3.314</td>
+<td align="right">-0.012</td>
+<td align="right">0.469</td>
 </tr>
 <tr class="even">
-<td align="left">species</td>
-<td align="right">10.8947627</td>
-<td align="right">10.8947627</td>
-<td align="right">1</td>
-<td align="right">138.4017</td>
-<td align="right">230.117882</td>
-<td align="right">0.0000000</td>
+<td align="left">ten</td>
+<td align="left">corolla_width</td>
+<td align="right">2.373</td>
+<td align="right">2.145</td>
+<td align="right">-0.096</td>
+<td align="right">0.048</td>
 </tr>
 <tr class="odd">
-<td align="left">temp:species</td>
-<td align="right">0.0493726</td>
-<td align="right">0.0493726</td>
-<td align="right">1</td>
-<td align="right">138.4017</td>
-<td align="right">1.042842</td>
-<td align="right">0.3089431</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>lmer(nectar_volume ~temp+(1|plantid),data=nectar)        %&gt;% anova %&gt;% kable(caption=&quot;nectar_volume&quot;)</code></pre>
-<table>
-<caption>nectar_volume</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">temp</td>
-<td align="right">43.35161</td>
-<td align="right">43.35161</td>
-<td align="right">1</td>
-<td align="right">73</td>
-<td align="right">4.790112</td>
-<td align="right">0.031823</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>lmer(nectar_conc   ~temp+(1|plantid),data=nectar)        %&gt;% anova %&gt;% kable(caption=&quot;nectar_conc&quot;)</code></pre>
-<table>
-<caption>nectar_conc</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">temp</td>
-<td align="right">1.40046</td>
-<td align="right">1.40046</td>
-<td align="right">1</td>
-<td align="right">66</td>
-<td align="right">0.0541714</td>
-<td align="right">0.8166778</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>lm(height_cm     ~temp, data=phen.max)      %&gt;% anova %&gt;% kable(caption=&quot;height_cm&quot;)</code></pre>
-<table>
-<caption>height_cm</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Df</th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">temp</td>
-<td align="right">1</td>
-<td align="right">16.21155</td>
-<td align="right">16.21155</td>
-<td align="right">0.1441605</td>
-<td align="right">0.7055428</td>
+<td align="left">agg</td>
+<td align="left">nectar_volume</td>
+<td align="right">3.790</td>
+<td align="right">5.327</td>
+<td align="right">0.406</td>
+<td align="right">0.032</td>
 </tr>
 <tr class="even">
-<td align="left">Residuals</td>
-<td align="right">59</td>
-<td align="right">6634.83763</td>
-<td align="right">112.45488</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">agg</td>
+<td align="left">nectar_conc</td>
+<td align="right">25.405</td>
+<td align="right">25.694</td>
+<td align="right">0.011</td>
+<td align="right">0.817</td>
 </tr>
-</tbody>
-</table>
-<pre class="r"><code>lmer(redness       ~temp+(1|plantid), data=flrcol)       %&gt;% anova %&gt;% kable(caption=&quot;redness&quot;)</code></pre>
-<table>
-<caption>redness</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Sum Sq</th>
-<th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
-<th align="right">F value</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
 <tr class="odd">
-<td align="left">temp</td>
-<td align="right">0.0028207</td>
-<td align="right">0.0028207</td>
-<td align="right">1</td>
-<td align="right">64</td>
-<td align="right">0.6936907</td>
-<td align="right">0.4080093</td>
+<td align="left">agg</td>
+<td align="left">redness</td>
+<td align="right">0.312</td>
+<td align="right">0.298</td>
+<td align="right">-0.042</td>
+<td align="right">0.408</td>
+</tr>
+<tr class="even">
+<td align="left">agg</td>
+<td align="left">height_cm</td>
+<td align="right">41.935</td>
+<td align="right">42.967</td>
+<td align="right">0.025</td>
+<td align="right">0.706</td>
 </tr>
 </tbody>
 </table>

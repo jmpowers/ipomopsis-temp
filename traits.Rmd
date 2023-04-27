@@ -390,8 +390,8 @@ morph.mean %>% pivot_longer(c(corolla_length, corolla_width)) %>%
 ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep="\n")
   facet_grid(name~site, scales="free_y", labeller = as_labeller(c(traitnames.units, speciessitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
-  geom_signif(comparisons = list(c(1,2)), test="t.test",
-              map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
+  #geom_signif(comparisons = list(c(1,2)), test="t.test",
+  #            map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
   geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
   labs(x="", y="", color="Temperature") + 
   scale_y_continuous(limits=c(0,NA))+
@@ -505,12 +505,25 @@ lmer(redness     ~temp*snow+(1|plotid)+(1|plantid), data=flrcol) %>% anova %>%
 # Effect of temperature
 
 ```{r temp}
-lmer(corolla_length~temp*species+(1|plantid),data=morph) %>% anova %>% kable(caption="corolla_length")
-lmer(corolla_width ~temp*species+(1|plantid),data=morph) %>% anova %>% kable(caption="corolla_width")
-lmer(nectar_volume ~temp+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_volume")
-lmer(nectar_conc   ~temp+(1|plantid),data=nectar)        %>% anova %>% kable(caption="nectar_conc")
-lm(height_cm     ~temp, data=phen.max)      %>% anova %>% kable(caption="height_cm")
-lmer(redness       ~temp+(1|plantid), data=flrcol)       %>% anova %>% kable(caption="redness")
+temp.mod <- tribble(
+  ~trait,          ~species,         ~model,
+  "corolla_length", "agg", lmer(corolla_length~temp+site+(1|plantid), data=filter(morph, species=="agg")),
+  "corolla_length", "ten", lmer(corolla_length~temp+(1|plantid), data=filter(morph, species=="ten")),
+  "corolla_width",  "agg", lmer(corolla_width ~temp+site+(1|plantid), data=filter(morph, species=="agg")),
+  "corolla_width",  "ten", lmer(corolla_width ~temp+(1|plantid), data=filter(morph, species=="ten")),
+  "nectar_volume",  "agg", lmer(nectar_volume ~temp+(1|plantid),data=nectar),
+  "nectar_conc",    "agg", lmer(nectar_conc   ~temp+(1|plantid),data=nectar),
+  "redness",        "agg", lmer(redness       ~temp+(1|plantid), data=flrcol),
+  "height_cm",      "agg", lm(height_cm       ~temp, data=phen.max)) %>% 
+  mutate(test = map(model, ~tidy(anova(.x))), 
+         emm = map(model, ~tidy(emmeans(.x, ~ temp))))
+
+temp.mod %>% select(trait, species, emm) %>% unnest(emm) %>% 
+  pivot_wider(names_from = temp, values_from=estimate, id_cols=c(trait, species)) %>% 
+  mutate(change=(warmed-control)/control) %>% 
+  left_join(temp.mod %>% select(trait, species, test) %>% unnest(test) %>% filter(term=="temp")) %>% 
+  select(species, trait, control, warmed, change, p.value) %>% 
+  kable(caption="treatment effects, accounting for aggregata site", digits=3)
 ```
 
 # Flower color
