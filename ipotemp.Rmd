@@ -1354,6 +1354,42 @@ ggplot(vol.plot.temp, aes(x=paste(ifelse(PlantType=="agg",Site,as.character(DN))
                           axis.text=element_text(color="black"))
 ```
 
+Both temperature and treatment
+
+```{r temptreatmap, fig.width=7, fig.height=6}
+safe_lmer <- function(formula, data) {
+ if(length(unique(pull(data,as.character(findbars(formula)[[1]])[3]))) < nrow(data)*(2/3)) {
+   lmer(formula, data=data) #run only if there are more random effect levels than rows
+ } else {
+   lm(nobars(formula), data=data) #else drop the random effects and run an lm
+ }
+}
+library(emmeans)
+library(broom.mixed)
+vol.plot.temptreat <- vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
+  group_by(chem, PlantType, Site, Year, DN) %>% select(temp, mean_temp_C_treatment, area, PlantID) %>% 
+  mutate(area=area/mean(area), PlantID=as.character(PlantID)) %>% nest() %>% 
+  mutate(coef = map(data, ~tidy(safe_lmer(area ~ temp + mean_temp_C_treatment + (1|PlantID), data=.x)))) %>% 
+  select(coef) %>% unnest(coef) %>% filter(term %in% c("tempwarmed","mean_temp_C_treatment"))
+
+ggplot(vol.plot.temptreat, aes(x=paste(ifelse(PlantType=="agg",Site,as.character(DN)), str_sub(Year,3,4)), y=fct_rev(chem))) + 
+  facet_grid(term ~PlantType, scales="free_x", 
+             labeller = as_labeller(c(agg="I. aggregata", ten="I. tenuituba", mean_temp_C_treatment="Temperature", tempwarmed="Treatment")))+
+  geom_tile(aes(fill=estimate)) + scale_fill_gradient2(guide="none")  + 
+  geom_text(aes(label=scales::percent(estimate, accuracy=1), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face="italic"),
+                          axis.text=element_text(color="black"))
+
+vol.plot %>% filter(expt=="otc", Site!="bb", chem=="total") %>% 
+  ggplot(aes(x=mean_temp_C_treatment, y=area, color=temp)) + geom_point() +
+  facet_wrap(vars(PlantType, Site,  DN, Year)) + geom_smooth(method="lm") + scale_color_brewer(palette = "Set1", direction = -1)
+#TODO may need to add temp*treat interaction, since fixed slope is giving misleading conclusions
+#TODO temperature range is very short in 2019 (fewer sampling days) and at night - not very informative
+#TODO most of the temp variation in among sampling days, confounded if scent changes with season
+#TODO no sqrt transformation, so outliers have more influence on lms
+```
+
+
 ```{r tempvtreat}
 bind_rows(treat=vol.plot.treat %>% rename(value=relchange), 
           temp=vol.plot.temp %>% rename(value=estimate), .id="variable") %>% 

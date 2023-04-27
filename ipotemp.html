@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-04-21" />
+<meta name="date" content="2023-04-27" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-04-21</h4>
+<h4 class="date">2023-04-27</h4>
 
 </div>
 
@@ -5171,6 +5171,38 @@ ggplot(vol.plot.temp, aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as.char
   theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face=&quot;italic&quot;),
                           axis.text=element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/temperaturemap-1.svg" width="672" /></p>
+<p>Both temperature and treatment</p>
+<pre class="r"><code>safe_lmer &lt;- function(formula, data) {
+ if(length(unique(pull(data,as.character(findbars(formula)[[1]])[3]))) &lt; nrow(data)*(2/3)) {
+   lmer(formula, data=data) #run only if there are more random effect levels than rows
+ } else {
+   lm(nobars(formula), data=data) #else drop the random effects and run an lm
+ }
+}
+library(emmeans)
+library(broom.mixed)
+vol.plot.temptreat &lt;- vol.plot %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(mean_temp_C_treatment) %&gt;% 
+  group_by(chem, PlantType, Site, Year, DN) %&gt;% select(temp, mean_temp_C_treatment, area, PlantID) %&gt;% 
+  mutate(area=area/mean(area), PlantID=as.character(PlantID)) %&gt;% nest() %&gt;% 
+  mutate(coef = map(data, ~tidy(safe_lmer(area ~ temp + mean_temp_C_treatment + (1|PlantID), data=.x)))) %&gt;% 
+  select(coef) %&gt;% unnest(coef) %&gt;% filter(term %in% c(&quot;tempwarmed&quot;,&quot;mean_temp_C_treatment&quot;))
+
+ggplot(vol.plot.temptreat, aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as.character(DN)), str_sub(Year,3,4)), y=fct_rev(chem))) + 
+  facet_grid(term ~PlantType, scales=&quot;free_x&quot;, 
+             labeller = as_labeller(c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;, mean_temp_C_treatment=&quot;Temperature&quot;, tempwarmed=&quot;Treatment&quot;)))+
+  geom_tile(aes(fill=estimate)) + scale_fill_gradient2(guide=&quot;none&quot;)  + 
+  geom_text(aes(label=scales::percent(estimate, accuracy=1), fontface=as.integer(p.value &lt; 0.05)+1))+ labs(x=&quot;&quot;,y=&quot;&quot;)+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face=&quot;italic&quot;),
+                          axis.text=element_text(color=&quot;black&quot;))</code></pre>
+<p><img src="plots/temptreatmap-1.svg" width="672" /></p>
+<pre class="r"><code>vol.plot %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;, chem==&quot;total&quot;) %&gt;% 
+  ggplot(aes(x=mean_temp_C_treatment, y=area, color=temp)) + geom_point() +
+  facet_wrap(vars(PlantType, Site,  DN, Year)) + geom_smooth(method=&quot;lm&quot;) + scale_color_brewer(palette = &quot;Set1&quot;, direction = -1)</code></pre>
+<p><img src="plots/temptreatmap-2.svg" width="672" /></p>
+<pre class="r"><code>#TODO may need to add temp*treat interaction, since fixed slope is giving misleading conclusions
+#TODO temperature range is very short in 2019 (fewer sampling days) and at night - not very informative
+#TODO most of the temp variation in among sampling days, confounded if scent changes with season
+#TODO no sqrt transformation, so outliers have more influence on lms</code></pre>
 <pre class="r"><code>bind_rows(treat=vol.plot.treat %&gt;% rename(value=relchange), 
           temp=vol.plot.temp %&gt;% rename(value=estimate), .id=&quot;variable&quot;) %&gt;% 
   select(-term, -std.error, -statistic, -p.value, -ratio, -estimate) %&gt;% 
