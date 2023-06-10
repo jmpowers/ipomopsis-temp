@@ -142,7 +142,8 @@ sds21.date.zeroed <- sds21.date %>%
 
 sds <- sds21 %>% 
   mutate(#flowers_volatiles = replace_na(flowers_volatiles, 0), #TODO get volatiles for 2018 & 2019
-    #flowers_destroyed = flowers_morphology_nectar + flowers_volatiles, #TODO + flowers_color
+    #TODO get all these counts
+    #flowers_destroyed = flowers_morphology_nectar + flowers_volatiles + flowers_color,
     seeds_per_fruit	= seeds / fruits,
     fruits_aborted	= aborts + flowers_buds_collected_last,
     seeds_est	= seeds + seeds_fly + (flowers_buds_collected_early + #flowers_destroyed + 
@@ -265,7 +266,7 @@ timings.otc %>% mutate(range=paste(begin, end=end, sep=" : "), .keep="unused") %
 
 dodging <- position_dodge2(width=1, reverse = T, preserve="single")
 shading <- data.frame(ystart=0:6+0.5, yend=1:7+0.5, col=letters[c(1,2,1,2,1,2,1)])
-timings.otc %>% filter(site!="bb", !variable %in% c("meltdates","sds","hobo","otc")) %>% 
+timings.otc %>% filter(site!="bb", !variable %in% c("meltdates","hobo","otc")) %>% #sds
   mutate(variable=fct_reorder(variable, begin, na.rm=T) %>% 
            fct_relevel(c("vt","vt.leaf","mt","nt","flrcol","ph")) %>% fct_rev(), 
          year=factor(year)) %>% 
@@ -669,6 +670,16 @@ ggplot(phen %>% drop_na(height_cm, temp), aes(x=julian, y=height_cm, color=temp)
   labs(y="Plant height", x="Day of year", color="Temperature") +
   scale_x_continuous(breaks=seq(120,240, by=20))+ 
   scale_color_brewer(palette="Set1", direction=-1) +theme_minimal() + geom_vline(xintercept=yday(ymd("2021-06-25")))
+
+phen.raw %>% drop_na(height_cm, temp) %>% group_by(plantid) %>% arrange(plantid, julian) %>% mutate(height_diff = c(NA,diff(height_cm))) %>% ggplot(aes(y=height_diff, x=factor(date), color=temp))  + geom_hline(yintercept=0)+
+  geom_boxplot(position=position_dodge(0.9), outlier.shape=NA) + geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.5, jitter.height=0)) + 
+  theme_minimal()
+
+(chomped <- phen.raw %>% filter(str_detect(notes,"herb|munch|chew|broke")) %>%
+  full_join(phen.raw %>% drop_na(height_cm, temp) %>% group_by(plantid) %>% arrange(plantid, julian) %>%
+              mutate(height_diff = c(NA,diff(height_cm))) %>% filter(height_diff <= -10)) %>% 
+  select(plantid, temp, date, notes, scribe, height_cm, height_diff) %>% arrange(temp, plantid)) 
+chomped %>% count(temp, plantid) %>% count(temp)
 
 phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% drop_na(open, buds) %>% 
   summarize(openbuds.se = sd(open+buds)/sqrt(length(open+buds)), openbuds=mean(open+buds)) %>% 

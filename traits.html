@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-04-27" />
+<meta name="date" content="2023-05-18" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-04-27</h4>
+<h4 class="date">2023-05-18</h4>
 
 </div>
 
@@ -672,7 +672,7 @@ timings.otc %&gt;% mutate(range=paste(begin, end=end, sep=&quot; : &quot;), .kee
 </table>
 <pre class="r"><code>dodging &lt;- position_dodge2(width=1, reverse = T, preserve=&quot;single&quot;)
 shading &lt;- data.frame(ystart=0:6+0.5, yend=1:7+0.5, col=letters[c(1,2,1,2,1,2,1)])
-timings.otc %&gt;% filter(site!=&quot;bb&quot;, !variable %in% c(&quot;meltdates&quot;,&quot;sds&quot;,&quot;hobo&quot;,&quot;otc&quot;)) %&gt;% 
+timings.otc %&gt;% filter(site!=&quot;bb&quot;, !variable %in% c(&quot;meltdates&quot;,&quot;hobo&quot;,&quot;otc&quot;)) %&gt;% #sds
   mutate(variable=fct_reorder(variable, begin, na.rm=T) %&gt;% 
            fct_relevel(c(&quot;vt&quot;,&quot;vt.leaf&quot;,&quot;mt&quot;,&quot;nt&quot;,&quot;flrcol&quot;,&quot;ph&quot;)) %&gt;% fct_rev(), 
          year=factor(year)) %&gt;% 
