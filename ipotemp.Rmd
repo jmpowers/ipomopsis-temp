@@ -31,6 +31,7 @@ library(ggrepel)
 library(lme4)
 library(lmerTest)
 library(broom)
+library(broom.mixed)
 library(viridis)
 library(RColorBrewer)
 library(pheatmap)
@@ -782,6 +783,11 @@ absamounts %>% pivot_wider(names_from=DN, values_from=c(mean, se)) %>%
   geom_path(aes(group=name), color="grey") + geom_text(aes(label=name, color=paste(expt, PlantType))) +
   scale_x_log10() + scale_y_log10() + geom_abline(slope=1, intercept=0) + scale_color_manual(values=c(NA,"cornflowerblue","red","blue"))
 
+absamounts %>% pivot_wider(names_from=DN, values_from=c(mean, se)) %>% drop_na(mean_night) %>% 
+  mutate(dn_ratio = mean_night/mean_day, exptPlantType=paste(expt, PlantType, sep="_")) %>% 
+  ungroup() %>% select(name, exptPlantType, dn_ratio, mean_night) %>% 
+  pivot_wider(names_from=exptPlantType, values_from=c(mean_night,dn_ratio)) %>% arrange(desc(`mean_night_otc_ten`)) %>% kable(digits=1)
+
 freqamounts <- svf %>% select(expt, PlantType, DN) %>% 
   bind_cols(decostand(vol, method="pa")) %>% pivot_longer(all_of(colnames(vol))) %>%
   group_by(expt, PlantType, DN, name) %>% 
@@ -1094,7 +1100,7 @@ svf.otc <- svf %>% filter(expt=="otc", DN=="night", Year=="2021") %>%
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ sampround * temp, distance="bray", data=svf.otc))
 anova.cap <- anova(cap.otc.comb, by="term")
-kable(anova.cap, caption="CAP tenuituba night by week")
+kable(anova.cap, caption="CAP tenuituba 2021 night by week")
 
 #Day, both species
 svf.otc <- svf %>% filter(expt=="otc", DN=="day", Year=="2021") %>% 
@@ -1380,7 +1386,6 @@ safe_lmer <- function(formula, data) {
    lm(nobars(formula), data=data) #else drop the random effects and run an lm
  }
 }
-library(broom.mixed)
 vol.plot.temptreat <- vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
   group_by(chem, PlantType, Site, Year, DN) %>% select(temp, mean_temp_C_treatment, area, PlantID) %>% 
   mutate(area=area/mean(area), PlantID=as.character(PlantID)) %>% nest() %>% 
@@ -1417,6 +1422,52 @@ bind_rows(treat=vol.plot.treat %>% rename(value=relchange),
   scale_x_continuous(labels=scales::percent_format()) + scale_color_brewer(palette = "Set2") +
   labs(x="Change in emissions per degree C", y="Change in emissions in warming treatment",
        color="Species, site, time, year")
+
+vol.long.meta <- gather(cbind(sample=rownames(vol), total=rowSums(vol), vol), key="chem",value="area", 2:(ncol(vol)+2), factor_key=T) %>% left_join(svf) %>% mutate(chem=factor(chem, levels=c("total",colnames(vol))))
+
+vol.plot.treat <- vol.long.meta %>% filter(expt=="otc", Site!="bb") %>% 
+  group_by(chem, PlantType, DN) %>% select(temp, area) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~temp, data=.x)),#TODO lmer with PlantID for 2021?
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %>% # warmed/control ratio 
+  filter(term=="tempwarmed")
+vol.plot.temp <- vol.long.meta %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
+  group_by(chem, PlantType, DN) %>% select(mean_temp_C_treatment, area) %>% 
+  mutate(area=area/ifelse(mean(area)==0, 1, mean(area))) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~mean_temp_C_treatment, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  filter(term=="mean_temp_C_treatment")
+
+vol.plot.temptreat.sep <- bind_rows(treat=vol.plot.treat %>% rename(value=relchange), 
+          temp=vol.plot.temp %>% rename(value=estimate), .id="variable") %>% 
+  select(-term, -std.error, -statistic, -p.value, -ratio, -estimate) %>% 
+  pivot_wider(names_from =variable, values_from=value)
+
+vol.plot.temptreat.sep %>% filter(treat <15) %>% 
+ggplot(aes(y=treat, x=temp, color=paste(PlantType, DN))) + 
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +  
+  geom_smooth(se=F, method="lm") +
+  geom_text(aes(label=chem), show.legend = F)+
+  theme_minimal() + scale_y_continuous(labels=scales::percent_format()) +
+  scale_x_continuous(labels=scales::percent_format()) + scale_color_brewer(palette = "Set2") +
+  labs(x="Change in emissions per degree C", y="Change in emissions in warming treatment",
+       color="Species, site, time, year")
+
+vol.plot.temptreat.sep %>% filter(DN=="day") %>% 
+  left_join(ipochemsf, by=join_by("chem"=="shortname")) %>% 
+  ggplot(aes(y=treat, x=temp, color=class)) + 
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +  
+  geom_text(aes(label=chem, fontface=as.integer(PlantType)))+
+  theme_minimal() + scale_y_continuous(labels=scales::percent_format()) +
+  scale_x_continuous(labels=scales::percent_format()) + scale_color_manual(values=class_pal) +
+  labs(x="Change in emissions per degree C", y="Change in emissions in warming treatment",
+       color="Class", title="Daytime changes", subtitle="tenuituba = bold text, aggregata = not bold")
+
+vol.plot.temptreat.sep %>% group_by(PlantType, DN)  %>%
+  summarize(r=cor(temp, treat), 
+            P = cor.test(temp, treat)$p.value) %>% 
+  kable(caption="Correlation between treatment and temperature effects", digits=3)
 ```
 
 
@@ -1440,6 +1491,43 @@ vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(SoilVWC) %>%
   filter(term=="poly(SoilVWC, 2)2", p.value < 0.05) %>% select(-term, -std.error, -statistic) %>% 
   arrange(p.value) %>%  kable(caption="Soil moisture curves with a significant quadratic term")
 ```
+
+## Day/night changes
+
+Mean change at night relative to day.
+```{r DNmap, fig.width=7, fig.height=7}
+#TODO lmer(area~DN+(1|PlantID)) gives negative intercepts
+vol.plot.DN <- vol.long.meta %>% filter(!(PlantType=="agg" & expt=="otc")) %>% 
+  group_by(chem, expt, PlantType, Year) %>% select(DN, area, PlantID) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~DN, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %>% # warmed/control ratio 
+  filter(term=="DNnight")
+
+ggplot(vol.plot.DN %>% filter(abs(relchange)<1000), aes(x=str_sub(Year,3,4), y=fct_rev(chem))) + 
+    facet_wrap(vars(PlantType, expt), scales="free_x")+
+  geom_tile(aes(fill=sign(relchange)* abs(relchange)^(1/3))) + scale_fill_gradient2(midpoint=0, guide="none")  + 
+  geom_text(aes(label=scales::percent(relchange, accuracy=1), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face="italic"),
+                          axis.text=element_text(color="black"))
+
+vol.plot.DN <- vol.long.meta %>% filter(!(PlantType=="agg" & expt=="otc")) %>% 
+  group_by(chem, expt, PlantType) %>% select(DN, area, PlantID) %>% nest() %>% 
+  mutate(model = map(data, ~ lm(area~DN, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %>% select(-data, -model) %>% unnest(test) %>% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %>% # warmed/control ratio 
+  filter(term=="DNnight")
+
+ggplot(vol.plot.DN, aes(x="N/D", y=fct_rev(chem))) + 
+    facet_wrap(vars(PlantType, expt), scales="free_x")+
+  geom_tile(aes(fill=sign(relchange)* abs(relchange)^(1/3))) + scale_fill_gradient2(midpoint=0, guide="none")  + 
+  geom_text(aes(label=scales::percent(relchange, accuracy=1), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face="italic"),
+                          axis.text=element_text(color="black"))
+```
+
 
 # Leaf volatiles
 

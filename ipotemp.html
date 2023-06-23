@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-04-27" />
+<meta name="date" content="2023-06-23" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-04-27</h4>
+<h4 class="date">2023-06-23</h4>
 
 </div>
 
@@ -3065,6 +3065,269 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
   geom_path(aes(group=name), color=&quot;grey&quot;) + geom_text(aes(label=name, color=paste(expt, PlantType))) +
   scale_x_log10() + scale_y_log10() + geom_abline(slope=1, intercept=0) + scale_color_manual(values=c(NA,&quot;cornflowerblue&quot;,&quot;red&quot;,&quot;blue&quot;))</code></pre>
 <p><img src="plots/comp-3.svg" width="1344" /></p>
+<pre class="r"><code>absamounts %&gt;% pivot_wider(names_from=DN, values_from=c(mean, se)) %&gt;% drop_na(mean_night) %&gt;% 
+  mutate(dn_ratio = mean_night/mean_day, exptPlantType=paste(expt, PlantType, sep=&quot;_&quot;)) %&gt;% 
+  ungroup() %&gt;% select(name, exptPlantType, dn_ratio, mean_night) %&gt;% 
+  pivot_wider(names_from=exptPlantType, values_from=c(mean_night,dn_ratio)) %&gt;% arrange(desc(`mean_night_otc_ten`)) %&gt;% kable(digits=1)</code></pre>
+<table>
+<colgroup>
+<col width="32%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="right">mean_night_otc_ten</th>
+<th align="right">mean_night_perc_agg</th>
+<th align="right">mean_night_perc_ten</th>
+<th align="right">dn_ratio_otc_ten</th>
+<th align="right">dn_ratio_perc_agg</th>
+<th align="right">dn_ratio_perc_ten</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(E)-b-ocimene</td>
+<td align="right">255.1</td>
+<td align="right">355.9</td>
+<td align="right">214.5</td>
+<td align="right">81.7</td>
+<td align="right">29.7</td>
+<td align="right">14.4</td>
+</tr>
+<tr class="even">
+<td align="left">a-pinene</td>
+<td align="right">203.1</td>
+<td align="right">113.7</td>
+<td align="right">60.2</td>
+<td align="right">1.8</td>
+<td align="right">3.4</td>
+<td align="right">2.7</td>
+</tr>
+<tr class="odd">
+<td align="left">a-farnesene</td>
+<td align="right">34.9</td>
+<td align="right">28.2</td>
+<td align="right">27.0</td>
+<td align="right">30.6</td>
+<td align="right">7.0</td>
+<td align="right">2.9</td>
+</tr>
+<tr class="even">
+<td align="left">b-myrcene</td>
+<td align="right">24.5</td>
+<td align="right">16.7</td>
+<td align="right">10.0</td>
+<td align="right">1.8</td>
+<td align="right">4.7</td>
+<td align="right">2.6</td>
+</tr>
+<tr class="odd">
+<td align="left">(Z)-b-ocimene</td>
+<td align="right">17.4</td>
+<td align="right">22.1</td>
+<td align="right">13.1</td>
+<td align="right">5.2</td>
+<td align="right">3.2</td>
+<td align="right">1.8</td>
+</tr>
+<tr class="even">
+<td align="left">(2E)-2,7-dimethylocta-2,6-dien-1-ol</td>
+<td align="right">12.3</td>
+<td align="right">15.7</td>
+<td align="right">9.0</td>
+<td align="right">1.0</td>
+<td align="right">4.6</td>
+<td align="right">2.2</td>
+</tr>
+<tr class="odd">
+<td align="left">petasitene</td>
+<td align="right">3.4</td>
+<td align="right">0.5</td>
+<td align="right">0.4</td>
+<td align="right">0.4</td>
+<td align="right">0.9</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="even">
+<td align="left">a-campholenal</td>
+<td align="right">3.2</td>
+<td align="right">0.9</td>
+<td align="right">1.0</td>
+<td align="right">1.1</td>
+<td align="right">1.8</td>
+<td align="right">4.3</td>
+</tr>
+<tr class="odd">
+<td align="left">(E)-hex-3-en-1-ol</td>
+<td align="right">3.0</td>
+<td align="right">0.9</td>
+<td align="right">0.6</td>
+<td align="right">0.1</td>
+<td align="right">0.2</td>
+<td align="right">0.7</td>
+</tr>
+<tr class="even">
+<td align="left">b-caryophyllene</td>
+<td align="right">2.7</td>
+<td align="right">3.9</td>
+<td align="right">1.1</td>
+<td align="right">0.3</td>
+<td align="right">0.8</td>
+<td align="right">0.3</td>
+</tr>
+<tr class="odd">
+<td align="left">2-methylbenzonitrile</td>
+<td align="right">2.4</td>
+<td align="right">0.1</td>
+<td align="right">0.3</td>
+<td align="right">0.5</td>
+<td align="right">0.5</td>
+<td align="right">0.8</td>
+</tr>
+<tr class="even">
+<td align="left">trans-b-bergamotene</td>
+<td align="right">1.9</td>
+<td align="right">1.6</td>
+<td align="right">1.7</td>
+<td align="right">3.1</td>
+<td align="right">0.6</td>
+<td align="right">0.7</td>
+</tr>
+<tr class="odd">
+<td align="left">methyl benzoate</td>
+<td align="right">1.8</td>
+<td align="right">0.1</td>
+<td align="right">0.2</td>
+<td align="right">2.7</td>
+<td align="right">0.4</td>
+<td align="right">0.6</td>
+</tr>
+<tr class="even">
+<td align="left">(E)-hex-2-enal</td>
+<td align="right">1.6</td>
+<td align="right">0.1</td>
+<td align="right">0.1</td>
+<td align="right">1.0</td>
+<td align="right">0.0</td>
+<td align="right">0.1</td>
+</tr>
+<tr class="odd">
+<td align="left">[(E)-hex-3-enyl] acetate</td>
+<td align="right">1.5</td>
+<td align="right">0.1</td>
+<td align="right">0.2</td>
+<td align="right">0.6</td>
+<td align="right">0.5</td>
+<td align="right">1.2</td>
+</tr>
+<tr class="even">
+<td align="left">pseudoionone</td>
+<td align="right">1.1</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+<td align="right">1.1</td>
+<td align="right">2.9</td>
+</tr>
+<tr class="odd">
+<td align="left">g-terpinene</td>
+<td align="right">1.0</td>
+<td align="right">0.8</td>
+<td align="right">0.7</td>
+<td align="right">2.0</td>
+<td align="right">0.6</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="even">
+<td
+align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
+<td align="right">0.8</td>
+<td align="right">0.7</td>
+<td align="right">0.5</td>
+<td align="right">0.5</td>
+<td align="right">0.8</td>
+<td align="right">0.9</td>
+</tr>
+<tr class="odd">
+<td align="left">trans-a-bergamotene</td>
+<td align="right">0.8</td>
+<td align="right">0.7</td>
+<td align="right">0.6</td>
+<td align="right">2.9</td>
+<td align="right">3.4</td>
+<td align="right">1.4</td>
+</tr>
+<tr class="even">
+<td align="left">(3E)-4,8-dimethylnona-1,3,7-triene</td>
+<td align="right">0.7</td>
+<td align="right">0.1</td>
+<td align="right">0.1</td>
+<td align="right">0.8</td>
+<td align="right">0.4</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="left">indole</td>
+<td align="right">0.7</td>
+<td align="right">0.0</td>
+<td align="right">0.1</td>
+<td align="right">6.3</td>
+<td align="right">0.2</td>
+<td align="right">1.2</td>
+</tr>
+<tr class="even">
+<td align="left">a-terpineol</td>
+<td align="right">0.6</td>
+<td align="right">1.3</td>
+<td align="right">0.6</td>
+<td align="right">0.2</td>
+<td align="right">0.5</td>
+<td align="right">0.3</td>
+</tr>
+<tr class="odd">
+<td align="left">[(Z)-hex-3-enyl] butanoate</td>
+<td align="right">0.4</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+<td align="right">0.2</td>
+</tr>
+<tr class="even">
+<td align="left">linalool</td>
+<td align="right">0.4</td>
+<td align="right">0.4</td>
+<td align="right">0.3</td>
+<td align="right">0.9</td>
+<td align="right">1.9</td>
+<td align="right">1.6</td>
+</tr>
+<tr class="odd">
+<td align="left">3-methylbutanal oxime</td>
+<td align="right">0.4</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.1</td>
+<td align="right">0.7</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">a-copaene</td>
+<td align="right">0.3</td>
+<td align="right">0.2</td>
+<td align="right">0.1</td>
+<td align="right">0.4</td>
+<td align="right">0.9</td>
+<td align="right">0.6</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>freqamounts &lt;- svf %&gt;% select(expt, PlantType, DN) %&gt;% 
   bind_cols(decostand(vol, method=&quot;pa&quot;)) %&gt;% pivot_longer(all_of(colnames(vol))) %&gt;%
   group_by(expt, PlantType, DN, name) %&gt;% 
@@ -4422,7 +4685,57 @@ Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
 2.1598 1.0425 0.6220 0.5002 0.3549 0.2873 0.2273 0.1819 
 (Showing 8 of 32 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;)
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
+kable(anova.cap, caption=&quot;CAP tenuituba night by week - interaction&quot;)</code></pre>
+<table>
+<caption>CAP tenuituba night by week - interaction</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Df</th>
+<th align="right">SumOfSqs</th>
+<th align="right">F</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sampround:temp</td>
+<td align="right">1</td>
+<td align="right">0.0640108</td>
+<td align="right">0.6007697</td>
+<td align="right">0.798</td>
+</tr>
+<tr class="even">
+<td align="left">Residual</td>
+<td align="right">62</td>
+<td align="right">6.6059728</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ sampround + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
+<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ sampround + temp, data =
+svf.otc, distance = &quot;bray&quot;)
+
+               Inertia Proportion Rank
+Total          5.90666    1.00000     
+Constrained    0.19444    0.03292    2
+Unconstrained  6.66998    1.12923   32
+Imaginary     -0.95776   -0.16215   33
+Inertia is squared Bray distance 
+Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
+
+Eigenvalues for constrained axes:
+   CAP1    CAP2 
+0.12295 0.07149 
+
+Eigenvalues for unconstrained axes:
+  MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
+2.1618 1.0568 0.6229 0.5035 0.3672 0.3011 0.2273 0.1837 
+(Showing 8 of 32 unconstrained eigenvalues)</code></pre>
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
 kable(anova.cap, caption=&quot;CAP tenuituba night by week&quot;)</code></pre>
 <table>
 <caption>CAP tenuituba night by week</caption>
@@ -4439,28 +4752,21 @@ kable(anova.cap, caption=&quot;CAP tenuituba night by week&quot;)</code></pre>
 <tr class="odd">
 <td align="left">sampround</td>
 <td align="right">1</td>
-<td align="right">0.1104880</td>
-<td align="right">1.0369793</td>
-<td align="right">0.347</td>
+<td align="right">0.1065137</td>
+<td align="right">1.0060539</td>
+<td align="right">0.371</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
 <td align="right">1</td>
 <td align="right">0.0839481</td>
-<td align="right">0.7878900</td>
-<td align="right">0.566</td>
+<td align="right">0.7929147</td>
+<td align="right">0.610</td>
 </tr>
 <tr class="odd">
-<td align="left">sampround:temp</td>
-<td align="right">1</td>
-<td align="right">0.0640108</td>
-<td align="right">0.6007697</td>
-<td align="right">0.798</td>
-</tr>
-<tr class="even">
 <td align="left">Residual</td>
-<td align="right">62</td>
-<td align="right">6.6059728</td>
+<td align="right">63</td>
+<td align="right">6.6699835</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4490,10 +4796,10 @@ Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
 6.688 4.822 2.283 2.075 1.591 1.386 1.186 1.098 
 (Showing 8 of 75 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;)
-kable(anova.cap, caption=&quot;CAP both species day by week&quot;)</code></pre>
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
+kable(anova.cap, caption=&quot;CAP both species day by week - interaction&quot;)</code></pre>
 <table>
-<caption>CAP both species day by week</caption>
+<caption>CAP both species day by week - interaction</caption>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -4507,23 +4813,9 @@ kable(anova.cap, caption=&quot;CAP both species day by week&quot;)</code></pre>
 <tr class="odd">
 <td align="left">Site</td>
 <td align="right">2</td>
-<td align="right">2.8197144</td>
-<td align="right">8.4117816</td>
+<td align="right">2.6322532</td>
+<td align="right">7.8525468</td>
 <td align="right">0.001</td>
-</tr>
-<tr class="even">
-<td align="left">sampround</td>
-<td align="right">1</td>
-<td align="right">1.0302387</td>
-<td align="right">6.1468231</td>
-<td align="right">0.001</td>
-</tr>
-<tr class="odd">
-<td align="left">temp</td>
-<td align="right">1</td>
-<td align="right">0.2373937</td>
-<td align="right">1.4163875</td>
-<td align="right">0.128</td>
 </tr>
 <tr class="even">
 <td align="left">sampround:temp</td>
@@ -4561,6 +4853,50 @@ Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
 6.691 4.829 2.298 2.075 1.595 1.387 1.190 1.106 
 (Showing 8 of 75 unconstrained eigenvalues)</code></pre>
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
+kable(anova.cap, caption=&quot;CAP both species day by week&quot;)</code></pre>
+<table>
+<caption>CAP both species day by week</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Df</th>
+<th align="right">SumOfSqs</th>
+<th align="right">F</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Site</td>
+<td align="right">2</td>
+<td align="right">2.6687031</td>
+<td align="right">7.974165</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">sampround</td>
+<td align="right">1</td>
+<td align="right">0.9894949</td>
+<td align="right">5.913281</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">temp</td>
+<td align="right">1</td>
+<td align="right">0.2373937</td>
+<td align="right">1.418679</td>
+<td align="right">0.128</td>
+</tr>
+<tr class="even">
+<td align="left">Residual</td>
+<td align="right">203</td>
+<td align="right">33.9688673</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
 ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
@@ -5244,7 +5580,6 @@ ggplot(vol.plot.temp, aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as.char
    lm(nobars(formula), data=data) #else drop the random effects and run an lm
  }
 }
-library(broom.mixed)
 vol.plot.temptreat &lt;- vol.plot %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(mean_temp_C_treatment) %&gt;% 
   group_by(chem, PlantType, Site, Year, DN) %&gt;% select(temp, mean_temp_C_treatment, area, PlantID) %&gt;% 
   mutate(area=area/mean(area), PlantID=as.character(PlantID)) %&gt;% nest() %&gt;% 
@@ -5280,6 +5615,82 @@ ggplot(vol.plot.temptreat, aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as
   labs(x=&quot;Change in emissions per degree C&quot;, y=&quot;Change in emissions in warming treatment&quot;,
        color=&quot;Species, site, time, year&quot;)</code></pre>
 <p><img src="plots/tempvtreat-1.svg" width="768" /></p>
+<pre class="r"><code>vol.long.meta &lt;- gather(cbind(sample=rownames(vol), total=rowSums(vol), vol), key=&quot;chem&quot;,value=&quot;area&quot;, 2:(ncol(vol)+2), factor_key=T) %&gt;% left_join(svf) %&gt;% mutate(chem=factor(chem, levels=c(&quot;total&quot;,colnames(vol))))
+
+vol.plot.treat &lt;- vol.long.meta %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;) %&gt;% 
+  group_by(chem, PlantType, DN) %&gt;% select(temp, area) %&gt;% nest() %&gt;% 
+  mutate(model = map(data, ~ lm(area~temp, data=.x)),#TODO lmer with PlantID for 2021?
+         test = map(model, ~tidy(summary(.x)))) %&gt;% select(-data, -model) %&gt;% unnest(test) %&gt;% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %&gt;% # warmed/control ratio 
+  filter(term==&quot;tempwarmed&quot;)
+vol.plot.temp &lt;- vol.long.meta %&gt;% filter(expt==&quot;otc&quot;, Site!=&quot;bb&quot;) %&gt;% drop_na(mean_temp_C_treatment) %&gt;% 
+  group_by(chem, PlantType, DN) %&gt;% select(mean_temp_C_treatment, area) %&gt;% 
+  mutate(area=area/ifelse(mean(area)==0, 1, mean(area))) %&gt;% nest() %&gt;% 
+  mutate(model = map(data, ~ lm(area~mean_temp_C_treatment, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %&gt;% select(-data, -model) %&gt;% unnest(test) %&gt;% 
+  filter(term==&quot;mean_temp_C_treatment&quot;)
+
+vol.plot.temptreat.sep &lt;- bind_rows(treat=vol.plot.treat %&gt;% rename(value=relchange), 
+          temp=vol.plot.temp %&gt;% rename(value=estimate), .id=&quot;variable&quot;) %&gt;% 
+  select(-term, -std.error, -statistic, -p.value, -ratio, -estimate) %&gt;% 
+  pivot_wider(names_from =variable, values_from=value)
+
+vol.plot.temptreat.sep %&gt;% filter(treat &lt;15) %&gt;% 
+ggplot(aes(y=treat, x=temp, color=paste(PlantType, DN))) + 
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +  
+  geom_smooth(se=F, method=&quot;lm&quot;) +
+  geom_text(aes(label=chem), show.legend = F)+
+  theme_minimal() + scale_y_continuous(labels=scales::percent_format()) +
+  scale_x_continuous(labels=scales::percent_format()) + scale_color_brewer(palette = &quot;Set2&quot;) +
+  labs(x=&quot;Change in emissions per degree C&quot;, y=&quot;Change in emissions in warming treatment&quot;,
+       color=&quot;Species, site, time, year&quot;)</code></pre>
+<p><img src="plots/tempvtreat-2.svg" width="768" /></p>
+<pre class="r"><code>vol.plot.temptreat.sep %&gt;% filter(DN==&quot;day&quot;) %&gt;% 
+  left_join(ipochemsf, by=join_by(&quot;chem&quot;==&quot;shortname&quot;)) %&gt;% 
+  ggplot(aes(y=treat, x=temp, color=class)) + 
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +  
+  geom_text(aes(label=chem, fontface=as.integer(PlantType)))+
+  theme_minimal() + scale_y_continuous(labels=scales::percent_format()) +
+  scale_x_continuous(labels=scales::percent_format()) + scale_color_manual(values=class_pal) +
+  labs(x=&quot;Change in emissions per degree C&quot;, y=&quot;Change in emissions in warming treatment&quot;,
+       color=&quot;Class&quot;, title=&quot;Daytime changes&quot;, subtitle=&quot;tenuituba = bold text, aggregata = not bold&quot;)</code></pre>
+<p><img src="plots/tempvtreat-3.svg" width="768" /></p>
+<pre class="r"><code>vol.plot.temptreat.sep %&gt;% group_by(PlantType, DN)  %&gt;%
+  summarize(r=cor(temp, treat), 
+            P = cor.test(temp, treat)$p.value) %&gt;% 
+  kable(caption=&quot;Correlation between treatment and temperature effects&quot;, digits=3)</code></pre>
+<table>
+<caption>Correlation between treatment and temperature effects</caption>
+<thead>
+<tr class="header">
+<th align="left">PlantType</th>
+<th align="left">DN</th>
+<th align="right">r</th>
+<th align="right">P</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">agg</td>
+<td align="left">day</td>
+<td align="right">0.260</td>
+<td align="right">0.190</td>
+</tr>
+<tr class="even">
+<td align="left">ten</td>
+<td align="left">day</td>
+<td align="right">0.483</td>
+<td align="right">0.011</td>
+</tr>
+<tr class="odd">
+<td align="left">ten</td>
+<td align="left">night</td>
+<td align="right">-0.197</td>
+<td align="right">0.324</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="soil-moisture-effects" class="section level2">
 <h2>Soil moisture effects</h2>
@@ -5379,6 +5790,41 @@ term</caption>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="daynight-changes" class="section level2">
+<h2>Day/night changes</h2>
+<p>Mean change at night relative to day.</p>
+<pre class="r"><code>#TODO lmer(area~DN+(1|PlantID)) gives negative intercepts
+vol.plot.DN &lt;- vol.long.meta %&gt;% filter(!(PlantType==&quot;agg&quot; &amp; expt==&quot;otc&quot;)) %&gt;% 
+  group_by(chem, expt, PlantType, Year) %&gt;% select(DN, area, PlantID) %&gt;% nest() %&gt;% 
+  mutate(model = map(data, ~ lm(area~DN, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %&gt;% select(-data, -model) %&gt;% unnest(test) %&gt;% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %&gt;% # warmed/control ratio 
+  filter(term==&quot;DNnight&quot;)
+
+ggplot(vol.plot.DN %&gt;% filter(abs(relchange)&lt;1000), aes(x=str_sub(Year,3,4), y=fct_rev(chem))) + 
+    facet_wrap(vars(PlantType, expt), scales=&quot;free_x&quot;)+
+  geom_tile(aes(fill=sign(relchange)* abs(relchange)^(1/3))) + scale_fill_gradient2(midpoint=0, guide=&quot;none&quot;)  + 
+  geom_text(aes(label=scales::percent(relchange, accuracy=1), fontface=as.integer(p.value &lt; 0.05)+1))+ labs(x=&quot;&quot;,y=&quot;&quot;)+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face=&quot;italic&quot;),
+                          axis.text=element_text(color=&quot;black&quot;))</code></pre>
+<p><img src="plots/DNmap-1.svg" width="672" /></p>
+<pre class="r"><code>vol.plot.DN &lt;- vol.long.meta %&gt;% filter(!(PlantType==&quot;agg&quot; &amp; expt==&quot;otc&quot;)) %&gt;% 
+  group_by(chem, expt, PlantType) %&gt;% select(DN, area, PlantID) %&gt;% nest() %&gt;% 
+  mutate(model = map(data, ~ lm(area~DN, data=.x)),
+         test = map(model, ~tidy(summary(.x)))) %&gt;% select(-data, -model) %&gt;% unnest(test) %&gt;% 
+  mutate(relchange = estimate[2]/estimate[1],#divide warming change by intercept (mean of controls)
+         ratio = (estimate[1] + estimate[2]) / estimate[1] ) %&gt;% # warmed/control ratio 
+  filter(term==&quot;DNnight&quot;)
+
+ggplot(vol.plot.DN, aes(x=&quot;N/D&quot;, y=fct_rev(chem))) + 
+    facet_wrap(vars(PlantType, expt), scales=&quot;free_x&quot;)+
+  geom_tile(aes(fill=sign(relchange)* abs(relchange)^(1/3))) + scale_fill_gradient2(midpoint=0, guide=&quot;none&quot;)  + 
+  geom_text(aes(label=scales::percent(relchange, accuracy=1), fontface=as.integer(p.value &lt; 0.05)+1))+ labs(x=&quot;&quot;,y=&quot;&quot;)+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face=&quot;italic&quot;),
+                          axis.text=element_text(color=&quot;black&quot;))</code></pre>
+<p><img src="plots/DNmap-2.svg" width="672" /></p>
 </div>
 </div>
 <div id="leaf-volatiles" class="section level1">
