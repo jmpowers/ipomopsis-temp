@@ -351,7 +351,8 @@ chemsf <- chems %>%
                                    "Decane, 3,8-dimethyl-",    "Ethanone, 1-cyclopentyl-", 
                                    "o-Xylene",
                                    "3,5-dimethyloctane","2-hexyldecan-1-ol",
-                                   "nonylcyclopropane","nonyl prop-1-en-2-yl carbonate")) %>% 
+                                   "nonylcyclopropane","nonyl prop-1-en-2-yl carbonate",
+                                   "(2E)-2,7-dimethylocta-2,6-dien-1-ol")) %>% #a quant integration that coelutes with b-myrcene
   filter_area(min_maximum = 1e6) %>% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %>%
   combine_filters() 

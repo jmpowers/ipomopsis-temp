@@ -69,7 +69,6 @@
 <circle cx='85.46' cy='373.99' r='4.05' style='stroke-width: 0.71; stroke: #006400; stroke-opacity: 0.30; fill: #006400; fill-opacity: 0.30;' />
 <circle cx='370.65' cy='342.13' r='3.90' style='stroke-width: 0.71; stroke: #006400; stroke-opacity: 0.30; fill: #006400; fill-opacity: 0.30;' />
 <circle cx='465.14' cy='207.76' r='3.94' style='stroke-width: 0.71; stroke: #0000FF; stroke-opacity: 0.30; fill: #0000FF; fill-opacity: 0.30;' />
-<circle cx='410.79' cy='445.73' r='4.79' style='stroke-width: 0.71; stroke: #FF0000; stroke-opacity: 0.30; fill: #FF0000; fill-opacity: 0.30;' />
 <circle cx='545.58' cy='90.63' r='3.97' style='stroke-width: 0.71; stroke: #0000FF; stroke-opacity: 0.30; fill: #0000FF; fill-opacity: 0.30;' />
 <circle cx='471.84' cy='165.44' r='4.86' style='stroke-width: 0.71; stroke: #0000FF; stroke-opacity: 0.30; fill: #0000FF; fill-opacity: 0.30;' />
 <circle cx='501.90' cy='302.66' r='6.76' style='stroke-width: 0.71; stroke: #0000FF; stroke-opacity: 0.30; fill: #0000FF; fill-opacity: 0.30;' />
@@ -104,7 +103,6 @@
 <text x='85.46' y='378.01' text-anchor='middle' style='font-size: 11.04px;fill: #006400; font-family: "Arial";'>(Z)-hex-2-en-1-ol</text>
 <text x='370.65' y='346.16' text-anchor='middle' style='font-size: 11.04px;fill: #006400; font-family: "Arial";'>hex-2-enal</text>
 <text x='465.14' y='211.78' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>(E)-hex-2-enal</text>
-<text x='410.79' y='449.75' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='545.58' y='94.65' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
 <text x='471.84' y='169.46' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>[(E)-hex-3-enyl] acetate</text>
 <text x='501.90' y='306.68' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>pseudoionone</text>

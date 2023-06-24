@@ -61,7 +61,7 @@
 <circle cx='414.62' cy='703.41' r='7.85' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='383.89' cy='743.59' r='4.10' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
 <circle cx='53.16' cy='726.10' r='2.31' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='482.56' cy='548.30' r='6.75' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
+<circle cx='482.56' cy='548.30' r='6.75' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
 <circle cx='551.28' cy='492.84' r='6.69' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='331.30' cy='735.51' r='2.18' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='452.67' cy='681.17' r='4.22' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -197,7 +197,7 @@
 <circle cx='444.93' cy='783.88' r='3.32' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='559.66' cy='394.93' r='10.03' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='466.46' cy='681.87' r='7.39' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
-<circle cx='370.06' cy='726.49' r='4.77' style='stroke-width: 0.71; stroke: #32CD32; fill: #32CD32;' />
+<circle cx='370.06' cy='726.49' r='4.77' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='437.85' cy='781.21' r='2.84' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='340.00' cy='763.68' r='2.84' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
 <circle cx='539.94' cy='401.03' r='7.79' style='stroke-width: 0.71; stroke: #FF3030; fill: #FF3030;' />
@@ -940,7 +940,7 @@
 <text x='444.93' y='787.90' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,5-Cyclohexadien-1-one, 2,6-bis(1,1-dimethylethyl)-4-ethylidene-</text>
 <text x='559.66' y='398.95' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,5-cyclohexadien-1-one, 2,6-bis(1,1-dimethylethyl)-4-hydroxy-4-methyl-</text>
 <text x='466.46' y='685.89' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,5-Furandione, dihydro-3-methyl-</text>
-<text x='370.06' y='730.51' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
+<text x='370.06' y='730.51' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='437.85' y='785.23' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,6,10-Dodecatrien-1-ol, 3,7,11-trimethyl-</text>
 <text x='340.00' y='767.70' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,6,10-Dodecatrienal, 3,7,11-trimethyl-</text>
 <text x='539.94' y='405.05' text-anchor='middle' style='font-size: 11.04px;fill: none; font-family: "Arial";'>2,6,10-Trimethyltridecane</text>
@@ -1558,6 +1558,6 @@
 <text x='741.42' y='507.70' style='font-size: 8.80px; font-family: "Arial";'>Excluded</text>
 <text x='741.42' y='524.98' style='font-size: 8.80px; font-family: "Arial";'>Excluded - pass t-test</text>
 <text x='741.42' y='542.26' style='font-size: 8.80px; font-family: "Arial";'>Included in final table</text>
-<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 26/7948 compounds included</text>
+<text x='53.16' y='15.10' style='font-size: 13.20px; font-family: "Arial";'>Filtering diagnostics: 25/7948 compounds included</text>
 </g>
 </svg>

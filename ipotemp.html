@@ -2296,7 +2296,8 @@ chemsf &lt;- chems %&gt;%
                                    &quot;Decane, 3,8-dimethyl-&quot;,    &quot;Ethanone, 1-cyclopentyl-&quot;, 
                                    &quot;o-Xylene&quot;,
                                    &quot;3,5-dimethyloctane&quot;,&quot;2-hexyldecan-1-ol&quot;,
-                                   &quot;nonylcyclopropane&quot;,&quot;nonyl prop-1-en-2-yl carbonate&quot;)) %&gt;% 
+                                   &quot;nonylcyclopropane&quot;,&quot;nonyl prop-1-en-2-yl carbonate&quot;,
+                                   &quot;(2E)-2,7-dimethylocta-2,6-dien-1-ol&quot;)) %&gt;% #a quant integration that coelutes with b-myrcene
   filter_area(min_maximum = 1e6) %&gt;% 
   filter_ambient_ratio(vol.all, metadata, ratio = 3) %&gt;%
   combine_filters() 
@@ -2884,14 +2885,6 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <p><img src="plots/comp-1.svg" width="1344" /></p>
 <pre class="r"><code>relamounts %&gt;% slice_head(n=6) %&gt;% filter(expt==&quot;otc&quot;) %&gt;%  kable(digits=3)</code></pre>
 <table>
-<colgroup>
-<col width="7%" />
-<col width="14%" />
-<col width="8%" />
-<col width="52%" />
-<col width="8%" />
-<col width="8%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">expt</th>
@@ -2908,7 +2901,7 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">a-pinene</td>
-<td align="right">0.510</td>
+<td align="right">0.530</td>
 <td align="right">0.019</td>
 </tr>
 <tr class="even">
@@ -2916,7 +2909,7 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">(E)-hex-3-en-1-ol</td>
-<td align="right">0.072</td>
+<td align="right">0.077</td>
 <td align="right">0.007</td>
 </tr>
 <tr class="odd">
@@ -2924,39 +2917,39 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">(E)-b-ocimene</td>
-<td align="right">0.060</td>
-<td align="right">0.006</td>
+<td align="right">0.064</td>
+<td align="right">0.007</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
 <td align="left">agg</td>
 <td align="left">day</td>
 <td align="left">(Z)-b-ocimene</td>
-<td align="right">0.054</td>
+<td align="right">0.057</td>
 <td align="right">0.006</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">agg</td>
 <td align="left">day</td>
-<td align="left">(2E)-2,7-dimethylocta-2,6-dien-1-ol</td>
-<td align="right">0.051</td>
-<td align="right">0.005</td>
+<td align="left">a-campholenal</td>
+<td align="right">0.044</td>
+<td align="right">0.007</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
 <td align="left">agg</td>
 <td align="left">day</td>
-<td align="left">a-campholenal</td>
-<td align="right">0.041</td>
-<td align="right">0.006</td>
+<td align="left">b-myrcene</td>
+<td align="right">0.040</td>
+<td align="right">0.003</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">a-pinene</td>
-<td align="right">0.525</td>
+<td align="right">0.544</td>
 <td align="right">0.030</td>
 </tr>
 <tr class="even">
@@ -2964,47 +2957,47 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">(E)-hex-3-en-1-ol</td>
-<td align="right">0.067</td>
-<td align="right">0.010</td>
+<td align="right">0.073</td>
+<td align="right">0.011</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">day</td>
 <td align="left">b-myrcene</td>
-<td align="right">0.053</td>
-<td align="right">0.005</td>
+<td align="right">0.058</td>
+<td align="right">0.006</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">day</td>
-<td align="left">(2E)-2,7-dimethylocta-2,6-dien-1-ol</td>
-<td align="right">0.050</td>
-<td align="right">0.007</td>
+<td align="left">(Z)-b-ocimene</td>
+<td align="right">0.042</td>
+<td align="right">0.008</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">day</td>
-<td align="left">(Z)-b-ocimene</td>
-<td align="right">0.038</td>
+<td align="left">petasitene</td>
+<td align="right">0.040</td>
 <td align="right">0.007</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">day</td>
-<td align="left">petasitene</td>
-<td align="right">0.038</td>
-<td align="right">0.006</td>
+<td align="left">pseudoionone</td>
+<td align="right">0.036</td>
+<td align="right">0.005</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">night</td>
 <td align="left">a-pinene</td>
-<td align="right">0.379</td>
+<td align="right">0.393</td>
 <td align="right">0.027</td>
 </tr>
 <tr class="even">
@@ -3012,15 +3005,15 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">ten</td>
 <td align="left">night</td>
 <td align="left">(E)-b-ocimene</td>
-<td align="right">0.374</td>
-<td align="right">0.026</td>
+<td align="right">0.387</td>
+<td align="right">0.027</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">night</td>
 <td align="left">a-farnesene</td>
-<td align="right">0.064</td>
+<td align="right">0.066</td>
 <td align="right">0.010</td>
 </tr>
 <tr class="even">
@@ -3028,24 +3021,24 @@ ggplot(relamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="left">ten</td>
 <td align="left">night</td>
 <td align="left">b-myrcene</td>
-<td align="right">0.041</td>
+<td align="right">0.043</td>
 <td align="right">0.004</td>
 </tr>
 <tr class="odd">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">night</td>
-<td align="left">(2E)-2,7-dimethylocta-2,6-dien-1-ol</td>
-<td align="right">0.036</td>
-<td align="right">0.004</td>
+<td align="left">(Z)-b-ocimene</td>
+<td align="right">0.030</td>
+<td align="right">0.002</td>
 </tr>
 <tr class="even">
 <td align="left">otc</td>
 <td align="left">ten</td>
 <td align="left">night</td>
-<td align="left">(Z)-b-ocimene</td>
-<td align="right">0.029</td>
-<td align="right">0.002</td>
+<td align="left">a-campholenal</td>
+<td align="right">0.017</td>
+<td align="right">0.010</td>
 </tr>
 </tbody>
 </table>
@@ -3137,15 +3130,6 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">1.8</td>
 </tr>
 <tr class="even">
-<td align="left">(2E)-2,7-dimethylocta-2,6-dien-1-ol</td>
-<td align="right">12.3</td>
-<td align="right">15.7</td>
-<td align="right">9.0</td>
-<td align="right">1.0</td>
-<td align="right">4.6</td>
-<td align="right">2.2</td>
-</tr>
-<tr class="odd">
 <td align="left">petasitene</td>
 <td align="right">3.4</td>
 <td align="right">0.5</td>
@@ -3154,7 +3138,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.9</td>
 <td align="right">0.4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">a-campholenal</td>
 <td align="right">3.2</td>
 <td align="right">0.9</td>
@@ -3163,7 +3147,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">1.8</td>
 <td align="right">4.3</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">(E)-hex-3-en-1-ol</td>
 <td align="right">3.0</td>
 <td align="right">0.9</td>
@@ -3172,7 +3156,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.2</td>
 <td align="right">0.7</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">b-caryophyllene</td>
 <td align="right">2.7</td>
 <td align="right">3.9</td>
@@ -3181,7 +3165,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.8</td>
 <td align="right">0.3</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">2-methylbenzonitrile</td>
 <td align="right">2.4</td>
 <td align="right">0.1</td>
@@ -3190,7 +3174,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.5</td>
 <td align="right">0.8</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">trans-b-bergamotene</td>
 <td align="right">1.9</td>
 <td align="right">1.6</td>
@@ -3199,7 +3183,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.6</td>
 <td align="right">0.7</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">methyl benzoate</td>
 <td align="right">1.8</td>
 <td align="right">0.1</td>
@@ -3208,7 +3192,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.4</td>
 <td align="right">0.6</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">(E)-hex-2-enal</td>
 <td align="right">1.6</td>
 <td align="right">0.1</td>
@@ -3217,7 +3201,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.0</td>
 <td align="right">0.1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">[(E)-hex-3-enyl] acetate</td>
 <td align="right">1.5</td>
 <td align="right">0.1</td>
@@ -3226,7 +3210,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.5</td>
 <td align="right">1.2</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">pseudoionone</td>
 <td align="right">1.1</td>
 <td align="right">0.2</td>
@@ -3235,7 +3219,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">1.1</td>
 <td align="right">2.9</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">g-terpinene</td>
 <td align="right">1.0</td>
 <td align="right">0.8</td>
@@ -3244,7 +3228,7 @@ ggplot(absamounts, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=past
 <td align="right">0.6</td>
 <td align="right">1.0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td
 align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.8</td>
@@ -3254,7 +3238,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.8</td>
 <td align="right">0.9</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">trans-a-bergamotene</td>
 <td align="right">0.8</td>
 <td align="right">0.7</td>
@@ -3263,7 +3247,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">3.4</td>
 <td align="right">1.4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">(3E)-4,8-dimethylnona-1,3,7-triene</td>
 <td align="right">0.7</td>
 <td align="right">0.1</td>
@@ -3272,7 +3256,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.4</td>
 <td align="right">0.4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">indole</td>
 <td align="right">0.7</td>
 <td align="right">0.0</td>
@@ -3281,7 +3265,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.2</td>
 <td align="right">1.2</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">a-terpineol</td>
 <td align="right">0.6</td>
 <td align="right">1.3</td>
@@ -3290,7 +3274,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.5</td>
 <td align="right">0.3</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">[(Z)-hex-3-enyl] butanoate</td>
 <td align="right">0.4</td>
 <td align="right">0.2</td>
@@ -3299,7 +3283,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.2</td>
 <td align="right">0.2</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">linalool</td>
 <td align="right">0.4</td>
 <td align="right">0.4</td>
@@ -3308,7 +3292,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">1.9</td>
 <td align="right">1.6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">3-methylbutanal oxime</td>
 <td align="right">0.4</td>
 <td align="right">0.0</td>
@@ -3317,7 +3301,7 @@ align="left">(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</td>
 <td align="right">0.7</td>
 <td align="right">0.0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">a-copaene</td>
 <td align="right">0.3</td>
 <td align="right">0.2</td>
@@ -3795,22 +3779,22 @@ plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></p
 <td align="left">GNA</td>
 <td align="left">2018</td>
 <td align="right">45</td>
-<td align="right">0.002</td>
-<td align="right">0.322</td>
+<td align="right">0.001</td>
+<td align="right">0.298</td>
 </tr>
 <tr class="even">
 <td align="left">GNA</td>
 <td align="left">2019</td>
 <td align="right">14</td>
-<td align="right">0.460</td>
-<td align="right">0.801</td>
+<td align="right">0.430</td>
+<td align="right">0.717</td>
 </tr>
 <tr class="odd">
 <td align="left">GNA</td>
 <td align="left">2021</td>
 <td align="right">56</td>
-<td align="right">0.007</td>
-<td align="right">0.176</td>
+<td align="right">0.017</td>
+<td align="right">0.172</td>
 </tr>
 <tr class="even">
 <td align="left">Maxfield</td>
@@ -3851,9 +3835,9 @@ plot.terms &lt;-c(&quot;mean_temp_C_treatment&quot;, &quot;temp&quot;)</code></p
 <tr class="odd">
 <td align="left">2021</td>
 <td align="right">137</td>
-<td align="right">0.043</td>
-<td align="right">0.206</td>
 <td align="right">0.031</td>
+<td align="right">0.189</td>
+<td align="right">0.034</td>
 </tr>
 </tbody>
 </table>
@@ -3867,21 +3851,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 temp + Site, data = svf.otc, distance = &quot;bray&quot;)
 
               Inertia Proportion Rank
-Total         27.4235     1.0000     
-Constrained    3.8391     0.1400    5
-Unconstrained 31.2936     1.1411   71
-Imaginary     -7.7093    -0.2811  124
+Total         27.2034     1.0000     
+Constrained    3.9638     0.1457    5
+Unconstrained 30.9955     1.1394   70
+Imaginary     -7.7558    -0.2851  125
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5 
-1.8795 0.9897 0.5831 0.2521 0.1346 
+1.9308 1.0530 0.6153 0.2320 0.1327 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-6.533 3.790 2.105 1.804 1.617 1.439 1.273 0.997 
-(Showing 8 of 71 unconstrained eigenvalues)</code></pre>
+6.483 3.885 2.124 1.764 1.522 1.360 1.248 1.024 
+(Showing 8 of 70 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova(cap.otc.comb, by=&quot;margin&quot;) %&gt;% kable(caption=&quot;CAP&quot;)</code></pre>
 <table>
 <caption>CAP</caption>
@@ -3898,35 +3882,35 @@ Eigenvalues for unconstrained axes:
 <tr class="odd">
 <td align="left">Year</td>
 <td align="right">2</td>
-<td align="right">1.7859180</td>
-<td align="right">5.421623</td>
+<td align="right">1.7938852</td>
+<td align="right">5.498188</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="even">
 <td align="left">mean_temp_C_treatment</td>
 <td align="right">1</td>
-<td align="right">0.5534893</td>
-<td align="right">3.360524</td>
+<td align="right">0.5762340</td>
+<td align="right">3.532269</td>
 <td align="right">0.002</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.3270523</td>
-<td align="right">1.985706</td>
-<td align="right">0.036</td>
+<td align="right">0.3368438</td>
+<td align="right">2.064826</td>
+<td align="right">0.027</td>
 </tr>
 <tr class="even">
 <td align="left">Site</td>
 <td align="right">1</td>
-<td align="right">0.4427976</td>
-<td align="right">2.688457</td>
-<td align="right">0.003</td>
+<td align="right">0.4224414</td>
+<td align="right">2.589533</td>
+<td align="right">0.004</td>
 </tr>
 <tr class="odd">
 <td align="left">Residual</td>
 <td align="right">190</td>
-<td align="right">31.2936190</td>
+<td align="right">30.9955012</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -3968,30 +3952,30 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <tbody>
 <tr class="odd">
 <td align="left">Year</td>
-<td align="right">264.48715</td>
-<td align="right">132.24357</td>
+<td align="right">281.49262</td>
+<td align="right">140.74631</td>
 <td align="right">2</td>
-<td align="right">169.4197</td>
-<td align="right">4.8893190</td>
-<td align="right">0.0086221</td>
+<td align="right">169.0906</td>
+<td align="right">5.3395933</td>
+<td align="right">0.0056406</td>
 </tr>
 <tr class="even">
 <td align="left">Site</td>
-<td align="right">36.86346</td>
-<td align="right">36.86346</td>
+<td align="right">40.49657</td>
+<td align="right">40.49657</td>
 <td align="right">1</td>
-<td align="right">106.2981</td>
-<td align="right">1.3629183</td>
-<td align="right">0.2456444</td>
+<td align="right">105.5449</td>
+<td align="right">1.5363473</td>
+<td align="right">0.2179113</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">14.42245</td>
-<td align="right">14.42245</td>
+<td align="right">16.88378</td>
+<td align="right">16.88378</td>
 <td align="right">1</td>
-<td align="right">133.9442</td>
-<td align="right">0.5332278</td>
-<td align="right">0.4665282</td>
+<td align="right">133.2994</td>
+<td align="right">0.6405318</td>
+<td align="right">0.4249423</td>
 </tr>
 </tbody>
 </table>
@@ -4028,15 +4012,15 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <td align="left">2019</td>
 <td align="right">38</td>
 <td align="right">0.001</td>
-<td align="right">0.247</td>
-<td align="right">0.691</td>
+<td align="right">0.245</td>
+<td align="right">0.676</td>
 </tr>
 <tr class="even">
 <td align="left">2021</td>
 <td align="right">137</td>
 <td align="right">0.001</td>
-<td align="right">0.128</td>
-<td align="right">0.198</td>
+<td align="right">0.115</td>
+<td align="right">0.175</td>
 </tr>
 </tbody>
 </table>
@@ -4049,21 +4033,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 <pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Year + mean_temp_C_treatment +
 temp, data = svf.otc, distance = &quot;bray&quot;)
 
-               Inertia Proportion Rank
-Total         10.67003    1.00000     
-Constrained    0.82772    0.07757    3
-Unconstrained 12.05535    1.12983   42
-Imaginary     -2.21304   -0.20741   49
+              Inertia Proportion Rank
+Total         10.5670     1.0000     
+Constrained    0.8211     0.0777    3
+Unconstrained 11.9490     1.1308   42
+Imaginary     -2.2032    -0.2085   49
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3 
-0.3425 0.2837 0.2016 
+0.3427 0.2801 0.1983 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.8783 2.1447 0.8114 0.7685 0.6296 0.4905 0.4704 0.4068 
+2.8778 2.2416 0.8531 0.6843 0.6489 0.4981 0.4287 0.4127 
 (Showing 8 of 42 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova(cap.otc.comb, by=&quot;margin&quot;) %&gt;% kable(caption=&quot;CAP&quot;)</code></pre>
 <table>
@@ -4081,28 +4065,28 @@ Eigenvalues for unconstrained axes:
 <tr class="odd">
 <td align="left">Year</td>
 <td align="right">1</td>
-<td align="right">0.3091642</td>
-<td align="right">2.256795</td>
-<td align="right">0.019</td>
+<td align="right">0.2963676</td>
+<td align="right">2.182631</td>
+<td align="right">0.024</td>
 </tr>
 <tr class="even">
 <td align="left">mean_temp_C_treatment</td>
 <td align="right">1</td>
-<td align="right">0.2090617</td>
-<td align="right">1.526080</td>
-<td align="right">0.109</td>
+<td align="right">0.2019649</td>
+<td align="right">1.487392</td>
+<td align="right">0.125</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.2708108</td>
-<td align="right">1.976829</td>
-<td align="right">0.032</td>
+<td align="right">0.2817359</td>
+<td align="right">2.074874</td>
+<td align="right">0.023</td>
 </tr>
 <tr class="even">
 <td align="left">Residual</td>
 <td align="right">88</td>
-<td align="right">12.0553471</td>
+<td align="right">11.9490428</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4143,21 +4127,21 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <tbody>
 <tr class="odd">
 <td align="left">Year</td>
-<td align="right">2.673962</td>
-<td align="right">2.673962</td>
+<td align="right">2.085656</td>
+<td align="right">2.085656</td>
 <td align="right">1</td>
 <td align="right">89</td>
-<td align="right">0.0696173</td>
-<td align="right">0.7925048</td>
+<td align="right">0.0588173</td>
+<td align="right">0.8089332</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
-<td align="right">129.620625</td>
-<td align="right">129.620625</td>
+<td align="right">121.725944</td>
+<td align="right">121.725944</td>
 <td align="right">1</td>
 <td align="right">89</td>
-<td align="right">3.3747065</td>
-<td align="right">0.0695419</td>
+<td align="right">3.4327741</td>
+<td align="right">0.0672288</td>
 </tr>
 </tbody>
 </table>
@@ -4171,20 +4155,20 @@ vol.otc &lt;- vol[svf.otc$sample,]
 temp, data = svf.otc, distance = &quot;bray&quot;)
 
               Inertia Proportion Rank
-Total          8.2222     1.0000     
-Constrained    1.0590     0.1288    3
-Unconstrained  8.6743     1.0550   39
-Imaginary     -1.5110    -0.1838   43
+Total          8.1751     1.0000     
+Constrained    1.0506     0.1285    3
+Unconstrained  8.6221     1.0547   39
+Imaginary     -1.4976    -0.1832   43
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3 
-0.8070 0.1538 0.0982 
+0.8042 0.1522 0.0942 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.5679 1.1460 0.7525 0.6839 0.4967 0.4268 0.3458 0.2590 
+2.5712 1.1655 0.7935 0.6989 0.4650 0.3663 0.3230 0.2672 
 (Showing 8 of 39 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova(cap.otc.comb, by=&quot;margin&quot;) %&gt;% kable(caption=&quot;CAP&quot;)</code></pre>
 <table>
@@ -4202,28 +4186,28 @@ Eigenvalues for unconstrained axes:
 <tr class="odd">
 <td align="left">Year</td>
 <td align="right">1</td>
-<td align="right">0.7139697</td>
-<td align="right">6.5023982</td>
+<td align="right">0.7067920</td>
+<td align="right">6.475958</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="even">
 <td align="left">mean_temp_C_treatment</td>
 <td align="right">1</td>
-<td align="right">0.2708502</td>
-<td align="right">2.4667378</td>
-<td align="right">0.013</td>
+<td align="right">0.2675576</td>
+<td align="right">2.451487</td>
+<td align="right">0.011</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.1088660</td>
-<td align="right">0.9914846</td>
-<td align="right">0.397</td>
+<td align="right">0.0999028</td>
+<td align="right">0.915356</td>
+<td align="right">0.468</td>
 </tr>
 <tr class="even">
 <td align="left">Residual</td>
 <td align="right">79</td>
-<td align="right">8.6742775</td>
+<td align="right">8.6221330</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4264,21 +4248,21 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <tbody>
 <tr class="odd">
 <td align="left">Year</td>
-<td align="right">376.551261</td>
-<td align="right">376.551261</td>
+<td align="right">369.873913</td>
+<td align="right">369.873913</td>
 <td align="right">1</td>
-<td align="right">64.69350</td>
-<td align="right">8.7603738</td>
-<td align="right">0.0042983</td>
+<td align="right">64.44679</td>
+<td align="right">8.8065257</td>
+<td align="right">0.0042088</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
-<td align="right">1.152037</td>
-<td align="right">1.152037</td>
+<td align="right">1.536687</td>
+<td align="right">1.536687</td>
 <td align="right">1</td>
-<td align="right">56.48877</td>
-<td align="right">0.0268019</td>
-<td align="right">0.8705416</td>
+<td align="right">56.52441</td>
+<td align="right">0.0365878</td>
+<td align="right">0.8489922</td>
 </tr>
 </tbody>
 </table>
@@ -4292,21 +4276,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          5.84260    1.00000     
-Constrained    0.18274    0.03128    2
-Unconstrained  6.58529    1.12712   31
-Imaginary     -0.92542   -0.15839   32
+Total          5.73117    1.00000     
+Constrained    0.18008    0.03142    2
+Unconstrained  6.45276    1.12591   32
+Imaginary     -0.90167   -0.15733   31
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
    CAP1    CAP2 
-0.11651 0.06623 
+0.11400 0.06608 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.1454 1.0567 0.6296 0.4879 0.3552 0.2988 0.2255 0.1844 
-(Showing 8 of 31 unconstrained eigenvalues)</code></pre>
+2.1223 1.0715 0.6437 0.4589 0.3199 0.2502 0.2150 0.1865 
+(Showing 8 of 32 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
 kable(anova.cap, caption=&quot;CAP tenuituba night - treatment&quot;)</code></pre>
 <table>
@@ -4324,21 +4308,21 @@ kable(anova.cap, caption=&quot;CAP tenuituba night - treatment&quot;)</code></pr
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.1000644</td>
-<td align="right">0.9269041</td>
-<td align="right">0.463</td>
+<td align="right">0.0878022</td>
+<td align="right">0.8300226</td>
+<td align="right">0.558</td>
 </tr>
 <tr class="even">
 <td align="left">SoilVWC</td>
 <td align="right">1</td>
-<td align="right">0.0934534</td>
-<td align="right">0.8656660</td>
-<td align="right">0.544</td>
+<td align="right">0.1021512</td>
+<td align="right">0.9656685</td>
+<td align="right">0.431</td>
 </tr>
 <tr class="odd">
 <td align="left">Residual</td>
 <td align="right">61</td>
-<td align="right">6.5852871</td>
+<td align="right">6.4527576</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4351,21 +4335,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 SoilVWC, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          5.84260    1.00000     
-Constrained    0.28665    0.04906    2
-Unconstrained  6.48138    1.10933   31
-Imaginary     -0.92542   -0.15839   32
+Total          5.73117    1.00000     
+Constrained    0.29238    0.05102    2
+Unconstrained  6.34046    1.10631   32
+Imaginary     -0.90167   -0.15733   31
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
    CAP1    CAP2 
-0.21323 0.07342 
+0.21094 0.08144 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.0161 1.0851 0.6246 0.4957 0.3676 0.2936 0.2044 0.1866 
-(Showing 8 of 31 unconstrained eigenvalues)</code></pre>
+1.9924 1.0961 0.6422 0.4585 0.3189 0.2374 0.2117 0.1873 
+(Showing 8 of 32 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
 kable(anova.cap, caption=&quot;CAP tenuituba night - temperature&quot;)</code></pre>
 <table>
@@ -4383,21 +4367,21 @@ kable(anova.cap, caption=&quot;CAP tenuituba night - temperature&quot;)</code></
 <tr class="odd">
 <td align="left">mean_temp_C_treatment</td>
 <td align="right">1</td>
-<td align="right">0.2039732</td>
-<td align="right">1.9197101</td>
-<td align="right">0.08</td>
+<td align="right">0.2001035</td>
+<td align="right">1.9251472</td>
+<td align="right">0.081</td>
 </tr>
 <tr class="even">
 <td align="left">SoilVWC</td>
 <td align="right">1</td>
-<td align="right">0.0799091</td>
-<td align="right">0.7520708</td>
-<td align="right">0.66</td>
+<td align="right">0.0893974</td>
+<td align="right">0.8600705</td>
+<td align="right">0.548</td>
 </tr>
 <tr class="odd">
 <td align="left">Residual</td>
 <td align="right">61</td>
-<td align="right">6.4813783</td>
+<td align="right">6.3404563</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4413,21 +4397,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 svf.otc, distance = &quot;bray&quot;)
 
               Inertia Proportion Rank
-Total         23.0080     1.0000     
-Constrained    5.4487     0.2368    4
-Unconstrained 23.7593     1.0327   65
-Imaginary     -6.2001    -0.2695  109
+Total         23.0541     1.0000     
+Constrained    5.6324     0.2443    4
+Unconstrained 23.5793     1.0228   66
+Imaginary     -6.1576    -0.2671  108
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
  CAP1  CAP2  CAP3  CAP4 
-4.267 0.687 0.338 0.157 
+4.464 0.708 0.299 0.161 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-4.790 3.135 1.624 1.281 1.112 1.071 0.968 0.916 
-(Showing 8 of 65 unconstrained eigenvalues)</code></pre>
+4.774 3.250 1.704 1.207 1.135 1.034 0.933 0.906 
+(Showing 8 of 66 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova(cap.otc.comb, by=&quot;term&quot;) %&gt;% kable(caption=&quot;CAP&quot;)</code></pre>
 <table>
 <caption>CAP</caption>
@@ -4444,35 +4428,35 @@ Eigenvalues for unconstrained axes:
 <tr class="odd">
 <td align="left">Year</td>
 <td align="right">1</td>
-<td align="right">0.6263415</td>
-<td align="right">4.481522</td>
-<td align="right">0.001</td>
+<td align="right">0.5688480</td>
+<td align="right">4.101224</td>
+<td align="right">0.002</td>
 </tr>
 <tr class="even">
 <td align="left">DN</td>
 <td align="right">1</td>
-<td align="right">4.0890598</td>
-<td align="right">29.257542</td>
+<td align="right">4.2840308</td>
+<td align="right">30.886584</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.2534728</td>
-<td align="right">1.813618</td>
-<td align="right">0.046</td>
+<td align="right">0.2574265</td>
+<td align="right">1.855968</td>
+<td align="right">0.040</td>
 </tr>
 <tr class="even">
 <td align="left">Year:DN</td>
 <td align="right">1</td>
-<td align="right">0.4798699</td>
-<td align="right">3.433507</td>
-<td align="right">0.002</td>
+<td align="right">0.5220770</td>
+<td align="right">3.764019</td>
+<td align="right">0.001</td>
 </tr>
 <tr class="odd">
 <td align="left">Residual</td>
 <td align="right">170</td>
-<td align="right">23.7593495</td>
+<td align="right">23.5793391</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4519,39 +4503,39 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <tbody>
 <tr class="odd">
 <td align="left">Year</td>
-<td align="right">356.2809</td>
-<td align="right">356.2809</td>
+<td align="right">352.5422</td>
+<td align="right">352.5422</td>
 <td align="right">1</td>
-<td align="right">91.50065</td>
-<td align="right">6.5530340</td>
-<td align="right">0.0121098</td>
+<td align="right">91.48272</td>
+<td align="right">6.6603027</td>
+<td align="right">0.0114495</td>
 </tr>
 <tr class="even">
 <td align="left">DN</td>
-<td align="right">1100.7920</td>
-<td align="right">1100.7920</td>
+<td align="right">1111.1045</td>
+<td align="right">1111.1045</td>
 <td align="right">1</td>
-<td align="right">131.64161</td>
-<td align="right">20.2467417</td>
-<td align="right">0.0000148</td>
+<td align="right">131.76273</td>
+<td align="right">20.9912255</td>
+<td align="right">0.0000106</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">19.3537</td>
-<td align="right">19.3537</td>
+<td align="right">16.1388</td>
+<td align="right">16.1388</td>
 <td align="right">1</td>
-<td align="right">66.56212</td>
-<td align="right">0.3559704</td>
-<td align="right">0.5527766</td>
+<td align="right">66.92548</td>
+<td align="right">0.3048976</td>
+<td align="right">0.5826676</td>
 </tr>
 <tr class="even">
 <td align="left">Year:DN</td>
-<td align="right">442.1140</td>
-<td align="right">442.1140</td>
+<td align="right">452.3715</td>
+<td align="right">452.3715</td>
 <td align="right">1</td>
-<td align="right">131.64403</td>
-<td align="right">8.1317527</td>
-<td align="right">0.0050520</td>
+<td align="right">131.76509</td>
+<td align="right">8.5463003</td>
+<td align="right">0.0040766</td>
 </tr>
 </tbody>
 </table>
@@ -4566,21 +4550,21 @@ vol.otc &lt;- vol[svf.otc$sample,]
 mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          40.7467     1.0000     
-Constrained     6.4695     0.1588    6
-Unconstrained  47.6764     1.1701   94
-Imaginary     -13.3991    -0.3288  193
+Total          40.5715     1.0000     
+Constrained     6.6847     0.1648    6
+Unconstrained  47.3336     1.1667   93
+Imaginary     -13.4467    -0.3314  194
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5   CAP6 
-2.8171 1.8417 0.8417 0.5257 0.2875 0.1558 
+2.9692 1.8767 0.8744 0.5543 0.2491 0.1609 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-8.716 6.229 2.994 2.698 2.157 1.936 1.803 1.505 
-(Showing 8 of 94 unconstrained eigenvalues)</code></pre>
+8.806 6.393 3.122 2.301 2.156 1.996 1.690 1.424 
+(Showing 8 of 93 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>(anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;))</code></pre>
 <pre><code>Permutation test for capscale under reduced model
 Marginal effects of terms
@@ -4589,11 +4573,11 @@ Number of permutations: 999
 
 Model: capscale(formula = sqrt(vol.otc) ~ Year + Site + mean_temp_C_treatment + temp, data = svf.otc, distance = &quot;bray&quot;)
                        Df SumOfSqs      F Pr(&gt;F)    
-Year                    2    1.711 5.0423  0.001 ***
-Site                    2    3.040 8.9577  0.001 ***
-mean_temp_C_treatment   1    0.477 2.8119  0.008 ** 
-temp                    1    0.493 2.9041  0.006 ** 
-Residual              281   47.676                  
+Year                    2    1.658 4.9207  0.001 ***
+Site                    2    3.165 9.3957  0.001 ***
+mean_temp_C_treatment   1    0.506 3.0027  0.005 ** 
+temp                    1    0.515 3.0560  0.002 ** 
+Residual              281   47.334                  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
@@ -4631,30 +4615,30 @@ text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
 <tbody>
 <tr class="odd">
 <td align="left">Year</td>
-<td align="right">182.32990</td>
-<td align="right">91.16495</td>
+<td align="right">184.09739</td>
+<td align="right">92.04870</td>
 <td align="right">2</td>
-<td align="right">282</td>
-<td align="right">2.844900</td>
-<td align="right">0.0598102</td>
+<td align="right">221.4682</td>
+<td align="right">3.049117</td>
+<td align="right">0.0493957</td>
 </tr>
 <tr class="even">
 <td align="left">Site</td>
-<td align="right">520.28455</td>
-<td align="right">260.14227</td>
+<td align="right">479.81097</td>
+<td align="right">239.90549</td>
 <td align="right">2</td>
-<td align="right">282</td>
-<td align="right">8.118018</td>
-<td align="right">0.0003734</td>
+<td align="right">177.4828</td>
+<td align="right">7.946879</td>
+<td align="right">0.0004950</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
-<td align="right">91.96233</td>
-<td align="right">91.96233</td>
+<td align="right">90.37225</td>
+<td align="right">90.37225</td>
 <td align="right">1</td>
-<td align="right">282</td>
-<td align="right">2.869783</td>
-<td align="right">0.0913611</td>
+<td align="right">172.2215</td>
+<td align="right">2.993585</td>
+<td align="right">0.0853863</td>
 </tr>
 </tbody>
 </table>
@@ -4670,75 +4654,25 @@ vol.otc &lt;- vol[svf.otc$sample,]
 svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          5.90666    1.00000     
-Constrained    0.25845    0.04376    3
-Unconstrained  6.60597    1.11839   32
-Imaginary     -0.95776   -0.16215   33
+Total          5.78909    1.00000     
+Constrained    0.25680    0.04436    3
+Unconstrained  6.46153    1.11616   32
+Imaginary     -0.92924   -0.16052   33
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
    CAP1    CAP2    CAP3 
-0.12362 0.08432 0.05051 
+0.12821 0.08915 0.03944 
 
 Eigenvalues for unconstrained axes:
   MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.1598 1.0425 0.6220 0.5002 0.3549 0.2873 0.2273 0.1819 
+2.1351 1.0528 0.6389 0.4509 0.3280 0.2517 0.2140 0.1899 
 (Showing 8 of 32 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
-kable(anova.cap, caption=&quot;CAP tenuituba night by week - interaction&quot;)</code></pre>
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;)
+kable(anova.cap, caption=&quot;CAP tenuituba 2021 night by week&quot;)</code></pre>
 <table>
-<caption>CAP tenuituba night by week - interaction</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Df</th>
-<th align="right">SumOfSqs</th>
-<th align="right">F</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">sampround:temp</td>
-<td align="right">1</td>
-<td align="right">0.0640108</td>
-<td align="right">0.6007697</td>
-<td align="right">0.798</td>
-</tr>
-<tr class="even">
-<td align="left">Residual</td>
-<td align="right">62</td>
-<td align="right">6.6059728</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ sampround + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
-<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ sampround + temp, data =
-svf.otc, distance = &quot;bray&quot;)
-
-               Inertia Proportion Rank
-Total          5.90666    1.00000     
-Constrained    0.19444    0.03292    2
-Unconstrained  6.66998    1.12923   32
-Imaginary     -0.95776   -0.16215   33
-Inertia is squared Bray distance 
-Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
-
-Eigenvalues for constrained axes:
-   CAP1    CAP2 
-0.12295 0.07149 
-
-Eigenvalues for unconstrained axes:
-  MDS1   MDS2   MDS3   MDS4   MDS5   MDS6   MDS7   MDS8 
-2.1618 1.0568 0.6229 0.5035 0.3672 0.3011 0.2273 0.1837 
-(Showing 8 of 32 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
-kable(anova.cap, caption=&quot;CAP tenuituba night by week&quot;)</code></pre>
-<table>
-<caption>CAP tenuituba night by week</caption>
+<caption>CAP tenuituba 2021 night by week</caption>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -4752,21 +4686,28 @@ kable(anova.cap, caption=&quot;CAP tenuituba night by week&quot;)</code></pre>
 <tr class="odd">
 <td align="left">sampround</td>
 <td align="right">1</td>
-<td align="right">0.1065137</td>
-<td align="right">1.0060539</td>
-<td align="right">0.371</td>
+<td align="right">0.1178795</td>
+<td align="right">1.1310826</td>
+<td align="right">0.283</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.0839481</td>
-<td align="right">0.7929147</td>
-<td align="right">0.610</td>
+<td align="right">0.0732391</td>
+<td align="right">0.7027467</td>
+<td align="right">0.703</td>
 </tr>
 <tr class="odd">
+<td align="left">sampround:temp</td>
+<td align="right">1</td>
+<td align="right">0.0656847</td>
+<td align="right">0.6302607</td>
+<td align="right">0.760</td>
+</tr>
+<tr class="even">
 <td align="left">Residual</td>
-<td align="right">63</td>
-<td align="right">6.6699835</td>
+<td align="right">62</td>
+<td align="right">6.4615344</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -4781,79 +4722,22 @@ vol.otc &lt;- vol[svf.otc$sample,]
 = svf.otc, distance = &quot;bray&quot;)
 
               Inertia Proportion Rank
-Total         29.8190     1.0000     
-Constrained    4.2000     0.1408    5
-Unconstrained 33.8562     1.1354   75
-Imaginary     -8.2372    -0.2762  132
+Total         29.2834     1.0000     
+Constrained    4.2305     0.1445    5
+Unconstrained 33.1971     1.1336   76
+Imaginary     -8.1442    -0.2781  131
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5 
-2.5423 0.9402 0.4642 0.1644 0.0888 
+2.6636 0.8891 0.4469 0.1575 0.0735 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-6.688 4.822 2.283 2.075 1.591 1.386 1.186 1.098 
-(Showing 8 of 75 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
-kable(anova.cap, caption=&quot;CAP both species day by week - interaction&quot;)</code></pre>
-<table>
-<caption>CAP both species day by week - interaction</caption>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">Df</th>
-<th align="right">SumOfSqs</th>
-<th align="right">F</th>
-<th align="right">Pr(&gt;F)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">2.6322532</td>
-<td align="right">7.8525468</td>
-<td align="right">0.001</td>
-</tr>
-<tr class="even">
-<td align="left">sampround:temp</td>
-<td align="right">1</td>
-<td align="right">0.1126442</td>
-<td align="right">0.6720811</td>
-<td align="right">0.812</td>
-</tr>
-<tr class="odd">
-<td align="left">Residual</td>
-<td align="right">202</td>
-<td align="right">33.8562231</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ Site + sampround + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
-<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Site + sampround + temp, data
-= svf.otc, distance = &quot;bray&quot;)
-
-              Inertia Proportion Rank
-Total         29.8190     1.0000     
-Constrained    4.0873     0.1371    4
-Unconstrained 33.9689     1.1392   75
-Imaginary     -8.2372    -0.2762  132
-Inertia is squared Bray distance 
-Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
-
-Eigenvalues for constrained axes:
-  CAP1   CAP2   CAP3   CAP4 
-2.5421 0.9364 0.4459 0.1630 
-
-Eigenvalues for unconstrained axes:
- MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-6.691 4.829 2.298 2.075 1.595 1.387 1.190 1.106 
-(Showing 8 of 75 unconstrained eigenvalues)</code></pre>
-<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
+6.687 4.977 2.116 1.887 1.592 1.318 1.176 0.982 
+(Showing 8 of 76 unconstrained eigenvalues)</code></pre>
+<pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;term&quot;)
 kable(anova.cap, caption=&quot;CAP both species day by week&quot;)</code></pre>
 <table>
 <caption>CAP both species day by week</caption>
@@ -4870,33 +4754,60 @@ kable(anova.cap, caption=&quot;CAP both species day by week&quot;)</code></pre>
 <tr class="odd">
 <td align="left">Site</td>
 <td align="right">2</td>
-<td align="right">2.6687031</td>
-<td align="right">7.974165</td>
+<td align="right">2.9203108</td>
+<td align="right">8.8848622</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="even">
 <td align="left">sampround</td>
 <td align="right">1</td>
-<td align="right">0.9894949</td>
-<td align="right">5.913281</td>
+<td align="right">0.9744600</td>
+<td align="right">5.9294668</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="odd">
 <td align="left">temp</td>
 <td align="right">1</td>
-<td align="right">0.2373937</td>
-<td align="right">1.418679</td>
-<td align="right">0.128</td>
+<td align="right">0.2410782</td>
+<td align="right">1.4669304</td>
+<td align="right">0.104</td>
 </tr>
 <tr class="even">
+<td align="left">sampround:temp</td>
+<td align="right">1</td>
+<td align="right">0.0946858</td>
+<td align="right">0.5761511</td>
+<td align="right">0.920</td>
+</tr>
+<tr class="odd">
 <td align="left">Residual</td>
-<td align="right">203</td>
-<td align="right">33.9688673</td>
+<td align="right">202</td>
+<td align="right">33.1970703</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>(cap.otc.comb &lt;- capscale(sqrt(vol.otc) ~ Site + sampround + temp, distance=&quot;bray&quot;, data=svf.otc))</code></pre>
+<pre><code>Call: capscale(formula = sqrt(vol.otc) ~ Site + sampround + temp, data
+= svf.otc, distance = &quot;bray&quot;)
+
+              Inertia Proportion Rank
+Total         29.2834     1.0000     
+Constrained    4.1358     0.1412    4
+Unconstrained 33.2918     1.1369   76
+Imaginary     -8.1442    -0.2781  131
+Inertia is squared Bray distance 
+Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
+
+Eigenvalues for constrained axes:
+  CAP1   CAP2   CAP3   CAP4 
+2.6620 0.8782 0.4383 0.1574 
+
+Eigenvalues for unconstrained axes:
+ MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
+6.691 4.984 2.118 1.888 1.596 1.328 1.178 0.983 
+(Showing 8 of 76 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>summ.cap &lt;- summary(cap.otc.comb)
 prop.expl &lt;- summ.cap$cont$importance
 ax.labs &lt;- paste0(colnames(prop.expl)[1:2], &quot; (&quot;,round(100*prop.expl[2,1:2]),&quot;% explained)&quot;)
@@ -5000,20 +4911,20 @@ vol.otc &lt;- vol[svf.otc$sample,]
 mean_temp_C_treatment, data = svf.otc, distance = &quot;bray&quot;)
 
                Inertia Proportion Rank
-Total          39.1231     1.0000     
-Constrained     5.8474     0.1495    6
-Unconstrained  45.8134     1.1710   91
-Imaginary     -12.5377    -0.3205  182
+Total          38.8589     1.0000     
+Constrained     6.0436     0.1555    6
+Unconstrained  45.3538     1.1671   91
+Imaginary     -12.5384    -0.3227  182
 Inertia is squared Bray distance 
 Species scores projected from &#39;sqrt&#39; &#39;vol.otc&#39; 
 
 Eigenvalues for constrained axes:
   CAP1   CAP2   CAP3   CAP4   CAP5   CAP6 
-2.5524 1.7385 0.8798 0.3519 0.2162 0.1086 
+2.6824 1.7610 0.9206 0.3734 0.1947 0.1115 
 
 Eigenvalues for unconstrained axes:
  MDS1  MDS2  MDS3  MDS4  MDS5  MDS6  MDS7  MDS8 
-8.697 5.945 2.764 2.654 2.057 1.889 1.754 1.430 
+8.764 6.108 2.888 2.237 2.067 1.919 1.635 1.371 
 (Showing 8 of 91 unconstrained eigenvalues)</code></pre>
 <pre class="r"><code>anova.cap &lt;- anova(cap.otc.comb, by=&quot;margin&quot;)
 kable(anova.cap, caption=&quot;CAP both species, soil moisture and temperature&quot;)</code></pre>
@@ -5032,35 +4943,35 @@ kable(anova.cap, caption=&quot;CAP both species, soil moisture and temperature&q
 <tr class="odd">
 <td align="left">Year</td>
 <td align="right">2</td>
-<td align="right">1.4659382</td>
-<td align="right">4.271738</td>
+<td align="right">1.437027</td>
+<td align="right">4.229927</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="even">
 <td align="left">Site</td>
 <td align="right">2</td>
-<td align="right">2.8941539</td>
-<td align="right">8.433553</td>
+<td align="right">3.003845</td>
+<td align="right">8.841898</td>
 <td align="right">0.001</td>
 </tr>
 <tr class="odd">
 <td align="left">SoilVWC</td>
 <td align="right">1</td>
-<td align="right">0.2149235</td>
-<td align="right">1.252572</td>
-<td align="right">0.196</td>
+<td align="right">0.219458</td>
+<td align="right">1.291961</td>
+<td align="right">0.179</td>
 </tr>
 <tr class="even">
 <td align="left">mean_temp_C_treatment</td>
 <td align="right">1</td>
-<td align="right">0.3330982</td>
-<td align="right">1.941294</td>
-<td align="right">0.027</td>
+<td align="right">0.349599</td>
+<td align="right">2.058108</td>
+<td align="right">0.022</td>
 </tr>
 <tr class="odd">
 <td align="left">Residual</td>
 <td align="right">267</td>
-<td align="right">45.8133761</td>
+<td align="right">45.353763</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -5108,22 +5019,22 @@ vols.PCA &lt;- vol.top %&gt;% mutate(across(everything(), ~ (.x-mean(.x, na.rm=T
   prcomp() 
 summary(vols.PCA) # PCs 1 - 5 explain 63% of the variation, #PCs total = top volatiles</code></pre>
 <pre><code>Importance of components:
-                          PC1    PC2     PC3     PC4    PC5    PC6     PC7
-Standard deviation     2.5918 1.7353 1.51401 1.29422 1.1672 1.0995 1.02406
-Proportion of Variance 0.2584 0.1158 0.08816 0.06442 0.0524 0.0465 0.04033
-Cumulative Proportion  0.2584 0.3742 0.46234 0.52676 0.5792 0.6257 0.66599
+                          PC1   PC2     PC3     PC4     PC5     PC6     PC7
+Standard deviation     2.5103 1.732 1.48808 1.27189 1.16686 1.09452 1.00658
+Proportion of Variance 0.2521 0.120 0.08858 0.06471 0.05446 0.04792 0.04053
+Cumulative Proportion  0.2521 0.372 0.46060 0.52530 0.57977 0.62768 0.66821
                            PC8    PC9    PC10    PC11    PC12    PC13    PC14
-Standard deviation     1.00040 0.9913 0.96627 0.93446 0.86470 0.80196 0.77942
-Proportion of Variance 0.03849 0.0378 0.03591 0.03359 0.02876 0.02474 0.02337
-Cumulative Proportion  0.70448 0.7423 0.77819 0.81178 0.84053 0.86527 0.88864
-                          PC15    PC16    PC17    PC18    PC19    PC20    PC21
-Standard deviation     0.73450 0.69010 0.64039 0.54285 0.49078 0.46831 0.45172
-Proportion of Variance 0.02075 0.01832 0.01577 0.01133 0.00926 0.00844 0.00785
-Cumulative Proportion  0.90938 0.92770 0.94347 0.95481 0.96407 0.97251 0.98036
-                          PC22    PC23    PC24    PC25    PC26
-Standard deviation     0.38933 0.37997 0.31728 0.29021 0.17289
-Proportion of Variance 0.00583 0.00555 0.00387 0.00324 0.00115
-Cumulative Proportion  0.98619 0.99174 0.99561 0.99885 1.00000</code></pre>
+Standard deviation     0.99142 0.9811 0.96619 0.91916 0.84912 0.80046 0.76465
+Proportion of Variance 0.03932 0.0385 0.03734 0.03379 0.02884 0.02563 0.02339
+Cumulative Proportion  0.70753 0.7460 0.78337 0.81717 0.84601 0.87164 0.89503
+                          PC15    PC16   PC17    PC18    PC19    PC20    PC21
+Standard deviation     0.70927 0.68848 0.6404 0.49617 0.48644 0.45613 0.42792
+Proportion of Variance 0.02012 0.01896 0.0164 0.00985 0.00947 0.00832 0.00732
+Cumulative Proportion  0.91515 0.93411 0.9505 0.96036 0.96982 0.97815 0.98547
+                          PC22    PC23    PC24   PC25
+Standard deviation     0.38147 0.31756 0.29491 0.1729
+Proportion of Variance 0.00582 0.00403 0.00348 0.0012
+Cumulative Proportion  0.99129 0.99533 0.99880 1.0000</code></pre>
 <pre class="r"><code>vols.PCA.E &lt;- vols.PCA$rotation[,1:5] #min(4, ncol(vols.PCA$rotation))
 
 calculate_beta &lt;- function(E, slopes) {
@@ -5519,15 +5430,6 @@ ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType==&quot;agg&quot;,Site,
 <td align="right">0.0272190</td>
 </tr>
 <tr class="odd">
-<td align="left">total</td>
-<td align="left">ten</td>
-<td align="left">SC</td>
-<td align="left">2021</td>
-<td align="left">day</td>
-<td align="right">507.931118</td>
-<td align="right">0.0344669</td>
-</tr>
-<tr class="even">
 <td align="left">linalool</td>
 <td align="left">agg</td>
 <td align="left">GNA</td>
@@ -5535,6 +5437,15 @@ ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType==&quot;agg&quot;,Site,
 <td align="left">day</td>
 <td align="right">1.600831</td>
 <td align="right">0.0356243</td>
+</tr>
+<tr class="even">
+<td align="left">total</td>
+<td align="left">ten</td>
+<td align="left">SC</td>
+<td align="left">2021</td>
+<td align="left">day</td>
+<td align="right">441.451959</td>
+<td align="right">0.0372350</td>
 </tr>
 <tr class="odd">
 <td align="left">(E)-hex-3-en-1-ol</td>
@@ -5674,20 +5585,20 @@ ggplot(aes(y=treat, x=temp, color=paste(PlantType, DN))) +
 <tr class="odd">
 <td align="left">agg</td>
 <td align="left">day</td>
-<td align="right">0.260</td>
-<td align="right">0.190</td>
+<td align="right">0.252</td>
+<td align="right">0.215</td>
 </tr>
 <tr class="even">
 <td align="left">ten</td>
 <td align="left">day</td>
-<td align="right">0.483</td>
-<td align="right">0.011</td>
+<td align="right">0.467</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="odd">
 <td align="left">ten</td>
 <td align="left">night</td>
-<td align="right">-0.197</td>
-<td align="right">0.324</td>
+<td align="right">-0.196</td>
+<td align="right">0.336</td>
 </tr>
 </tbody>
 </table>
@@ -5740,8 +5651,8 @@ term</caption>
 <td align="left">SC</td>
 <td align="left">2019</td>
 <td align="left">day</td>
-<td align="right">324.647956</td>
-<td align="right">0.0049892</td>
+<td align="right">307.484757</td>
+<td align="right">0.0054685</td>
 </tr>
 <tr class="odd">
 <td align="left">petasitene</td>

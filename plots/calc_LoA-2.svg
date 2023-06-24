@@ -71,7 +71,7 @@
 <polyline points='484.75,544.01 484.75,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='648.62,544.01 648.62,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <circle cx='482.37' cy='106.45' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
-<circle cx='390.75' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
+<circle cx='390.75' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #F8766D;' />
 <circle cx='413.10' cy='198.25' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='644.12' cy='60.56' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='714.05' cy='274.75' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
@@ -104,7 +104,7 @@
 <circle cx='714.05' cy='14.66' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='305.84' cy='504.24' r='2.49' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='515.38' cy='106.45' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
-<circle cx='420.77' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
+<circle cx='420.77' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #00BA38;' />
 <circle cx='414.65' cy='198.25' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
 <circle cx='552.20' cy='60.56' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
 <circle cx='372.39' cy='274.75' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
@@ -139,7 +139,7 @@
 <circle cx='714.05' cy='14.66' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
 <circle cx='379.64' cy='504.24' r='2.49' style='stroke-width: 0.71; stroke: #00BA38; fill: #00BA38;' />
 <circle cx='714.05' cy='106.45' r='2.49' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
-<circle cx='405.52' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
+<circle cx='405.52' cy='228.85' r='2.49' style='stroke-width: 0.71; stroke: #619CFF;' />
 <circle cx='400.91' cy='198.25' r='2.49' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
 <circle cx='564.73' cy='60.56' r='2.49' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />
 <circle cx='498.16' cy='274.75' r='2.49' style='stroke-width: 0.71; stroke: #619CFF; fill: #619CFF;' />

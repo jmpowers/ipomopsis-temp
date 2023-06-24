@@ -45,8 +45,8 @@
 <polyline points='351.26,544.01 351.26,39.36 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
 <line x1='48.73' y1='445.92' x2='467.54' y2='445.92' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <line x1='193.59' y1='544.01' x2='193.59' y2='39.36' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<text x='156.97' y='447.72' text-anchor='middle' style='font-size: 11.04px;fill: #7F7F7F; font-family: "Arial";'>total</text>
-<text x='269.94' y='408.99' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #7F7F7F; font-family: "Arial";'>total</text>
+<text x='155.86' y='447.20' text-anchor='middle' style='font-size: 11.04px;fill: #7F7F7F; font-family: "Arial";'>total</text>
+<text x='259.94' y='411.79' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #7F7F7F; font-family: "Arial";'>total</text>
 <text x='146.25' y='233.27' text-anchor='middle' style='font-size: 11.04px;fill: #E56E00; font-family: "Arial";'>a-farnesene</text>
 <text x='204.34' y='290.45' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #E56E00; font-family: "Arial";'>a-farnesene</text>
 <text x='175.51' y='413.58' text-anchor='middle' style='font-size: 11.04px;fill: #BC0060; font-family: "Arial";'>b-myrcene</text>
@@ -65,8 +65,6 @@
 <text x='426.30' y='316.57' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #E56E00; font-family: "Arial";'>(1Z,4Z,7Z)-1,5,9,9-tetramethylcycloundeca-1,4,7-triene</text>
 <text x='240.93' y='272.13' text-anchor='middle' style='font-size: 11.04px;fill: #86D400; font-family: "Arial";'>(E)-hex-2-enal</text>
 <text x='323.65' y='333.62' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #86D400; font-family: "Arial";'>(E)-hex-2-enal</text>
-<text x='181.93' y='458.65' text-anchor='middle' style='font-size: 11.04px;fill: #86D400; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
-<text x='439.47' y='347.05' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #86D400; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='248.07' y='424.97' text-anchor='middle' style='font-size: 11.04px;fill: #86D400; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
 <text x='360.55' y='429.49' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #86D400; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
 <text x='196.98' y='433.26' text-anchor='middle' style='font-size: 11.04px;fill: #86D400; font-family: "Arial";'>[(E)-hex-3-enyl] acetate</text>

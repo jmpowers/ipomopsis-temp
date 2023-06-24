@@ -52,7 +52,6 @@
 <polyline points='655.53,544.01 655.53,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='825.12,544.01 825.12,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='523.88,288.39 470.17,294.09 439.96,308.54 ' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-linecap: butt;' />
-<polyline points='669.60,172.01 575.64,161.89 588.51,185.20 ' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-linecap: butt;' />
 <polyline points='479.96,292.17 391.71,371.14 380.88,378.79 ' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-linecap: butt;' />
 <polyline points='569.83,44.02 668.92,29.96 684.81,51.35 ' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-linecap: butt;' />
 <polyline points='520.05,259.22 538.02,375.43 442.49,399.89 ' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-linecap: butt;' />
@@ -80,7 +79,6 @@
 <text x='834.39' y='57.68' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>a-pinene</text>
 <text x='709.15' y='235.67' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
 <text x='677.57' y='147.03' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>b-myrcene</text>
-<text x='669.60' y='176.04' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='656.88' y='240.11' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>b-caryophyllene</text>
 <text x='647.74' y='229.89' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>petasitene</text>
 <text x='603.15' y='276.29' text-anchor='middle' style='font-size: 11.04px;fill: #6495ED; font-family: "Arial";'>pseudoionone</text>
@@ -110,7 +108,6 @@
 <text x='588.64' y='140.99' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>a-farnesene</text>
 <text x='588.57' y='288.91' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>(E)-hex-3-en-1-ol</text>
 <text x='580.17' y='163.10' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>b-myrcene</text>
-<text x='575.64' y='165.91' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='562.50' y='261.22' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>trans-b-bergamotene</text>
 <text x='553.64' y='271.74' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>a-terpineol</text>
 <text x='538.02' y='379.45' text-anchor='middle' style='font-size: 11.04px;fill: #FF0000; font-family: "Arial";'>(E)-hex-2-enal</text>
@@ -133,7 +130,6 @@
 <text x='684.81' y='55.37' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>(E)-b-ocimene</text>
 <text x='649.44' y='142.84' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>a-farnesene</text>
 <text x='632.63' y='173.54' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>(Z)-b-ocimene</text>
-<text x='588.51' y='189.22' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>(2E)-2,7-dimethylocta-2,6-dien-1-ol</text>
 <text x='584.11' y='184.82' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>b-myrcene</text>
 <text x='574.55' y='279.46' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>b-caryophyllene</text>
 <text x='548.40' y='259.61' text-anchor='middle' style='font-size: 11.04px;fill: #0000FF; font-family: "Arial";'>trans-b-bergamotene</text>
