@@ -5503,7 +5503,7 @@ ggplot(aes(x=paste(ifelse(PlantType==&quot;agg&quot;,Site,as.character(DN)), str
   facet_grid(term ~PlantType, scales=&quot;free_x&quot;, 
              labeller = as_labeller(c(agg=&quot;I. aggregata&quot;, ten=&quot;I. tenuituba&quot;, 
                                       mean_temp_C_treatment=&quot;(A) Temperature&quot;, tempwarmed=&quot;(B) Treatment&quot;)))+
-  geom_tile(aes(fill=if_else(term ==&quot;mean_temp_C_treatment&quot;, log10(relchange+1)*5,log10(relchange+1)))) + scale_fill_gradient2(guide=&quot;none&quot;, limits=c(-1,1), oob=scales::squish)  + 
+  geom_tile(aes(fill=if_else(term ==&quot;mean_temp_C_treatment&quot;, log10(relchange+1)*5,log10(relchange+1)))) + scale_fill_gradient2(guide=&quot;none&quot;, limits=c(-1,1), oob=scales::squish, low = &quot;orange&quot;,high=&quot;forestgreen&quot;)  + 
   geom_text(aes(label=scales::percent(relchange, accuracy=1, big.mark=&quot;&quot;), fontface=as.integer(p.value &lt; 0.05)+1))+ labs(x=&quot;&quot;,y=&quot;&quot;)+
   theme_minimal() + theme(panel.grid = element_blank(), strip.text.x = element_text(face=&quot;italic&quot;),
                           axis.text=element_text(color=&quot;black&quot;))</code></pre>

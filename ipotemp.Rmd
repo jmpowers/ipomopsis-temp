@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: TRUE 
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{=html}
@@ -1398,7 +1398,7 @@ ggplot(aes(x=paste(ifelse(PlantType=="agg",Site,as.character(DN)), str_sub(Year,
   facet_grid(term ~PlantType, scales="free_x", 
              labeller = as_labeller(c(agg="I. aggregata", ten="I. tenuituba", 
                                       mean_temp_C_treatment="(A) Temperature", tempwarmed="(B) Treatment")))+
-  geom_tile(aes(fill=if_else(term =="mean_temp_C_treatment", log10(relchange+1)*5,log10(relchange+1)))) + scale_fill_gradient2(guide="none", limits=c(-1,1), oob=scales::squish)  + 
+  geom_tile(aes(fill=if_else(term =="mean_temp_C_treatment", log10(relchange+1)*5,log10(relchange+1)))) + scale_fill_gradient2(guide="none", limits=c(-1,1), oob=scales::squish, low = "orange",high="forestgreen")  + 
   geom_text(aes(label=scales::percent(relchange, accuracy=1, big.mark=""), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
   theme_minimal() + theme(panel.grid = element_blank(), strip.text.x = element_text(face="italic"),
                           axis.text=element_text(color="black"))

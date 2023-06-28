@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: TRUE 
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 <style type="text/css">
 .main-container { max-width: 1000px; margin-left: 0; margin-right: auto; }
@@ -216,10 +216,10 @@ floraltraits <- traits[1:6]
 seedtraits <- traits[7:14] 
 traitnames.units <- set_names(c(
   "Corolla length (mm)", "Corolla width (mm)",
-  "Nectar production (\U00B5L/day)", "Nectar conc. (% by mass)",
-  "Inflorescence height (cm)", "Redness index", 
-  "Open flowers", "Seeds per fruit", "Estimated total seeds", "Nonaborted fruits", "Flower number", 
-  "Prop. nonaborted fruits infested","Prop. fruits aborted","Estimated seeds per flower"), traits)
+  "Nectar production\n(\U00B5L/day)", "Nectar conc.\n(% by mass)",
+  "Inflorescence height\n(cm)", "Redness index", 
+  "Open flowers", "Seeds per fruit", "Estimated total\nseeds", "Nonaborted fruits", "Flower number", 
+  "Prop. nonaborted\nfruits infested","Prop. fruits\naborted","Estimated seeds\nper flower"), traits)
 
 traitnames <- set_names(c(
   "Corolla length", "Corolla width",
@@ -386,19 +386,19 @@ ggplot(nectar, aes(y=nectar_conc, x=nectar_volume, color=temp)) +
 ```
 
 # Trait plasticity
-```{r plasticity_multisite, fig.height=7.5}
+```{r plasticity_multisite, fig.height=5, fig.width=5}
 morph.mean %>% pivot_longer(c(corolla_length, corolla_width)) %>% 
 ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[site], sep="\n")
   facet_grid(name~site, scales="free_y", labeller = as_labeller(c(traitnames.units, speciessitenames)))+
   geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
   #geom_signif(comparisons = list(c(1,2)), test="t.test",
   #            map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
-  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.1), size=1) +
+  geom_point(position=position_jitterdodge(dodge.width=0.9, jitter.width=0.3), size=1) +
   labs(x="", y="", color="Temperature") + 
-  scale_y_continuous(limits=c(0,NA))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.05)))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
-        panel.grid.major.x = element_blank())
+        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank())
 
 morph %>% pivot_longer(c(corolla_length, corolla_width)) %>% filter(site=="Maxfield") %>% 
 ggplot(aes(x=temp, y=value, color=temp)) +
@@ -453,7 +453,7 @@ ggplot(nectar.meandate, aes(x=date, y=value, color=temp)) +
   theme(legend.position = "top")
 ```
 
-```{r plasticity, fig.width=9, fig.height=7}
+```{r plasticity, fig.width=7, fig.height=4}
 all.mean %>% pivot_longer(any_of(floraltraits[-c(1:2)])) %>% 
   filter(site=="Maxfield") %>% 
   drop_na(value) %>% 
@@ -464,11 +464,12 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   geom_signif(comparisons = list(c(1,2)), test="t.test",
               map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
   labs(x="", y="", color="Temperature") + 
-  scale_y_continuous(limits=c(0,NA))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.07)))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
-        panel.grid.major.x = element_blank())
-
+        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank())
+```
+```{r seedtraits, fig.width=6.5, fig.height=6.5}
 all.mean %>% pivot_longer(any_of(seedtraits)) %>% 
   filter(site=="Maxfield") %>% 
   drop_na(value) %>% 
@@ -479,8 +480,8 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   geom_signif(comparisons = list(c(1,2)), test="t.test",
               map_signif_level=TRUE, color="black",size=0.4, textsize=3) +
   labs(x="", y="", color="Temperature") + 
-  scale_y_continuous(limits=c(0,NA))+
-  scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() +
+  scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.07)))+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
         panel.grid.major.x = element_blank())
 ```
@@ -731,6 +732,24 @@ phen %>% drop_na(temp) %>% group_by(year, temp, julian) %>% summarize_at("has_eg
   scale_y_continuous(labels = scales::percent)+
   scale_color_brewer(palette="Set1", direction=-1) + theme_minimal() + geom_vline(xintercept=yday(ymd("2021-06-25")))
 ```
+
+```{r phenology_temp_openeggs, fig.width=3, fig.height=5}
+bind_rows(
+  buds=phen %>% drop_na(snow,temp) %>% group_by(temp, julian) %>% drop_na(open, buds) %>% 
+    summarize(response.se = sd(open+buds)/sqrt(length(open+buds)), response=mean(open+buds)),
+  eggs_per_flower = phen %>% drop_na(temp) %>% group_by(temp, julian) %>% drop_na(eggs_per_flower) %>% 
+    summarize(response.se = sd(eggs_per_flower)/sqrt(length(eggs_per_flower)), response=mean(eggs_per_flower)), .id = "variable") %>% 
+  ggplot(aes(x=julian, y=response, color=temp))+ geom_point() + 
+  geom_path(aes(group=temp)) + geom_linerange(aes(ymin=response-response.se, ymax=response+response.se))+
+  facet_wrap(vars(variable), scales="free_y", nrow=2, 
+             labeller=as_labeller(c(buds="(A) Total open flowers + elongated buds", eggs_per_flower="(B) Eggs per flower")))+
+  labs(x="Day of year", color="Temperature") +
+  scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.05)))+
+  scale_x_continuous(breaks=seq(120,240, by=10))+ geom_vline(xintercept=yday(ymd("2021-06-25")), linetype=2)+
+  scale_color_brewer(palette="Set1", direction=-1) + theme_bw()+   
+  theme(legend.position = "top", axis.title.y=element_blank())
+```
+
 
 # Selection
 
