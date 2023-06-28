@@ -60,6 +60,13 @@ class_pal <- set_names(c("#BC0060","#027B8C","#E56E00","#86D400"), levels(ipoche
 shortnames <- ipochems %>% select(name, shortname) %>% filter(shortname!="") %>% deframe()
 #shortnames[shortnames %in% shortnames[duplicated(shortnames)]]
 ipo.data$Name <- recode(ipo.data$Name, !!!shortnames)
+
+greekify <- function(names) {
+  names %>% 
+    str_replace("^a-","\U03B1-") %>% str_replace("-a-","-\U03B1-") %>% 
+    str_replace("^b-","\U03B2-") %>% str_replace("-b-","-\U03B2-") %>% 
+    str_replace("^g-","\U03B3-") %>% str_replace("-g-","-\U03B3-")
+}
 ```
 
 # Check quant vs. qual integrations
@@ -920,7 +927,7 @@ cap.yr.agg %>% select(-c(meta,cap)) %>% unnest(anova) %>%
 
 ### All years
 
-```{r otc_comb_temp}
+```{r otc_comb_temp, fig.height=6.5, fig.width=6.5}
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="agg", Site!="bb") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp + Site, distance="bray", data=svf.otc))
@@ -936,14 +943,16 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*3.5, yend=CAP2*3.5), 
                arrow=arrow(length=unit(0.5, "lines")), color="white")+
   geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars)%>% mutate(Label=names(arrowvars)),
-            aes(x=CAP1*3.6, y=CAP2*3.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=5) +
+            aes(x=CAP1*3.6, y=CAP2*3.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=4) +
   geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2018","2019","2021","","","GNA","Maxfield")),
-            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
-  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=4) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% mutate(Label=greekify(Label)) %>% 
+                    filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
             aes(x=CAP1*1.5, y=CAP2*1.5), size=4, color="black", point.size=NA, box.padding=0)+ 
   scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
   scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
-  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
+  coord_fixed() + theme_bw() + 
+  theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
 lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
@@ -968,7 +977,7 @@ cap.yr.ten %>% select(-c(meta,cap)) %>% unnest(anova) %>%
 
 ### Both years, day
 
-```{r otc_comb_temp_tenD}
+```{r otc_comb_temp_tenD, fig.height=5, fig.width=8}
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="ten", DN=="day") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp, distance="bray", data=svf.otc))
@@ -982,21 +991,23 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*2.5, yend=CAP2*2.5), 
                arrow=arrow(length=unit(0.5, "lines")), color="white")+
   geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars) %>% mutate(Label=names(arrowvars)),
-            aes(x=CAP1*2.6, y=CAP2*2.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=5) +
+            aes(x=CAP1*2.6, y=CAP2*2.6, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,1)), fontface="bold", color="white", size=4) +
   geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2019","2021","","")),
-            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
-  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=4) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% mutate(Label=greekify(Label)) %>% 
+                    filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
             aes(x=CAP1*4, y=CAP2*4), size=4, color="black", point.size=NA, box.padding=0)+ 
   scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
   scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
-  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
+  coord_fixed() + theme_bw() +
+  theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
 lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ### Both years, night
 
-```{r otc_comb_temp_tenN}
+```{r otc_comb_temp_tenN, fig.height=6.5, fig.width=6.5}
 svf.otc <- svf %>% filter(expt=="otc", PlantType=="ten", DN=="night") %>% drop_na(mean_temp_C_treatment)
 vol.otc <- vol[svf.otc$sample,]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ Year + mean_temp_C_treatment + temp, distance="bray", data=svf.otc))
@@ -1007,17 +1018,19 @@ cap.df <- fortify(cap.otc.comb)
 ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) + 
   geom_path(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(group=paste(Year, Site, temp, PlantID)), color="grey60")+
   geom_point(data=cap.df %>% filter(Score=="sites") %>% bind_cols(svf.otc), aes(shape=Year, color=mean_temp_C_treatment), size=3)+
-  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*3, yend=CAP2*3), 
+  geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*2.6, yend=CAP2*2.6), 
                arrow=arrow(length=unit(0.5, "lines")), color="white")+
   geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars) %>% mutate(Label=names(arrowvars)),
-            aes(x=CAP1*3.1, y=CAP2*3.1, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,0)), fontface="bold", color="white", size=5) +
+            aes(x=CAP1*2.7, y=CAP2*2.7, angle=atan(CAP2/CAP1)*180/pi, hjust=c(1,0)), fontface="bold", color="white", size=4) +
   geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("2019","2021","","")),
-            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=5) +
-  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1, y=CAP2), fontface="bold", color="white", size=4) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% mutate(Label=greekify(Label)) %>% 
+                    filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
             aes(x=CAP1*3, y=CAP2*3), size=4, color="black", point.size=NA, box.padding=0)+ 
   scale_color_viridis_c("Temp (\u00B0C)", option="inferno", breaks=seq(0, 60, by=4)) + 
   scale_shape_manual(values=c(`2018`=15,`2019`=19,`2021`=17)) +  labs(x=ax.labs[1], y=ax.labs[2])+
-  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
+  coord_fixed() + theme_bw() + 
+  theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
 lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
@@ -1323,7 +1336,8 @@ vol.plot.treat <- vol.plot %>% filter(expt=="otc", Site!="bb") %>%
          ratio = (estimate[1] + estimate[2]) / estimate[1] ) %>% # warmed/control ratio 
   filter(term=="tempwarmed")
 
-ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType=="agg",Site,as.character(DN)), str_sub(Year,3,4))), y=fct_rev(chem))) + 
+ggplot(vol.plot.treat, aes(x=paste(paste(ifelse(PlantType=="agg",Site,as.character(DN)), str_sub(Year,3,4))), 
+                           y=fct_relabel(fct_rev(chem), greekify))) + 
   facet_wrap(vars(PlantType), scales="free_x", 
              labeller = as_labeller(c(agg="I. aggregata", ten="I. tenuituba")))+
   geom_tile(aes(fill=sign(relchange)* abs(relchange)^(1/3))) + scale_fill_gradient2(midpoint=0, guide="none")  + 
@@ -1374,6 +1388,19 @@ ggplot(vol.plot.temp, aes(x=paste(ifelse(PlantType=="agg",Site,as.character(DN))
   geom_tile(aes(fill=estimate)) + scale_fill_gradient2(guide="none")  + 
   geom_text(aes(label=scales::percent(estimate, accuracy=1), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
   theme_minimal() + theme(panel.grid = element_blank(), strip.text = element_text(face="italic"),
+                          axis.text=element_text(color="black"))
+```
+
+Separate temperature and treatment
+```{r temptreatmapsep, fig.height=6.5, fig.width=6.5}
+bind_rows(vol.plot.temp, vol.plot.treat) %>% mutate(relchange = coalesce(relchange,estimate)) %>% 
+ggplot(aes(x=paste(ifelse(PlantType=="agg",Site,as.character(DN)), str_sub(Year,3,4)), y=fct_relabel(fct_rev(chem), greekify))) + 
+  facet_grid(term ~PlantType, scales="free_x", 
+             labeller = as_labeller(c(agg="I. aggregata", ten="I. tenuituba", 
+                                      mean_temp_C_treatment="(A) Temperature", tempwarmed="(B) Treatment")))+
+  geom_tile(aes(fill=if_else(term =="mean_temp_C_treatment", log10(relchange+1)*5,log10(relchange+1)))) + scale_fill_gradient2(guide="none", limits=c(-1,1), oob=scales::squish)  + 
+  geom_text(aes(label=scales::percent(relchange, accuracy=1, big.mark=""), fontface=as.integer(p.value < 0.05)+1))+ labs(x="",y="")+
+  theme_minimal() + theme(panel.grid = element_blank(), strip.text.x = element_text(face="italic"),
                           axis.text=element_text(color="black"))
 ```
 
