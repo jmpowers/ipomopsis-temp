@@ -34,6 +34,16 @@ knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, knitr.kable.NA 
                       fig.height=5, fig.width=5)
 ```
 
+```{r rename_figs, eval=FALSE}
+figs <- read_tsv("fig_paths.tsv")
+walk2(figs$path, figs$fig, ~system(paste0("cp ", .x, " ./figures/Figure", .y, ".",tools::file_ext(.x))))
+walk2(figs$path, figs$fig, ~system(paste0("inkscape -o ./figures/Figure", .y, ".eps ", .x)))
+```
+
+# Site Map
+
+![SiteMap](./plots/sitemap.jpg)
+
 ```{r read_data}
 # Load in all the Ipomopsis temperature experiment data
 # Includes census, phenology, floral and leaf traits, and seeds
@@ -233,7 +243,7 @@ traitnames <- set_names(c(
 
 ## Timings
 
-```{r timings, fig.height=6}
+```{r timings, fig.width=5,fig.height=4}
 timings <- bind_rows(
   meltdates=meltdates %>% rename(begin=sun_date) %>% mutate(end=begin),
   otc = otc_duration %>% mutate(begin=yday(OTC_start), end=yday(OTC_end)), 
@@ -277,10 +287,9 @@ timings.otc %>% filter(site!="bb", !variable %in% c("meltdates","hobo","otc")) %
                  position = dodging, size=1, show.legend=FALSE) + 
   geom_point(aes(x=begin), position = dodging, size=2)+
   geom_point(aes(x=end), position = dodging, size=2) + 
-  scale_y_discrete(labels=timings_labels)+
+  scale_y_discrete(labels=timings_labels, expand=expansion(mult=c(0,0.08)))+
   labs(color="Year", shape="Site", x="Days after OTCs deployed")+ scale_color_manual(values=year_pal)+
-  theme_minimal() + theme(legend.position = "top", legend.box="vertical",
-                          panel.grid.major.y=element_blank(), axis.title.y=element_blank())
+  theme_bw() + theme(panel.grid.major.y=element_blank(), axis.title.y=element_blank(), axis.text=element_text(color="black"))
 ```
 
 
@@ -333,7 +342,7 @@ all.mean %>% count(site, temp, plotid, plantid) %>% count(site, temp, plotid) %>
 
 # Soil moisture
 
-```{r soilmoisture, fig.height=7, fig.width=7}
+```{r soilmoisture, fig.height=5, fig.width=6}
 ggplot(sm, aes(x=factor(date), y=VWC, color=temp)) + 
   facet_wrap(vars(type, site), scales="free_x", labeller = as_labeller(c(atplant="Next to plant", general="General", sitenames)))+
   geom_boxplot(outlier.size = 0.5)+
@@ -362,12 +371,14 @@ print(paste("Mean difference in VWC across dates and sites (mean +-SD):", round(
 
 ggplot(sm.mean, aes(x=VWC_control, y=VWC_warmed, shape=paste(site, type), color=factor(year))) +
   #facet_wrap(vars(type, site), labeller = as_labeller(c(atplant="Next to plant", general="General", sitenames)))+
-  geom_abline(intercept=0, slope=1)+ geom_smooth(aes(group=1), color="black", se=F)+ geom_point(size=3) + 
+  geom_abline(intercept=0, slope=1)+ geom_smooth(aes(group=1), color="black", se=F, span=0.7)+ geom_point(size=3) + 
   geom_errorbar(aes(ymin=VWC_warmed-SE_warmed, ymax=VWC_warmed+SE_warmed))+
   geom_errorbarh(aes(xmin=VWC_control-SE_control, xmax=VWC_control+SE_control))+
-  coord_fixed(xlim=c(0,17), ylim=c(0,17))+  theme_minimal() + scale_color_manual("Year", values=year_pal)+
+  coord_fixed(xlim=c(0,17), ylim=c(0,17)) + scale_color_manual("Year", values=year_pal)+
   scale_shape_manual("Site, location", values = c(19,1, 17, 2, 15, 0), labels=~str_replace(.x, "atplant","at plant")) + 
-  labs(x="Soil moisture, control (%VWC)", y="Soil moisture, warmed (%VWC)")
+  labs(x="Soil moisture, control (%VWC)", y="Soil moisture, warmed (%VWC)")+
+  theme_bw() + scale_y_continuous(expand=expansion(mult=c(0,0.05)))+scale_x_continuous(expand=expansion(mult=c(0,0.05)))+
+  theme(axis.text = element_text(color="black"))
 ```
 
 # Trait correlations
@@ -398,7 +409,7 @@ ggplot(aes(x=temp, y=value, color=temp)) + #paste(spnames[species], sitenames[si
   scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.05)))+
   scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank())
+        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank(), axis.text=element_text(color="black"))
 
 morph %>% pivot_longer(c(corolla_length, corolla_width)) %>% filter(site=="Maxfield") %>% 
 ggplot(aes(x=temp, y=value, color=temp)) +
@@ -467,7 +478,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.07)))+
   scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank())
+        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank(), axis.text=element_text(color="black"))
 ```
 ```{r seedtraits, fig.width=6.5, fig.height=6.5}
 all.mean %>% pivot_longer(any_of(seedtraits)) %>% 
@@ -483,7 +494,7 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.07)))+
   scale_color_brewer(palette="Set1", direction=-1) + theme_bw() +
   theme(legend.position = "top", axis.title.x=element_blank(), axis.text.x=element_blank(),
-        panel.grid.major.x = element_blank())
+        panel.grid.major.x = element_blank(), axis.ticks.x=element_blank(), axis.text=element_text(color="black"))
 ```
 
 
@@ -747,7 +758,7 @@ bind_rows(
   scale_y_continuous(limits=c(0,NA), expand=expansion(mult=c(0,0.05)))+
   scale_x_continuous(breaks=seq(120,240, by=10))+ geom_vline(xintercept=yday(ymd("2021-06-25")), linetype=2)+
   scale_color_brewer(palette="Set1", direction=-1) + theme_bw()+   
-  theme(legend.position = "top", axis.title.y=element_blank())
+  theme(legend.position = "top", axis.title.y=element_blank(), axis.text=element_text(color="black"))
 ```
 
 

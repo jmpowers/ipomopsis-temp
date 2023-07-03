@@ -1,0 +1,16 @@
+fig	path
+1	plots/otc_comb_temp-1.svg
+2	plots/otc_comb_temp_tenD-1.svg
+3	plots/otc_comb_temp_tenN-1.svg
+4	plots/temptreatmapsep-1.svg
+5	plots-traits/plasticity_multisite-1.svg
+6	plots-traits/plasticity-1.svg
+7	plots-traits/phenology_temp_openeggs-1.svg
+8	plots-traits/seedtraits-1.svg
+S1	plots/sitemap.jpg
+S2	plots-traits/timings-1.svg
+S3	plots-otcs/hobos_mean-3.svg
+S4	plots-traits/soilmoisture-3.svg
+S5	plots/barplots-1.svg
+S6	plots/temptrend-1.svg
+S7	plots/cap_leaf_otc-1.svg

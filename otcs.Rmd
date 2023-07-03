@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: TRUE 
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 <style type="text/css">
 .main-container { max-width: 1000px; margin-left: 0; margin-right: auto; }
@@ -23,7 +23,7 @@ library(tidyverse)
 library(lubridate)
 library(knitr)
 knitr::opts_chunk$set(comment="", cache=T, warning=F, message=F, 
-                      fig.path = "plots-otcs/", dev="png", fig.height=7, fig.width=9)
+                      fig.path = "plots-otcs/", dev="svglite", dev.args=list(fix_text_size=FALSE), fig.height=7, fig.width=9)
 
 ```
 
@@ -67,7 +67,7 @@ sitenames <- c(GNA="Gothic Natural Area",Maxfield="Maxfield Meadow",SC="Spring C
 
 # Raw data
 
-```{r heatmap}
+```{r heatmap, dev="png", dev.args=list()}
 ggplot(drop_na(hobos,temp_C), aes(x=yday(date)+time/24, fill=temp_C, y=paste(year, site, temp, plotid))) + 
   facet_wrap(vars(year), ncol=1, scales="free_y") +
   geom_tile() + scale_fill_viridis_c(option="inferno") +
@@ -88,7 +88,7 @@ hobos %>% filter(year=="2018", site=="GNA", date>=ymd("2018-07-29")) %>% drop_na
 
 # Hourly mean temps
 
-```{r hobos_mean}
+```{r hobos_mean, fig.height=6, fig.width=6}
 hobos.mean <- hobos %>% group_by(year, site, datetime, date, time, temp) %>% 
   summarize(mean_temp_C = mean(temp_C, na.rm=T), mean_intensity_lux = mean(intensity_lux, na.rm=T))%>%
   pivot_wider(names_from=temp, values_from=c(mean_temp_C, mean_intensity_lux)) %>% drop_na(mean_temp_C_warmed) %>% 
@@ -123,7 +123,8 @@ hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_warmed,
                                       y=OTC_diff_C_mean, x=12, color="warmed"))+
   labs(y="Temperature (\u00B0C)", x="Time of day (h)", color="Temperature") +
   scale_color_brewer(palette="Set1", direction=-1, guide="none") +
-  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()
+  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) +
+  theme_minimal() + theme(axis.text = element_text(color="black"))
 
 hobos.mean %>% pivot_longer(mean_intensity_lux_control:mean_intensity_lux_warmed, 
                             names_to="temp", names_prefix="mean_intensity_lux_", values_to="intensity_lux") %>% 

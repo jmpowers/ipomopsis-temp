@@ -1318,12 +1318,12 @@ DNcols <- c("grey90","grey20")
 ggplot(vol.plot %>% drop_na(PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=paste(Site, Year),y=area,  fill=DN, color=paste(Treat))) +
   geom_boxplot(size=0.7, outlier.size=0.7, position=position_dodge2(preserve="total")) + 
-  facet_wrap(vars(chem), scales="free_y") + 
-  scale_y_sqrt("Emissions (ng/flower/hr)") + 
+  facet_wrap(vars(chem), scales="free_y", labeller=as_labeller(greekify)) + 
+  scale_y_sqrt("Emissions (ng/flower/hr)", expand=expansion(mult=c(0,0.05))) + 
   scale_color_brewer("Treatment", palette = "Set1", direction=-1)+
-  scale_x_discrete("Site, year")+
   scale_fill_manual("Time of day",values=DNcols) + 
-  theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))
+  theme_bw() + theme(axis.text.x=element_text(angle=20, vjust=0.5), legend.position = "top", axis.text=element_text(color="black"),
+                     axis.title.x=element_blank(), panel.grid.major.x=element_blank())
 ```
 
 Mean change in warming treatment relative to controls.
@@ -1357,13 +1357,13 @@ lmer(indole~temp+(1|PlantID), data = filter(cbind(vol,svf), expt=="otc", PlantTy
 ```{r temptrend, fig.width=10, fig.height=9}
 ggplot(drop_na(vol.plot, PlantType, expt) %>% filter(expt=="otc", Site!="bb"),#TODO track down NAs
        aes(x=mean_temp_C_treatment, y=area, shape=DN, color=paste(PlantType, Site, Year))) +
-  geom_point() + geom_smooth(se=F, method="loess", span=1)+ 
-  facet_wrap(vars(chem), scales="free_y") + 
-  scale_y_sqrt("Emissions (ng/flower/hr)") + 
+  geom_point(size=1) + geom_smooth(se=F, method="loess", span=1.2)+ 
+  facet_wrap(vars(chem), scales="free_y", labeller=as_labeller(greekify)) + 
+  scale_y_sqrt("Emissions (ng/flower/hr)", expand=expansion(mult=c(0,0.05))) + 
   scale_x_continuous("Mean temperature in controls or OTCs (\u00B0C)")+
   scale_color_brewer("Species, site, year", palette = "Dark2", direction=-1)+#scale_color_manual("Species", values=spcols) + 
   scale_shape_manual("Time of day",values=c(1,19)) + 
-  theme_minimal() + theme(axis.text.x=element_text(angle=20, vjust=0.5))
+  theme_bw() + theme(legend.position = "top", axis.text=element_text(color="black"))
 
 vol.plot %>% filter(expt=="otc", Site!="bb") %>% drop_na(mean_temp_C_treatment) %>% 
   group_by(chem, PlantType, Site, Year, DN) %>% select(mean_temp_C_treatment, area) %>% nest() %>% 
@@ -1602,7 +1602,7 @@ text(nmds.vol_leaf, display="species", cex=0.7, col="grey20")
 
 ## CAP - OTCs
 
-```{r cap_leaf_otc}
+```{r cap_leaf_otc, fig.height=5, fig.width=6.5}
 svf.otc <- svl %>% filter(expt=="otc")
 vol.otc <- vol.leaf[svl$expt=="otc",]
 (cap.otc.comb <- capscale(sqrt(vol.otc) ~ PlantType + temp, distance="bray", data=svf.otc)) #can't test temp, missing data
@@ -1615,15 +1615,17 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   geom_segment(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars), aes(x=0,y=0,xend=CAP1*1.2, yend=CAP2*1.2), 
                arrow=arrow(length=unit(0.5, "lines")), color="white")+
   geom_text(data=cap.df %>% filter(Score=="biplot", Label %in% arrowvars[2]) %>% mutate(Label=names(arrowvars[2])),
-            aes(x=CAP1*1.3, y=CAP2*1.3, angle=atan(CAP2/CAP1)*180/pi, hjust=1), fontface="bold", color="white", size=5) +
-  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("aggregata","tenuituba","","")),
-            aes(x=CAP1, y=CAP2), fontface=4, color="white", size=5) +
-  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
+            aes(x=CAP1*1.3, y=CAP2*1.3, angle=atan(CAP2/CAP1)*180/pi, hjust=1), fontface="bold", color="white", size=4) +
+  geom_text(data=cap.df %>% filter(Score=="centroids") %>% mutate(Label=c("I. aggregata","I. tenuituba","","")),
+            aes(x=CAP1, y=CAP2), fontface=4, color="white", size=4) +
+  geom_text_repel(data=cap.df %>% left_join(ipochems, by=c("Label"="name")) %>% mutate(Label=greekify(Label)) %>% 
+                    filter(Score=="species", sqrt(CAP1^2+CAP2^2)>0.2), 
             aes(x=CAP1*3.2, y=CAP2*3.2), size=4, color="black", point.size=NA, box.padding=0)+ 
   scale_color_manual("Treatment", values=tempcol) +  
   scale_shape_manual("Species", values=c(19,15), labels=c(expression(italic("I. aggregata")),expression(italic("I. tenuituba")))) + 
   labs(x=ax.labs[1], y=ax.labs[2])+
-  coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
+  coord_fixed() + theme_bw() + 
+  theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
 lmer(sqrt(Total) ~ PlantType + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```

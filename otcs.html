@@ -11,11 +11,11 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-01-26" />
+<meta name="date" content="2023-06-29" />
 
 <title>OTC performance - Ipomopsis temperature experiments</title>
 
-<script src="libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="libs/header-attrs-2.20/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -110,8 +110,8 @@ pre code {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -119,16 +119,9 @@ pre code {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -261,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-01-26</h4>
+<h4 class="date">2023-06-29</h4>
 
 </div>
 
@@ -294,6 +287,314 @@ hobometa %&gt;% count(site, year, plotid, temp) %&gt;% pivot_wider(names_from=te
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2018</td>
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2018</td>
+<td align="left">B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2018</td>
+<td align="left">C</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2018</td>
+<td align="left">D</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2018</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2019</td>
+<td align="left">V</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2019</td>
+<td align="left">W</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2019</td>
+<td align="left">X</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2019</td>
+<td align="left">Y</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2019</td>
+<td align="left">Z</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">K</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">L</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">M</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">N</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">P</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">PQ</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">Q</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GNA</td>
+<td align="right">2021</td>
+<td align="left">R</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">1B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">1C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">2A</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">2B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">3A</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">3B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">3D</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">4B</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">4C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">5B</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">5D</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">6A</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Maxfield</td>
+<td align="right">2021</td>
+<td align="left">6C</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2019</td>
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2019</td>
+<td align="left">B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2019</td>
+<td align="left">D</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2019</td>
+<td align="left">E</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">B</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">C</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">E</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">F</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">H</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">SC</td>
+<td align="right">2021</td>
+<td align="left">I</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
 <tr class="odd">
 <td align="left">bb</td>
 <td align="right">2018</td>
@@ -329,314 +630,6 @@ hobometa %&gt;% count(site, year, plotid, temp) %&gt;% pivot_wider(names_from=te
 <td align="right">1</td>
 <td align="right">1</td>
 </tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2018</td>
-<td align="left">A</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2018</td>
-<td align="left">B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2018</td>
-<td align="left">C</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2018</td>
-<td align="left">D</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2018</td>
-<td align="left">E</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2019</td>
-<td align="left">V</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2019</td>
-<td align="left">W</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2019</td>
-<td align="left">X</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2019</td>
-<td align="left">Y</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2019</td>
-<td align="left">Z</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">K</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">L</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">M</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">N</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">P</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">PQ</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">Q</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">GNA</td>
-<td align="right">2021</td>
-<td align="left">R</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">1B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">1C</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">2A</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">2B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">3A</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">3B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">3D</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">4B</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">4C</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">5B</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">5D</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">6A</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">Maxfield</td>
-<td align="right">2021</td>
-<td align="left">6C</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2019</td>
-<td align="left">A</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2019</td>
-<td align="left">B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2019</td>
-<td align="left">D</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2019</td>
-<td align="left">E</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">A</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">B</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">C</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">D</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">E</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">F</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">G</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">H</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">SC</td>
-<td align="right">2021</td>
-<td align="left">I</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
 </tbody>
 </table>
 <pre class="r"><code>hobometa %&gt;% count(site, year, temp) %&gt;% pivot_wider(names_from=temp, values_from=n, values_fill=0) %&gt;% kable(caption=&quot;Loggers per treatment&quot;)</code></pre>
@@ -652,46 +645,46 @@ hobometa %&gt;% count(site, year, plotid, temp) %&gt;% pivot_wider(names_from=te
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">bb</td>
-<td align="right">2018</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
 <td align="left">GNA</td>
 <td align="right">2018</td>
 <td align="right">4</td>
 <td align="right">5</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">GNA</td>
 <td align="right">2019</td>
 <td align="right">5</td>
 <td align="right">4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">GNA</td>
 <td align="right">2021</td>
 <td align="right">3</td>
 <td align="right">7</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Maxfield</td>
 <td align="right">2021</td>
 <td align="right">4</td>
 <td align="right">12</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">SC</td>
 <td align="right">2019</td>
 <td align="right">4</td>
 <td align="right">4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">SC</td>
 <td align="right">2021</td>
 <td align="right">7</td>
 <td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">bb</td>
+<td align="right">2018</td>
+<td align="right">4</td>
+<td align="right">4</td>
 </tr>
 </tbody>
 </table>
@@ -735,7 +728,7 @@ sitenames &lt;- c(GNA=&quot;Gothic Natural Area&quot;,Maxfield=&quot;Maxfield Me
   facet_wrap(vars(site))+
   geom_path() +  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) + theme_minimal()+
   labs(x=&quot;Date&quot;, y=&quot;Temperature (\u00B0C)&quot;, color=&quot;Temperature&quot;) + scale_x_datetime(date_breaks=&quot;1 day&quot;)</code></pre>
-<p><img src="plots-otcs/lineplot-1.png" width="864" /></p>
+<p><img src="plots-otcs/lineplot-1.svg" width="864" /></p>
 </div>
 <div id="hourly-mean-temps" class="section level1">
 <h1>Hourly mean temps</h1>
@@ -841,14 +834,14 @@ hobos.mean.mean %&gt;% kable(caption=&quot;Mean temperatures across season in ea
   geom_point(size=0.5) + geom_abline(slope=1, intercept=0, color=&quot;white&quot;) + coord_fixed() +
   scale_color_viridis_c(option=&quot;magma&quot;) + geom_smooth(se=F, color=&quot;pink&quot;, span=0.2) + theme_dark() +
   labs(title = &quot;Average Hourly Temp Comparison (Scatter)&quot;)</code></pre>
-<p><img src="plots-otcs/hobos_mean-1.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_mean-1.svg" width="576" /></p>
 <pre class="r"><code>ggplot(hobos.mean, aes(x=time, y=OTC_diff_C))+
   facet_wrap(vars(year, site), labeller = as_labeller(c(sitenames, set_names(2018:2021))))+
   geom_line(aes(group=date),size=0.5, alpha=0.2) +
   geom_smooth(se=F, color=&quot;black&quot;, span=0.15, method=&quot;loess&quot;) + 
   labs(x=&quot;Time of day (h)&quot;, y=&quot;Temperature difference (\u00B0C)&quot;) + 
   scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_mean-2.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_mean-2.svg" width="576" /></p>
 <pre class="r"><code>hobos.mean %&gt;% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, 
                             names_to=&quot;temp&quot;, names_prefix=&quot;mean_temp_C_&quot;, values_to=&quot;temp_C&quot;) %&gt;% 
   ggplot(aes(x=time, y=temp_C, color=temp)) + 
@@ -859,8 +852,9 @@ hobos.mean.mean %&gt;% kable(caption=&quot;Mean temperatures across season in ea
                                       y=OTC_diff_C_mean, x=12, color=&quot;warmed&quot;))+
   labs(y=&quot;Temperature (\u00B0C)&quot;, x=&quot;Time of day (h)&quot;, color=&quot;Temperature&quot;) +
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) +
-  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_mean-3.png" width="864" /></p>
+  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) +
+  theme_minimal() + theme(axis.text = element_text(color=&quot;black&quot;))</code></pre>
+<p><img src="plots-otcs/hobos_mean-3.svg" width="576" /></p>
 <pre class="r"><code>hobos.mean %&gt;% pivot_longer(mean_intensity_lux_control:mean_intensity_lux_warmed, 
                             names_to=&quot;temp&quot;, names_prefix=&quot;mean_intensity_lux_&quot;, values_to=&quot;intensity_lux&quot;) %&gt;% 
   ggplot(aes(x=time, y=intensity_lux, color=temp, group=date)) + 
@@ -870,7 +864,7 @@ hobos.mean.mean %&gt;% kable(caption=&quot;Mean temperatures across season in ea
   labs(y=&quot;Light intensity (lux)&quot;, x=&quot;Time of day (h)&quot;, color=&quot;Temperature&quot;) +
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) +
   scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) + theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_mean-4.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_mean-4.svg" width="576" /></p>
 <pre class="r"><code>library(colorspace)
 circlecol &lt;- hex(polarLAB(70, 60, seq(0, 2*pi, length.out = 20)*180/pi), fixup=T)
 ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(datetime)+minute(datetime)/60)) + 
@@ -879,7 +873,7 @@ ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(da
   scale_color_gradientn(colors=circlecol) +
   labs(x=&quot;Mean light intensity at controls (lux)&quot;, y=&quot;Mean temperature difference OTCs - controls (\u00B0C)&quot;, color=&quot;Hour&quot;,
        title = &quot;Temp vs. Light at different times of day&quot;)+ theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_mean-5.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_mean-5.svg" width="576" /></p>
 </div>
 <div id="daily-minmax-temps" class="section level1">
 <h1>Daily min/max temps</h1>
@@ -897,12 +891,12 @@ ggplot(hobos.minmax, aes(x=yday(date), y=value, color=temp)) +
   labs(y=&quot;Temperature (\u00B0C)&quot;, x=&quot;Date&quot;,  color=&quot;Temperature&quot;) +
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) + scale_y_continuous(n.breaks=10) +
   labs(title = &quot;Min and Max Daily Temp across Season&quot;) + theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_minmax-1.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_minmax-1.svg" width="864" /></p>
 <pre class="r"><code>ggplot(hobos.max.date.long, aes(x=control, y=OTC_diff_C)) + 
   geom_point() + geom_smooth(span=0.6, se=F, color=&quot;black&quot;) + geom_hline(yintercept=0) +
   labs(y = &quot;Maximum temperature difference (\u00B0C)&quot;, x=&quot;Maximum temperature in controls (\u00B0C)&quot;, 
        title=&quot;OTC effect on daily maximum temperature&quot;) + theme_minimal()</code></pre>
-<p><img src="plots-otcs/hobos_minmax-2.png" width="864" /></p>
+<p><img src="plots-otcs/hobos_minmax-2.svg" width="864" /></p>
 <pre class="r"><code>hobos.max.diff &lt;- hobos.max.date.long %&gt;% group_by(year, site) %&gt;% 
   summarize(OTC_diff_C.mean = mean(OTC_diff_C),
             OTC_diff_C.sd = sd(OTC_diff_C))
@@ -970,7 +964,7 @@ ggplot(hobos.max.vsmean, aes(x=control, y=diff_C, color=temp)) +
                                      y=OTC_diff_C.mean, x=17, color=&quot;warmed&quot;))+
   scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) + theme_minimal() + 
   labs(x=&quot;Daily maximum temperature in controls (\u00B0C)&quot;, y=&quot;Difference in daily maximum temperature (\u00B0C)&quot;, color=&quot;Temperature&quot;)</code></pre>
-<p><img src="plots-otcs/variation-1.png" width="864" /></p>
+<p><img src="plots-otcs/variation-1.svg" width="864" /></p>
 <pre class="r"><code>library(ggExtra)
 p &lt;- ggplot(hobos.max.vsmean %&gt;% filter(temp==&quot;warmed&quot;), aes(x=control, y=diff_C, color=paste(year, sitenames[site]))) + 
   geom_point(size=0.5, show.legend=F) + geom_hline(yintercept=0)+
@@ -980,7 +974,7 @@ p &lt;- ggplot(hobos.max.vsmean %&gt;% filter(temp==&quot;warmed&quot;), aes(x=c
   labs(x=&quot;Mean daily maximum ambient temperature (\u00B0C)&quot;, y=&quot;Difference in daily maximum temperature (\u00B0C)&quot;, color=&quot;&quot;)
 ggExtra::ggMarginal(p, fill=&quot;white&quot;, groupColour = T, xparams=list(bw=1.5, size=1), yparams=list(bw=0.8, size=1)) %&gt;% 
   print(newpage=T)</code></pre>
-<p><img src="plots-otcs/variation-2.png" width="864" /></p>
+<p><img src="plots-otcs/variation-2.svg" width="864" /></p>
 </div>
 
 
