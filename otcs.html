@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-06-29" />
+<meta name="date" content="2023-07-24" />
 
 <title>OTC performance - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-06-29</h4>
+<h4 class="date">2023-07-24</h4>
 
 </div>
 
@@ -874,6 +874,16 @@ ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(da
   labs(x=&quot;Mean light intensity at controls (lux)&quot;, y=&quot;Mean temperature difference OTCs - controls (\u00B0C)&quot;, color=&quot;Hour&quot;,
        title = &quot;Temp vs. Light at different times of day&quot;)+ theme_minimal()</code></pre>
 <p><img src="plots-otcs/hobos_mean-5.svg" width="576" /></p>
+<pre class="r"><code>hobos.mean %&gt;% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, 
+                            names_to=&quot;temp&quot;, names_prefix=&quot;mean_temp_C_&quot;, values_to=&quot;temp_C&quot;) %&gt;% 
+  ggplot(aes(x=time, y=temp_C, color=temp)) + 
+  geom_line(aes(group=paste(date, site, year, temp)),size=0.3, alpha=0.05) +
+  geom_smooth(aes(group=temp), se=F, span=0.15, method=&quot;loess&quot;, size=1) +
+  labs(y=&quot;Temperature (\u00B0C)&quot;, x=&quot;Time of day (h)&quot;, color=&quot;Temperature&quot;) +
+  scale_color_brewer(palette=&quot;Set1&quot;, direction=-1, guide=&quot;none&quot;) +
+  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) +
+  theme_minimal() + theme(axis.text = element_text(color=&quot;black&quot;))</code></pre>
+<p><img src="plots-otcs/hobos_mean_all-1.svg" width="288" /></p>
 </div>
 <div id="daily-minmax-temps" class="section level1">
 <h1>Daily min/max temps</h1>

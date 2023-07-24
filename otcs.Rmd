@@ -145,6 +145,18 @@ ggplot(hobos.mean, aes(x=mean_intensity_lux_control, y=OTC_diff_C, color=hour(da
   labs(x="Mean light intensity at controls (lux)", y="Mean temperature difference OTCs - controls (\u00B0C)", color="Hour",
        title = "Temp vs. Light at different times of day")+ theme_minimal()
 ```
+```{r hobos_mean_all, fig.height=3, fig.width=3}
+hobos.mean %>% pivot_longer(mean_temp_C_control:mean_temp_C_warmed, 
+                            names_to="temp", names_prefix="mean_temp_C_", values_to="temp_C") %>% 
+  ggplot(aes(x=time, y=temp_C, color=temp)) + 
+  geom_line(aes(group=paste(date, site, year, temp)),size=0.3, alpha=0.05) +
+  geom_smooth(aes(group=temp), se=F, span=0.15, method="loess", size=1) +
+  labs(y="Temperature (\u00B0C)", x="Time of day (h)", color="Temperature") +
+  scale_color_brewer(palette="Set1", direction=-1, guide="none") +
+  scale_y_continuous(n.breaks=8) + scale_x_continuous(breaks=seq(0,23, by=4)) +
+  theme_minimal() + theme(axis.text = element_text(color="black"))
+```
+
 
 # Daily min/max temps
 
