@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: TRUE 
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 <style type="text/css">
 .main-container { max-width: 1000px; margin-left: 0; margin-right: auto; }
@@ -26,6 +26,7 @@ library(lme4)
 library(lmerTest)
 library(emmeans)
 library(broom)
+library(broom.mixed)
 library(viridis)
 library(ggsignif)
 library(RColorBrewer)
@@ -174,6 +175,11 @@ write.csv(sds, "data/2021_Maxfield_sds.csv")
 vt <- read_csv("data/volatiles/CWu_meta21.csv") %>% 
   rename(date=Date, site=Site, VWC=SoilVWC, notes=Notes) %>% 
   mutate(year=year(date)) %>% filter(Expt=="otc", temp !="air", site != "bb")
+
+svfl <- read_csv("data/volatiles/svf_svl.csv") %>% #final filtering for stats, both flowers and leaves
+  rename(site=Site, VWC=SoilVWC, plantid=PlantID, species=PlantType, total_vols=TotalVols) %>%
+  mutate(plantid = paste(species, plantid)) %>% 
+  mutate(year=factor(year(date))) %>% filter(Expt=="otc", temp !="air", site != "bb")
 
 # soilmoisture ---------------------------------------------------------------
 
@@ -519,7 +525,12 @@ lmer(redness     ~temp*snow+(1|plotid)+(1|plantid), data=flrcol) %>% anova %>%
 
 ```{r temp}
 temp.mod <- tribble(
-  ~trait,          ~species,         ~model,
+  ~trait,        ~species,  ~model,
+  "total_vols",    "aggD", lmer(total_vols    ~temp+site+year+(1|plantid), data=filter(svfl, type=="floral", species=="agg")),
+  "total_vols",    "tenD", lmer(total_vols    ~temp+year+(1|plantid), data=filter(svfl, type=="floral", species=="ten", DN=="day")),
+  "total_vols",    "tenN", lmer(total_vols    ~temp+year+(1|plantid), data=filter(svfl, type=="floral", species=="ten", DN=="night")),
+  "total_vols_leaf","leafD", lm(total_vols    ~temp+species, 
+                                  data=mutate(filter(svfl, type=="leaf"), total_vols=total_vols/1000)),#g to mg biomass
   "corolla_length", "agg", lmer(corolla_length~temp+site+(1|plantid), data=filter(morph, species=="agg")),
   "corolla_length", "ten", lmer(corolla_length~temp+(1|plantid), data=filter(morph, species=="ten")),
   "corolla_width",  "agg", lmer(corolla_width ~temp+site+(1|plantid), data=filter(morph, species=="agg")),
@@ -527,16 +538,31 @@ temp.mod <- tribble(
   "nectar_volume",  "agg", lmer(nectar_volume ~temp+(1|plantid),data=nectar),
   "nectar_conc",    "agg", lmer(nectar_conc   ~temp+(1|plantid),data=nectar),
   "redness",        "agg", lmer(redness       ~temp+(1|plantid), data=flrcol),
-  "height_cm",      "agg", lm(height_cm       ~temp, data=phen.max)) %>% 
+  "height_cm",      "agg", lm(height_cm       ~temp, data=phen.max),
+  "openbuds",       "agg", lmer(I(open+buds)  ~temp*date + (1|plantid), data=mutate(filter(phen.raw, date!="2021-06-23"), date=factor(date))),
+  "eggs_per_flower","agg",lmer(eggs_per_flower~temp*date + (1|plantid), data=mutate(filter(phen.raw, date!="2021-06-23"), date=factor(date)))) %>% 
+  bind_rows(tibble(trait=seedtraits[-1], species="agg") %>% 
+              mutate(model = map(trait, ~lm(formula(paste(.x, "~ temp")), data = sds)))) %>% 
   mutate(test = map(model, ~tidy(anova(.x))), 
-         emm = map(model, ~tidy(emmeans(.x, ~ temp))))
+         emm = map(model, ~tidy(emmeans(.x, ~ temp))),
+         data = map(model, model.frame),
+         n_plants = map_int(data, ~nlevels(.x$plantid)),
+         n_samples = map_int(data, nrow))
 
-temp.mod %>% select(trait, species, emm) %>% unnest(emm) %>% 
-  pivot_wider(names_from = temp, values_from=estimate, id_cols=c(trait, species)) %>% 
-  mutate(change=(warmed-control)/control) %>% 
-  left_join(temp.mod %>% select(trait, species, test) %>% unnest(test) %>% filter(term=="temp")) %>% 
-  select(species, trait, control, warmed, change, p.value) %>% 
-  kable(caption="treatment effects, accounting for aggregata site", digits=3)
+temp.mod %>% select(-model,-test,-data) %>% unnest(emm) %>% 
+  pivot_wider(names_from = temp, values_from=c(estimate, std.error), id_cols=c(trait, species)) %>% 
+  mutate(change=(estimate_warmed-estimate_control)/estimate_control) %>% 
+  left_join(temp.mod %>% select(-model,-emm,-data) %>% unnest(test) %>% filter(term!="Residuals")) %>% 
+  select(trait, species, term, NumDF, DenDF, F.value=statistic, p.value, n_plants, n_samples,
+         estimate_control, std.error_control, estimate_warmed, std.error_warmed, change) %>% 
+  mutate(trait = c(set_names(str_replace(traitnames.units,"\n"," "), names(traitnames.units)),
+                   total_vols="Total volatile emissions (ng/flower/hr)",
+                   total_vols_leaf = "Total volatile emissions (ng/mg/hr)",
+                   openbuds = "Open flowers and elongated buds",
+                   eggs_per_flower = "Eggs per flower")[trait], 
+         species = c(spnames, aggD="I. aggregata day", 
+                     tenD="I. tenuituba day", tenN = "I. tenuituba night", leafD="Leaves day")[species], 
+         term = recode(term, temp="Treatment", site="Site", year="Year", species="Species", date="Date",`temp:date`="Date \U00D7 Trt")) %>% kable(digits=3)
 ```
 
 # Flower color

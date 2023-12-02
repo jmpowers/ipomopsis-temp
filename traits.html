@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-06-30" />
+<meta name="date" content="2023-12-01" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-06-30</h4>
+<h4 class="date">2023-12-01</h4>
 
 </div>
 
@@ -402,6 +402,11 @@ write.csv(sds, &quot;data/2021_Maxfield_sds.csv&quot;)
 vt &lt;- read_csv(&quot;data/volatiles/CWu_meta21.csv&quot;) %&gt;% 
   rename(date=Date, site=Site, VWC=SoilVWC, notes=Notes) %&gt;% 
   mutate(year=year(date)) %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, site != &quot;bb&quot;)
+
+svfl &lt;- read_csv(&quot;data/volatiles/svf_svl.csv&quot;) %&gt;% #final filtering for stats, both flowers and leaves
+  rename(site=Site, VWC=SoilVWC, plantid=PlantID, species=PlantType, total_vols=TotalVols) %&gt;%
+  mutate(plantid = paste(species, plantid)) %&gt;% 
+  mutate(year=factor(year(date))) %&gt;% filter(Expt==&quot;otc&quot;, temp !=&quot;air&quot;, site != &quot;bb&quot;)
 
 # soilmoisture ---------------------------------------------------------------
 
@@ -1555,7 +1560,12 @@ ggplot(aes(x=temp, y=value, color=temp)) +
 <div id="effect-of-temperature" class="section level1">
 <h1>Effect of temperature</h1>
 <pre class="r"><code>temp.mod &lt;- tribble(
-  ~trait,          ~species,         ~model,
+  ~trait,        ~species,  ~model,
+  &quot;total_vols&quot;,    &quot;aggD&quot;, lmer(total_vols    ~temp+site+year+(1|plantid), data=filter(svfl, type==&quot;floral&quot;, species==&quot;agg&quot;)),
+  &quot;total_vols&quot;,    &quot;tenD&quot;, lmer(total_vols    ~temp+year+(1|plantid), data=filter(svfl, type==&quot;floral&quot;, species==&quot;ten&quot;, DN==&quot;day&quot;)),
+  &quot;total_vols&quot;,    &quot;tenN&quot;, lmer(total_vols    ~temp+year+(1|plantid), data=filter(svfl, type==&quot;floral&quot;, species==&quot;ten&quot;, DN==&quot;night&quot;)),
+  &quot;total_vols_leaf&quot;,&quot;leafD&quot;, lm(total_vols    ~temp+species, 
+                                  data=mutate(filter(svfl, type==&quot;leaf&quot;), total_vols=total_vols/1000)),#g to mg biomass
   &quot;corolla_length&quot;, &quot;agg&quot;, lmer(corolla_length~temp+site+(1|plantid), data=filter(morph, species==&quot;agg&quot;)),
   &quot;corolla_length&quot;, &quot;ten&quot;, lmer(corolla_length~temp+(1|plantid), data=filter(morph, species==&quot;ten&quot;)),
   &quot;corolla_width&quot;,  &quot;agg&quot;, lmer(corolla_width ~temp+site+(1|plantid), data=filter(morph, species==&quot;agg&quot;)),
@@ -1563,92 +1573,578 @@ ggplot(aes(x=temp, y=value, color=temp)) +
   &quot;nectar_volume&quot;,  &quot;agg&quot;, lmer(nectar_volume ~temp+(1|plantid),data=nectar),
   &quot;nectar_conc&quot;,    &quot;agg&quot;, lmer(nectar_conc   ~temp+(1|plantid),data=nectar),
   &quot;redness&quot;,        &quot;agg&quot;, lmer(redness       ~temp+(1|plantid), data=flrcol),
-  &quot;height_cm&quot;,      &quot;agg&quot;, lm(height_cm       ~temp, data=phen.max)) %&gt;% 
+  &quot;height_cm&quot;,      &quot;agg&quot;, lm(height_cm       ~temp, data=phen.max),
+  &quot;openbuds&quot;,       &quot;agg&quot;, lmer(I(open+buds)  ~temp*date + (1|plantid), data=mutate(filter(phen.raw, date!=&quot;2021-06-23&quot;), date=factor(date))),
+  &quot;eggs_per_flower&quot;,&quot;agg&quot;,lmer(eggs_per_flower~temp*date + (1|plantid), data=mutate(filter(phen.raw, date!=&quot;2021-06-23&quot;), date=factor(date)))) %&gt;% 
+  bind_rows(tibble(trait=seedtraits[-1], species=&quot;agg&quot;) %&gt;% 
+              mutate(model = map(trait, ~lm(formula(paste(.x, &quot;~ temp&quot;)), data = sds)))) %&gt;% 
   mutate(test = map(model, ~tidy(anova(.x))), 
-         emm = map(model, ~tidy(emmeans(.x, ~ temp))))
+         emm = map(model, ~tidy(emmeans(.x, ~ temp))),
+         data = map(model, model.frame),
+         n_plants = map_int(data, ~nlevels(.x$plantid)),
+         n_samples = map_int(data, nrow))
 
-temp.mod %&gt;% select(trait, species, emm) %&gt;% unnest(emm) %&gt;% 
-  pivot_wider(names_from = temp, values_from=estimate, id_cols=c(trait, species)) %&gt;% 
-  mutate(change=(warmed-control)/control) %&gt;% 
-  left_join(temp.mod %&gt;% select(trait, species, test) %&gt;% unnest(test) %&gt;% filter(term==&quot;temp&quot;)) %&gt;% 
-  select(species, trait, control, warmed, change, p.value) %&gt;% 
-  kable(caption=&quot;treatment effects, accounting for aggregata site&quot;, digits=3)</code></pre>
-<table>
-<caption>treatment effects, accounting for aggregata site</caption>
+temp.mod %&gt;% select(-model,-test,-data) %&gt;% unnest(emm) %&gt;% 
+  pivot_wider(names_from = temp, values_from=c(estimate, std.error), id_cols=c(trait, species)) %&gt;% 
+  mutate(change=(estimate_warmed-estimate_control)/estimate_control) %&gt;% 
+  left_join(temp.mod %&gt;% select(-model,-emm,-data) %&gt;% unnest(test) %&gt;% filter(term!=&quot;Residuals&quot;)) %&gt;% 
+  select(trait, species, term, NumDF, DenDF, F.value=statistic, p.value, n_plants, n_samples,
+         estimate_control, std.error_control, estimate_warmed, std.error_warmed, change) %&gt;% 
+  mutate(trait = c(set_names(str_replace(traitnames.units,&quot;\n&quot;,&quot; &quot;), names(traitnames.units)),
+                   total_vols=&quot;Total volatile emissions (ng/flower/hr)&quot;,
+                   total_vols_leaf = &quot;Total volatile emissions (ng/mg/hr)&quot;,
+                   openbuds = &quot;Open flowers and elongated buds&quot;,
+                   eggs_per_flower = &quot;Eggs per flower&quot;)[trait], 
+         species = c(spnames, aggD=&quot;I. aggregata day&quot;, 
+                     tenD=&quot;I. tenuituba day&quot;, tenN = &quot;I. tenuituba night&quot;, leafD=&quot;Leaves day&quot;)[species], 
+         term = recode(term, temp=&quot;Treatment&quot;, site=&quot;Site&quot;, year=&quot;Year&quot;, species=&quot;Species&quot;, date=&quot;Date&quot;,`temp:date`=&quot;Date \U00D7 Trt&quot;)) %&gt;% kable(digits=3)</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="20%" />
+<col width="9%" />
+<col width="5%" />
+<col width="3%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+<col width="8%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="3%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th align="left">species</th>
 <th align="left">trait</th>
-<th align="right">control</th>
-<th align="right">warmed</th>
-<th align="right">change</th>
+<th align="left">species</th>
+<th align="left">term</th>
+<th align="right">NumDF</th>
+<th align="right">DenDF</th>
+<th align="right">F.value</th>
 <th align="right">p.value</th>
+<th align="right">n_plants</th>
+<th align="right">n_samples</th>
+<th align="right">estimate_control</th>
+<th align="right">std.error_control</th>
+<th align="right">estimate_warmed</th>
+<th align="right">std.error_warmed</th>
+<th align="right">change</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">agg</td>
-<td align="left">corolla_length</td>
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. aggregata day</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">132.675</td>
+<td align="right">0.104</td>
+<td align="right">0.747</td>
+<td align="right">153</td>
+<td align="right">203</td>
+<td align="right">87.268</td>
+<td align="right">18.743</td>
+<td align="right">93.717</td>
+<td align="right">17.303</td>
+<td align="right">0.074</td>
+</tr>
+<tr class="even">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. aggregata day</td>
+<td align="left">Site</td>
+<td align="right">1</td>
+<td align="right">99.554</td>
+<td align="right">0.908</td>
+<td align="right">0.343</td>
+<td align="right">153</td>
+<td align="right">203</td>
+<td align="right">87.268</td>
+<td align="right">18.743</td>
+<td align="right">93.717</td>
+<td align="right">17.303</td>
+<td align="right">0.074</td>
+</tr>
+<tr class="odd">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. aggregata day</td>
+<td align="left">Year</td>
+<td align="right">2</td>
+<td align="right">172.102</td>
+<td align="right">5.743</td>
+<td align="right">0.004</td>
+<td align="right">153</td>
+<td align="right">203</td>
+<td align="right">87.268</td>
+<td align="right">18.743</td>
+<td align="right">93.717</td>
+<td align="right">17.303</td>
+<td align="right">0.074</td>
+</tr>
+<tr class="even">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. tenuituba day</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">89.000</td>
+<td align="right">2.280</td>
+<td align="right">0.135</td>
+<td align="right">61</td>
+<td align="right">92</td>
+<td align="right">160.841</td>
+<td align="right">34.366</td>
+<td align="right">224.921</td>
+<td align="right">31.586</td>
+<td align="right">0.398</td>
+</tr>
+<tr class="odd">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. tenuituba day</td>
+<td align="left">Year</td>
+<td align="right">1</td>
+<td align="right">89.000</td>
+<td align="right">0.359</td>
+<td align="right">0.551</td>
+<td align="right">61</td>
+<td align="right">92</td>
+<td align="right">160.841</td>
+<td align="right">34.366</td>
+<td align="right">224.921</td>
+<td align="right">31.586</td>
+<td align="right">0.398</td>
+</tr>
+<tr class="even">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. tenuituba night</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">59.382</td>
+<td align="right">0.245</td>
+<td align="right">0.622</td>
+<td align="right">58</td>
+<td align="right">83</td>
+<td align="right">495.035</td>
+<td align="right">111.211</td>
+<td align="right">425.752</td>
+<td align="right">99.265</td>
+<td align="right">-0.140</td>
+</tr>
+<tr class="odd">
+<td align="left">Total volatile emissions (ng/flower/hr)</td>
+<td align="left">I. tenuituba night</td>
+<td align="left">Year</td>
+<td align="right">1</td>
+<td align="right">66.460</td>
+<td align="right">5.684</td>
+<td align="right">0.020</td>
+<td align="right">58</td>
+<td align="right">83</td>
+<td align="right">495.035</td>
+<td align="right">111.211</td>
+<td align="right">425.752</td>
+<td align="right">99.265</td>
+<td align="right">-0.140</td>
+</tr>
+<tr class="even">
+<td align="left">Total volatile emissions (ng/mg/hr)</td>
+<td align="left">Leaves day</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1.093</td>
+<td align="right">0.304</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">17.189</td>
+<td align="right">4.018</td>
+<td align="right">21.520</td>
+<td align="right">3.699</td>
+<td align="right">0.252</td>
+</tr>
+<tr class="odd">
+<td align="left">Total volatile emissions (ng/mg/hr)</td>
+<td align="left">Leaves day</td>
+<td align="left">Species</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">3.040</td>
+<td align="right">0.091</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">17.189</td>
+<td align="right">4.018</td>
+<td align="right">21.520</td>
+<td align="right">3.699</td>
+<td align="right">0.252</td>
+</tr>
+<tr class="even">
+<td align="left">Corolla length (mm)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">121.882</td>
+<td align="right">4.525</td>
+<td align="right">0.035</td>
+<td align="right">126</td>
+<td align="right">323</td>
 <td align="right">25.560</td>
+<td align="right">0.313</td>
 <td align="right">26.451</td>
+<td align="right">0.279</td>
 <td align="right">0.035</td>
+</tr>
+<tr class="odd">
+<td align="left">Corolla length (mm)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Site</td>
+<td align="right">1</td>
+<td align="right">126.857</td>
+<td align="right">0.481</td>
+<td align="right">0.489</td>
+<td align="right">126</td>
+<td align="right">323</td>
+<td align="right">25.560</td>
+<td align="right">0.313</td>
+<td align="right">26.451</td>
+<td align="right">0.279</td>
 <td align="right">0.035</td>
 </tr>
 <tr class="even">
-<td align="left">ten</td>
-<td align="left">corolla_length</td>
-<td align="right">30.932</td>
-<td align="right">30.632</td>
-<td align="right">-0.010</td>
+<td align="left">Corolla length (mm)</td>
+<td align="left">I. tenuituba</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">29.000</td>
+<td align="right">0.160</td>
 <td align="right">0.692</td>
+<td align="right">31</td>
+<td align="right">62</td>
+<td align="right">30.932</td>
+<td align="right">0.601</td>
+<td align="right">30.632</td>
+<td align="right">0.446</td>
+<td align="right">-0.010</td>
 </tr>
 <tr class="odd">
-<td align="left">agg</td>
-<td align="left">corolla_width</td>
-<td align="right">3.355</td>
-<td align="right">3.314</td>
-<td align="right">-0.012</td>
+<td align="left">Corolla width (mm)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">113.757</td>
+<td align="right">0.529</td>
 <td align="right">0.469</td>
+<td align="right">120</td>
+<td align="right">213</td>
+<td align="right">3.355</td>
+<td align="right">0.042</td>
+<td align="right">3.314</td>
+<td align="right">0.039</td>
+<td align="right">-0.012</td>
 </tr>
 <tr class="even">
-<td align="left">ten</td>
-<td align="left">corolla_width</td>
-<td align="right">2.373</td>
-<td align="right">2.145</td>
-<td align="right">-0.096</td>
+<td align="left">Corolla width (mm)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Site</td>
+<td align="right">1</td>
+<td align="right">117.148</td>
+<td align="right">32.475</td>
+<td align="right">0.000</td>
+<td align="right">120</td>
+<td align="right">213</td>
+<td align="right">3.355</td>
+<td align="right">0.042</td>
+<td align="right">3.314</td>
+<td align="right">0.039</td>
+<td align="right">-0.012</td>
+</tr>
+<tr class="odd">
+<td align="left">Corolla width (mm)</td>
+<td align="left">I. tenuituba</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">29.000</td>
+<td align="right">4.258</td>
 <td align="right">0.048</td>
+<td align="right">31</td>
+<td align="right">62</td>
+<td align="right">2.373</td>
+<td align="right">0.089</td>
+<td align="right">2.145</td>
+<td align="right">0.066</td>
+<td align="right">-0.096</td>
 </tr>
-<tr class="odd">
-<td align="left">agg</td>
-<td align="left">nectar_volume</td>
-<td align="right">3.790</td>
-<td align="right">5.327</td>
-<td align="right">0.406</td>
+<tr class="even">
+<td align="left">Nectar production (µL/day)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">73.000</td>
+<td align="right">4.790</td>
 <td align="right">0.032</td>
-</tr>
-<tr class="even">
-<td align="left">agg</td>
-<td align="left">nectar_conc</td>
-<td align="right">25.405</td>
-<td align="right">25.694</td>
-<td align="right">0.011</td>
-<td align="right">0.817</td>
+<td align="right">51</td>
+<td align="right">75</td>
+<td align="right">3.790</td>
+<td align="right">0.464</td>
+<td align="right">5.327</td>
+<td align="right">0.537</td>
+<td align="right">0.406</td>
 </tr>
 <tr class="odd">
-<td align="left">agg</td>
-<td align="left">redness</td>
-<td align="right">0.312</td>
-<td align="right">0.298</td>
-<td align="right">-0.042</td>
-<td align="right">0.408</td>
+<td align="left">Nectar conc. (% by mass)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">66.000</td>
+<td align="right">0.054</td>
+<td align="right">0.817</td>
+<td align="right">49</td>
+<td align="right">68</td>
+<td align="right">25.405</td>
+<td align="right">0.851</td>
+<td align="right">25.694</td>
+<td align="right">0.925</td>
+<td align="right">0.011</td>
 </tr>
 <tr class="even">
-<td align="left">agg</td>
-<td align="left">height_cm</td>
-<td align="right">41.935</td>
-<td align="right">42.967</td>
-<td align="right">0.025</td>
+<td align="left">Redness index</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">64.000</td>
+<td align="right">0.694</td>
+<td align="right">0.408</td>
+<td align="right">46</td>
+<td align="right">66</td>
+<td align="right">0.312</td>
+<td align="right">0.012</td>
+<td align="right">0.298</td>
+<td align="right">0.010</td>
+<td align="right">-0.042</td>
+</tr>
+<tr class="odd">
+<td align="left">Inflorescence height (cm)</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.144</td>
 <td align="right">0.706</td>
+<td align="right">0</td>
+<td align="right">61</td>
+<td align="right">41.935</td>
+<td align="right">1.905</td>
+<td align="right">42.967</td>
+<td align="right">1.936</td>
+<td align="right">0.025</td>
+</tr>
+<tr class="even">
+<td align="left">Open flowers and elongated buds</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">75.670</td>
+<td align="right">1.229</td>
+<td align="right">0.271</td>
+<td align="right">61</td>
+<td align="right">256</td>
+<td align="right">6.154</td>
+<td align="right">0.874</td>
+<td align="right">7.549</td>
+<td align="right">0.906</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="odd">
+<td align="left">Open flowers and elongated buds</td>
+<td align="left">I. aggregata</td>
+<td align="left">Date</td>
+<td align="right">6</td>
+<td align="right">201.443</td>
+<td align="right">14.831</td>
+<td align="right">0.000</td>
+<td align="right">61</td>
+<td align="right">256</td>
+<td align="right">6.154</td>
+<td align="right">0.874</td>
+<td align="right">7.549</td>
+<td align="right">0.906</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="even">
+<td align="left">Open flowers and elongated buds</td>
+<td align="left">I. aggregata</td>
+<td align="left">Date × Trt</td>
+<td align="right">6</td>
+<td align="right">201.443</td>
+<td align="right">0.273</td>
+<td align="right">0.949</td>
+<td align="right">61</td>
+<td align="right">256</td>
+<td align="right">6.154</td>
+<td align="right">0.874</td>
+<td align="right">7.549</td>
+<td align="right">0.906</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="odd">
+<td align="left">Eggs per flower</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">1</td>
+<td align="right">87.420</td>
+<td align="right">5.331</td>
+<td align="right">0.023</td>
+<td align="right">60</td>
+<td align="right">195</td>
+<td align="right">0.110</td>
+<td align="right">0.024</td>
+<td align="right">0.035</td>
+<td align="right">0.022</td>
+<td align="right">-0.684</td>
+</tr>
+<tr class="even">
+<td align="left">Eggs per flower</td>
+<td align="left">I. aggregata</td>
+<td align="left">Date</td>
+<td align="right">6</td>
+<td align="right">146.268</td>
+<td align="right">13.685</td>
+<td align="right">0.000</td>
+<td align="right">60</td>
+<td align="right">195</td>
+<td align="right">0.110</td>
+<td align="right">0.024</td>
+<td align="right">0.035</td>
+<td align="right">0.022</td>
+<td align="right">-0.684</td>
+</tr>
+<tr class="odd">
+<td align="left">Eggs per flower</td>
+<td align="left">I. aggregata</td>
+<td align="left">Date × Trt</td>
+<td align="right">6</td>
+<td align="right">146.268</td>
+<td align="right">3.275</td>
+<td align="right">0.005</td>
+<td align="right">60</td>
+<td align="right">195</td>
+<td align="right">0.110</td>
+<td align="right">0.024</td>
+<td align="right">0.035</td>
+<td align="right">0.022</td>
+<td align="right">-0.684</td>
+</tr>
+<tr class="even">
+<td align="left">Seeds per fruit</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.479</td>
+<td align="right">0.492</td>
+<td align="right">0</td>
+<td align="right">51</td>
+<td align="right">5.960</td>
+<td align="right">0.578</td>
+<td align="right">6.521</td>
+<td align="right">0.567</td>
+<td align="right">0.094</td>
+</tr>
+<tr class="odd">
+<td align="left">Estimated total seeds</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.246</td>
+<td align="right">0.622</td>
+<td align="right">0</td>
+<td align="right">51</td>
+<td align="right">142.954</td>
+<td align="right">21.340</td>
+<td align="right">128.121</td>
+<td align="right">20.926</td>
+<td align="right">-0.104</td>
+</tr>
+<tr class="even">
+<td align="left">Nonaborted fruits</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.079</td>
+<td align="right">0.779</td>
+<td align="right">0</td>
+<td align="right">62</td>
+<td align="right">36.129</td>
+<td align="right">6.232</td>
+<td align="right">33.645</td>
+<td align="right">6.232</td>
+<td align="right">-0.069</td>
+</tr>
+<tr class="odd">
+<td align="left">Flower number</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.031</td>
+<td align="right">0.862</td>
+<td align="right">0</td>
+<td align="right">62</td>
+<td align="right">57.742</td>
+<td align="right">7.424</td>
+<td align="right">55.903</td>
+<td align="right">7.424</td>
+<td align="right">-0.032</td>
+</tr>
+<tr class="even">
+<td align="left">Prop. nonaborted fruits infested</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1.105</td>
+<td align="right">0.298</td>
+<td align="right">0</td>
+<td align="right">59</td>
+<td align="right">0.138</td>
+<td align="right">0.024</td>
+<td align="right">0.103</td>
+<td align="right">0.023</td>
+<td align="right">-0.255</td>
+</tr>
+<tr class="odd">
+<td align="left">Prop. fruits aborted</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.404</td>
+<td align="right">0.527</td>
+<td align="right">0</td>
+<td align="right">62</td>
+<td align="right">0.444</td>
+<td align="right">0.050</td>
+<td align="right">0.489</td>
+<td align="right">0.050</td>
+<td align="right">0.101</td>
+</tr>
+<tr class="even">
+<td align="left">Estimated seeds per flower</td>
+<td align="left">I. aggregata</td>
+<td align="left">Treatment</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.596</td>
+<td align="right">0.444</td>
+<td align="right">0</td>
+<td align="right">51</td>
+<td align="right">2.193</td>
+<td align="right">0.231</td>
+<td align="right">1.942</td>
+<td align="right">0.227</td>
+<td align="right">-0.114</td>
 </tr>
 </tbody>
 </table>

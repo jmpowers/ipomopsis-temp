@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: TRUE 
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{=html}
@@ -670,11 +670,14 @@ for(yr in levels(svf$YearFilament)) {
   #TODO these slopes are leading to most of the year effects. try using one year for now. 
   vol[thisyr,] <- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0("area_per_ng","2019")), FUN = '/')
 }
-svf$Total <- rowSums(vol)
+svf$TotalVols <- rowSums(vol)
 
 ipochemsl <- ipochems[match(colnames(vol.leaf), ipochems$shortname),]
 vol.leaf <- sweep(vol.leaf, 2, ipochemsl$area_per_ng2019, FUN = '/')
-svl$Total <- rowSums(vol.leaf)
+svl$TotalVols <- rowSums(vol.leaf)
+
+write_csv(bind_rows(floral=svf,
+                    leaf=svl %>% mutate(Year = factor(Year)), .id="type"), "data/volatiles/svf_svl.csv")
 ```
 
 ## Ambient heatmap and NMDS
@@ -954,7 +957,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
-lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lmer(sqrt(TotalVols) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ## CAP of *I. tenuituba*
@@ -1002,7 +1005,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() +
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
-lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lmer(sqrt(TotalVols) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ### Both years, night
@@ -1032,7 +1035,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
-lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lmer(sqrt(TotalVols) ~ Year + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ### 2021, night, VWC
@@ -1073,7 +1076,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   scale_color_manual("Treatment", values=tempcol)+ scale_shape_manual("Year, time", values=c(0,15,1,19))+
   coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"))
 
-lmer(sqrt(Total) ~ Year * DN + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lmer(sqrt(TotalVols) ~ Year * DN + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 
@@ -1102,7 +1105,7 @@ text(cap.otc.comb, display="cn")
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("red",0.7),alpha("red",0)))
 
-lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lmer(sqrt(TotalVols) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ## 2021 by week
@@ -1627,7 +1630,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="grey70"), axis.text = element_text(color="black"))
 
-lmer(sqrt(Total) ~ PlantType + temp + (1|PlantID), data = svf.otc) %>% anova %>% kable(caption="total emissions")
+lm(sqrt(TotalVols) ~ PlantType + temp, data = svf.otc) %>% anova %>% kable(caption="total emissions")
 ```
 
 ## CAP - Percivals
@@ -1648,13 +1651,13 @@ absamounts.leaf <- svl %>% select(expt, PlantType, DN) %>%
   group_by(PlantType, name) %>% 
   summarize(mean=mean(value), se=sd(value)/sqrt(n())) %>% arrange(PlantType, desc(mean))
 
-ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=PlantType))+ 
-  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
-  labs(x="Mean nanograms per g dry mass per hour",y="",color="Species")
+ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean/1000, color=PlantType))+ 
+  geom_pointrange(aes(xmin=mean/1000-se/1000, xmax=mean/1000+se/1000), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
+  labs(x="Mean ng / mg dry mass / hour",y="",color="Species")
 
 absamounts.leaf %>% mutate(across(all_of(c("mean", "se")), ~format(round(.x/1000, 2), nsmall = 2))) %>%
   mutate(meanse = paste(mean,"\U00B1", se), .keep="unused") %>% 
   pivot_wider(names_from=PlantType, values_from=meanse) %>% 
-  kable(caption="Leaf volatiles, mean \U00B1 se milligrams per g dry mass per hour", digits=2)
+  kable(caption="Leaf volatiles, mean \U00B1 se ng / mg dry mass / hour", digits=2)
 ```
 

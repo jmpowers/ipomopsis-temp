@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-06-29" />
+<meta name="date" content="2023-11-30" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-06-29</h4>
+<h4 class="date">2023-11-30</h4>
 
 </div>
 
@@ -2796,11 +2796,14 @@ for(yr in levels(svf$YearFilament)) {
   #TODO these slopes are leading to most of the year effects. try using one year for now. 
   vol[thisyr,] &lt;- sweep(vol[thisyr,], 2, pull(ipochemsf, paste0(&quot;area_per_ng&quot;,&quot;2019&quot;)), FUN = &#39;/&#39;)
 }
-svf$Total &lt;- rowSums(vol)
+svf$TotalVols &lt;- rowSums(vol)
 
 ipochemsl &lt;- ipochems[match(colnames(vol.leaf), ipochems$shortname),]
 vol.leaf &lt;- sweep(vol.leaf, 2, ipochemsl$area_per_ng2019, FUN = &#39;/&#39;)
-svl$Total &lt;- rowSums(vol.leaf)</code></pre>
+svl$TotalVols &lt;- rowSums(vol.leaf)
+
+write_csv(bind_rows(floral=svf,
+                    leaf=svl %&gt;% mutate(Year = factor(Year)), .id=&quot;type&quot;), &quot;data/volatiles/svf_svl.csv&quot;)</code></pre>
 </div>
 <div id="ambient-heatmap-and-nmds" class="section level2">
 <h2>Ambient heatmap and NMDS</h2>
@@ -3944,7 +3947,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill=&quot;grey70&quot;), axis.text = element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/otc_comb_temp-1.svg" width="624" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lmer(sqrt(TotalVols) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <thead>
@@ -4121,7 +4124,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() +
   theme(panel.grid = element_blank(), panel.background = element_rect(fill=&quot;grey70&quot;), axis.text = element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/otc_comb_temp_tenD-1.svg" width="768" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lmer(sqrt(TotalVols) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <thead>
@@ -4244,7 +4247,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill=&quot;grey70&quot;), axis.text = element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/otc_comb_temp_tenN-1.svg" width="624" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lmer(sqrt(TotalVols) ~ Year + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <thead>
@@ -4490,7 +4493,7 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   scale_color_manual(&quot;Treatment&quot;, values=tempcol)+ scale_shape_manual(&quot;Year, time&quot;, values=c(0,15,1,19))+
   coord_fixed() + theme_bw() + theme(panel.grid = element_blank(), panel.background = element_rect(fill=&quot;grey70&quot;))</code></pre>
 <p><img src="plots/otc_comb_ten-1.svg" width="768" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ Year * DN + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lmer(sqrt(TotalVols) ~ Year * DN + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <colgroup>
@@ -4611,7 +4614,7 @@ text(cap.otc.comb, display=&quot;cn&quot;)
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;red&quot;,0.7),alpha(&quot;red&quot;,0)))</code></pre>
 <p><img src="plots/otc_both_species-1.svg" width="768" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lmer(sqrt(TotalVols) ~ Year + Site + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <thead>
@@ -5970,16 +5973,15 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
   coord_fixed() + theme_bw() + 
   theme(panel.grid = element_blank(), panel.background = element_rect(fill=&quot;grey70&quot;), axis.text = element_text(color=&quot;black&quot;))</code></pre>
 <p><img src="plots/cap_leaf_otc-1.svg" width="624" /></p>
-<pre class="r"><code>lmer(sqrt(Total) ~ PlantType + temp + (1|PlantID), data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
+<pre class="r"><code>lm(sqrt(TotalVols) ~ PlantType + temp, data = svf.otc) %&gt;% anova %&gt;% kable(caption=&quot;total emissions&quot;)</code></pre>
 <table>
 <caption>total emissions</caption>
 <thead>
 <tr class="header">
 <th align="left"></th>
+<th align="right">Df</th>
 <th align="right">Sum Sq</th>
 <th align="right">Mean Sq</th>
-<th align="right">NumDF</th>
-<th align="right">DenDF</th>
 <th align="right">F value</th>
 <th align="right">Pr(&gt;F)</th>
 </tr>
@@ -5987,21 +5989,27 @@ ggplot(mapping=aes(x=CAP1, y=CAP2, label=Label)) +
 <tbody>
 <tr class="odd">
 <td align="left">PlantType</td>
-<td align="right">7305.962</td>
-<td align="right">7305.962</td>
 <td align="right">1</td>
-<td align="right">21.36177</td>
-<td align="right">2.395081</td>
-<td align="right">0.1364056</td>
+<td align="right">9850.849</td>
+<td align="right">9850.849</td>
+<td align="right">2.9179598</td>
+<td align="right">0.0972834</td>
 </tr>
 <tr class="even">
 <td align="left">temp</td>
-<td align="right">3051.723</td>
-<td align="right">3051.723</td>
 <td align="right">1</td>
-<td align="right">19.06651</td>
-<td align="right">1.000433</td>
-<td align="right">0.3297315</td>
+<td align="right">3218.065</td>
+<td align="right">3218.065</td>
+<td align="right">0.9532361</td>
+<td align="right">0.3362205</td>
+</tr>
+<tr class="odd">
+<td align="left">Residuals</td>
+<td align="right">32</td>
+<td align="right">108029.987</td>
+<td align="right">3375.937</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 </tr>
 </tbody>
 </table>
@@ -6032,17 +6040,16 @@ Residual  10  2.95071              </code></pre>
   group_by(PlantType, name) %&gt;% 
   summarize(mean=mean(value), se=sd(value)/sqrt(n())) %&gt;% arrange(PlantType, desc(mean))
 
-ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean, color=PlantType))+ 
-  geom_pointrange(aes(xmin=mean-se, xmax=mean+se), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
-  labs(x=&quot;Mean nanograms per g dry mass per hour&quot;,y=&quot;&quot;,color=&quot;Species&quot;)</code></pre>
+ggplot(absamounts.leaf, aes(y=fct_reorder(name, mean, base::mean), x=mean/1000, color=PlantType))+ 
+  geom_pointrange(aes(xmin=mean/1000-se/1000, xmax=mean/1000+se/1000), position=position_dodge2(width=0.4)) + scale_x_sqrt(expand=c(0,0))+ 
+  labs(x=&quot;Mean ng / mg dry mass / hour&quot;,y=&quot;&quot;,color=&quot;Species&quot;)</code></pre>
 <p><img src="plots/compleaf-1.svg" width="768" /></p>
 <pre class="r"><code>absamounts.leaf %&gt;% mutate(across(all_of(c(&quot;mean&quot;, &quot;se&quot;)), ~format(round(.x/1000, 2), nsmall = 2))) %&gt;%
   mutate(meanse = paste(mean,&quot;\U00B1&quot;, se), .keep=&quot;unused&quot;) %&gt;% 
   pivot_wider(names_from=PlantType, values_from=meanse) %&gt;% 
-  kable(caption=&quot;Leaf volatiles, mean \U00B1 se milligrams per g dry mass per hour&quot;, digits=2)</code></pre>
+  kable(caption=&quot;Leaf volatiles, mean \U00B1 se ng / mg dry mass / hour&quot;, digits=2)</code></pre>
 <table>
-<caption>Leaf volatiles, mean ± se milligrams per g dry mass per
-hour</caption>
+<caption>Leaf volatiles, mean ± se ng / mg dry mass / hour</caption>
 <thead>
 <tr class="header">
 <th align="left">name</th>
