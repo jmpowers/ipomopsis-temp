@@ -1141,6 +1141,10 @@ points(cap.otc.comb, display="sites", col=tempcol[svf.otc$temp], pch=as.integer(
 text(cap.otc.comb, display="cn")
 text(cap.otc.comb, display="species", cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)>0.25, alpha("purple",0.7),alpha("purple",0)))
+
+bind_cols(svf.otc, vol.otc) %>% group_by(Site, sampround) %>% summarize(`a-pinene`=mean(`a-pinene`)) %>%
+  pivot_wider(names_from=sampround, values_from=`a-pinene`) %>% mutate(ratio = `4wks`/`2wks`) %>% 
+  kable(caption="a-pinene emissions")
 ```
 
 ## Both species, VWC+temp, day

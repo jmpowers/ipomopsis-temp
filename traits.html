@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-12-01" />
+<meta name="date" content="2023-12-04" />
 
 <title>Floral traits - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-12-01</h4>
+<h4 class="date">2023-12-04</h4>
 
 </div>
 
@@ -498,7 +498,64 @@ timings_labels &lt;- c(meltdates=&quot;Snowmelt&quot;,      otc=&quot;Open top c
                    mt=&quot;Floral morphology&quot;,     nt=&quot;Nectar&quot;, 
                    sds=&quot;Seeds&quot;,                flrcol=&quot;Flower color&quot;)
 
-timings.otc &lt;- timings %&gt;% left_join(select(otc_duration, year, site, OTC_start)) %&gt;% 
+otc_duration %&gt;% select(year, site, OTC_start) %&gt;% mutate(julian = yday(OTC_start)) %&gt;% 
+  kable(caption=&quot;OTC deployment&quot;)</code></pre>
+<table>
+<caption>OTC deployment</caption>
+<thead>
+<tr class="header">
+<th align="right">year</th>
+<th align="left">site</th>
+<th align="left">OTC_start</th>
+<th align="right">julian</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="left">Maxfield</td>
+<td align="left">2021-06-25</td>
+<td align="right">176</td>
+</tr>
+<tr class="even">
+<td align="right">2021</td>
+<td align="left">SC</td>
+<td align="left">2021-06-29</td>
+<td align="right">180</td>
+</tr>
+<tr class="odd">
+<td align="right">2021</td>
+<td align="left">GNA</td>
+<td align="left">2021-07-01</td>
+<td align="right">182</td>
+</tr>
+<tr class="even">
+<td align="right">2019</td>
+<td align="left">SC</td>
+<td align="left">2019-07-10</td>
+<td align="right">191</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="left">GNA</td>
+<td align="left">2019-07-09</td>
+<td align="right">190</td>
+</tr>
+<tr class="even">
+<td align="right">2018</td>
+<td align="left">GNA</td>
+<td align="left">2018-07-05</td>
+<td align="right">186</td>
+</tr>
+<tr class="odd">
+<td align="right">2018</td>
+<td align="left">bb</td>
+<td align="left">2018-07-06</td>
+<td align="right">187</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>timings.otc &lt;- timings %&gt;% left_join(select(otc_duration, year, site, OTC_start)) %&gt;% 
   mutate(begin=begin-yday(OTC_start), end=end-yday(OTC_start))
 
 timings.otc %&gt;% mutate(range=paste(begin, end=end, sep=&quot; : &quot;), .keep=&quot;unused&quot;) %&gt;% select(-OTC_start) %&gt;% 

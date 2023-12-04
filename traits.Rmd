@@ -273,6 +273,9 @@ timings_labels <- c(meltdates="Snowmelt",      otc="Open top chambers", hobo="Lo
                    mt="Floral morphology",     nt="Nectar", 
                    sds="Seeds",                flrcol="Flower color")
 
+otc_duration %>% select(year, site, OTC_start) %>% mutate(julian = yday(OTC_start)) %>% 
+  kable(caption="OTC deployment")
+
 timings.otc <- timings %>% left_join(select(otc_duration, year, site, OTC_start)) %>% 
   mutate(begin=begin-yday(OTC_start), end=end-yday(OTC_start))
 

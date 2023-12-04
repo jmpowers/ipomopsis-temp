@@ -11,7 +11,7 @@
 
 <meta name="author" content="Carrie Wu, John Powers, David Hopp, Diane Campbell" />
 
-<meta name="date" content="2023-11-30" />
+<meta name="date" content="2023-12-04" />
 
 <title>Volatiles - Ipomopsis temperature experiments</title>
 
@@ -254,7 +254,7 @@ div.tocify {
 experiments</h1>
 <h4 class="author">Carrie Wu, John Powers, David Hopp, Diane
 Campbell</h4>
-<h4 class="date">2023-11-30</h4>
+<h4 class="date">2023-12-04</h4>
 
 </div>
 
@@ -4839,6 +4839,40 @@ text(cap.otc.comb, display=&quot;cn&quot;)
 text(cap.otc.comb, display=&quot;species&quot;, cex=0.7, srt=45,
                      col=ifelse(sqrt(cap.otc.comb$CCA$v[,1]^2 + cap.otc.comb$CCA$v[,2]^2)&gt;0.25, alpha(&quot;purple&quot;,0.7),alpha(&quot;purple&quot;,0)))</code></pre>
 <p><img src="plots/otc_week-1.svg" width="768" /></p>
+<pre class="r"><code>bind_cols(svf.otc, vol.otc) %&gt;% group_by(Site, sampround) %&gt;% summarize(`a-pinene`=mean(`a-pinene`)) %&gt;%
+  pivot_wider(names_from=sampround, values_from=`a-pinene`) %&gt;% mutate(ratio = `4wks`/`2wks`) %&gt;% 
+  kable(caption=&quot;a-pinene emissions&quot;)</code></pre>
+<table>
+<caption>a-pinene emissions</caption>
+<thead>
+<tr class="header">
+<th align="left">Site</th>
+<th align="right">2wks</th>
+<th align="right">4wks</th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GNA</td>
+<td align="right">82.81904</td>
+<td align="right">160.0686</td>
+<td align="right">1.932751</td>
+</tr>
+<tr class="even">
+<td align="left">Maxfield</td>
+<td align="right">29.15796</td>
+<td align="right">130.4171</td>
+<td align="right">4.472778</td>
+</tr>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">96.09855</td>
+<td align="right">128.6603</td>
+<td align="right">1.338837</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="both-species-vwctemp-day" class="section level2">
 <h2>Both species, VWC+temp, day</h2>
